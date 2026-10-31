@@ -67,6 +67,36 @@ function box(w, h, d, color, emissive = 0x000000, intensity = 0) {
   );
 }
 
+const LEVELS = [
+  {
+    name: 'Block Meadow', sky: 0x8ed8ff, groundTop: 0x8be36b, groundBody: 0x8a5a2b,
+    segments: [[0, 23], [27, 20], [51, 21], [76, 21], [101, 28], [134, 16]],
+    platforms: [[30, 3.6, 8], [52, 4.2, 7], [80, 3.6, 10], [106, 4.4, 8], [122, 3.6, 6]],
+    blocks: [[8, 4.6, 'coin'], [12, 4.6, 'coin'], [16, 4.6, 'coin'], [10, 7.4, 'brick'], [56, 8.2, 'coin'], [60, 8.2, 'coin'], [86, 7.4, 'coin'], [90, 7.4, 'coin'], [112, 8.6, 'brick']],
+    coins: [[6, 3.0], [8.2, 3.0], [10.4, 3.0], [31, 4.6], [33, 4.6], [35, 4.6], [37, 4.6], [53, 5.8], [55, 5.8], [57, 5.8], [81, 5.0], [83, 5.0], [85, 5.0], [87, 5.0], [89, 5.0], [107, 6.0], [109, 6.0], [111, 6.0], [124, 5.4], [126, 5.4], [128, 5.4], [136, 2.8], [138, 2.8], [140, 2.8]],
+    enemies: [[18, 14, 22, 1.2], [33, 28, 34, 5.0], [58, 53, 64, 1.2], [70, 68, 74, 1.2], [86, 80, 92, 5.0], [114, 106, 120, 5.9], [122, 116, 128, 1.2]],
+    checkpoint: 76, goal: 138,
+  },
+  {
+    name: 'Canyon Run', sky: 0xffc48a, groundTop: 0xe0a35f, groundBody: 0x8a5a2b,
+    segments: [[0, 18], [22, 16], [42, 18], [64, 14], [82, 20], [106, 16], [126, 26]],
+    platforms: [[24, 3.6, 8], [46, 4.2, 7], [70, 3.8, 8], [92, 4.4, 8], [112, 3.8, 7], [130, 4.2, 8]],
+    blocks: [[6, 4.6, 'coin'], [10, 4.6, 'coin'], [48, 8.2, 'coin'], [52, 8.2, 'coin'], [88, 7.6, 'coin'], [92, 7.6, 'coin'], [118, 8.6, 'brick']],
+    coins: [[4, 3.0], [6.4, 3.0], [8.8, 3.0], [25, 4.6], [27, 4.6], [29, 4.6], [47, 5.8], [49, 5.8], [71, 5.4], [73, 5.4], [75, 5.4], [93, 6.0], [95, 6.0], [97, 6.0], [113, 5.4], [115, 5.4], [131, 5.8], [133, 5.8], [135, 5.8]],
+    enemies: [[14, 8, 18, 1.2], [30, 24, 40, 5.0], [52, 46, 60, 1.2], [76, 70, 80, 5.4], [98, 92, 104, 6.0], [116, 112, 126, 5.4], [134, 128, 140, 1.2]],
+    checkpoint: 86, goal: 144,
+  },
+  {
+    name: 'Sky Steps', sky: 0xa8e6ff, groundTop: 0x9be15d, groundBody: 0x6b4a2a,
+    segments: [[0, 16], [20, 12], [36, 14], [54, 16], [74, 12], [90, 18], [112, 14], [130, 28]],
+    platforms: [[18, 3.6, 6], [34, 3.8, 8], [50, 4.2, 7], [68, 3.8, 8], [86, 4.4, 8], [104, 3.8, 7], [120, 4.2, 8]],
+    blocks: [[4, 4.6, 'coin'], [8, 4.6, 'coin'], [38, 7.8, 'coin'], [42, 7.8, 'coin'], [72, 7.8, 'coin'], [76, 7.8, 'coin'], [108, 7.8, 'coin'], [112, 7.8, 'coin']],
+    coins: [[3, 3.0], [5.4, 3.0], [19, 4.6], [21, 4.6], [35, 4.8], [37, 4.8], [51, 5.2], [53, 5.2], [69, 4.8], [71, 4.8], [87, 5.4], [89, 5.4], [105, 4.8], [107, 4.8], [121, 5.2], [123, 5.2], [132, 2.8], [134, 2.8], [136, 2.8]],
+    enemies: [[12, 8, 16, 1.2], [22, 20, 28, 1.2], [48, 36, 50, 5.2], [66, 54, 70, 1.2], [82, 74, 84, 1.2], [94, 90, 104, 5.4], [116, 112, 128, 5.2], [138, 130, 148, 1.2]],
+    checkpoint: 96, goal: 152,
+  },
+];
+
 export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
   // ------------------------------------------------------------- scene -------
   const scene = new THREE.Scene();
@@ -101,9 +131,11 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
   const coins = [];
   const enemies = [];
   const bumpBlocks = [];
+  const levelProps = [];
   let checkpoint = { x: START_X + 40, y: START_Y };
   let goal = { x: 138, y: 6 };
   let levelEnd = 148;
+  let levelIndex = 0;
 
   function addSolid(x, y, w, h, color = COLORS.groundTop) {
     const mesh = box(w, h, 2.4, color);
@@ -154,7 +186,11 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     return enemy;
   }
 
-  function buildLevel() {
+  function buildLevel(index = levelIndex) {
+    levelIndex = clamp(index, 0, LEVELS.length - 1);
+    const cfg = LEVELS[levelIndex];
+    scene.background.set(cfg.sky);
+    scene.fog.color.set(cfg.sky);
     for (const solid of solids) { scene.remove(solid.mesh); solid.mesh.geometry.dispose(); solid.mesh.material.dispose(); if (solid.top) { scene.remove(solid.top); solid.top.geometry.dispose(); solid.top.material.dispose(); } }
     solids.length = 0;
     for (const block of bumpBlocks) { scene.remove(block.mesh); block.mesh.geometry.dispose(); block.mesh.material.dispose(); if (block.label) { scene.remove(block.label); block.label.material.map?.dispose(); block.label.material.dispose(); } }
@@ -163,52 +199,30 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     coins.length = 0;
     for (const enemy of enemies) { scene.remove(enemy.group); enemy.group.traverse((object) => { if (object.geometry) object.geometry.dispose(); if (object.material) object.material.dispose(); }); }
     enemies.length = 0;
+    for (const prop of levelProps) { scene.remove(prop); prop.traverse?.((object) => { if (object.geometry) object.geometry.dispose(); if (object.material) object.material.dispose(); }); }
+    levelProps.length = 0;
 
-    // Ground segments with pits.
-    const segments = [[0, 23], [27, 20], [51, 21], [76, 21], [101, 28], [134, 16]];
-    for (const [start, width] of segments) {
-      addSolid(start, 0, width, 1.6);
-      addSolid(start, -1.6, width, 1.6, COLORS.groundBody);
+    for (const [startX, width] of cfg.segments) {
+      addSolid(startX, 0, width, 1.6, cfg.groundTop);
+      addSolid(startX, -1.6, width, 1.6, cfg.groundBody);
     }
-    // Floating platforms.
-    addSolid(30, 3.6, 8, 0.8, COLORS.groundTop);
-    addSolid(52, 4.2, 7, 0.8, COLORS.groundTop);
-    addSolid(80, 3.6, 10, 0.8, COLORS.groundTop);
-    addSolid(106, 4.4, 8, 0.8, COLORS.groundTop);
-    addSolid(122, 3.6, 6, 0.8, COLORS.groundTop);
-    // Question / brick blocks.
-    for (const x of [8, 12, 16]) addBumpBlock(x, 4.6, 'coin');
-    addBumpBlock(10, 7.4, 'brick');
-    for (const x of [56, 60]) addBumpBlock(x, 8.2, 'coin');
-    for (const x of [86, 90]) addBumpBlock(x, 7.4, 'coin');
-    addBumpBlock(112, 8.6, 'brick');
-    // Coins.
-    for (let i = 0; i < 3; i++) addCoin(6 + i * 2.2, 3.0);
-    for (let i = 0; i < 4; i++) addCoin(31 + i * 2, 4.6);
-    for (let i = 0; i < 3; i++) addCoin(53 + i * 2, 5.8);
-    for (let i = 0; i < 5; i++) addCoin(81 + i * 2, 5.0);
-    for (let i = 0; i < 3; i++) addCoin(107 + i * 2, 6.0);
-    for (let i = 0; i < 3; i++) addCoin(124 + i * 2, 5.4);
-    for (let i = 0; i < 3; i++) addCoin(136 + i * 2, 2.8);
-    // Enemies.
-    addEnemy(18, 14, 22);
-    addEnemy(33, 28, 34, 5.0);
-    addEnemy(58, 53, 64);
-    addEnemy(70, 68, 74);
-    addEnemy(86, 80, 92, 5.0);
-    addEnemy(114, 106, 120, 5.9);
-    addEnemy(122, 116, 128);
+    for (const [x, y, width] of cfg.platforms) addSolid(x, y, width, 0.8, cfg.groundTop);
+    for (const [x, y, kind] of cfg.blocks) addBumpBlock(x, y, kind);
+    for (const [x, y] of cfg.coins) addCoin(x, y);
+    for (const [x, minX, maxX, y] of cfg.enemies) addEnemy(x, minX, maxX, y);
 
-    // Checkpoint (small flag).
+    // Mid-level checkpoint flag.
     const cpPole = box(0.18, 4.2, 0.18, 0xf4f7fb);
-    cpPole.position.set(76, 2.1, 0.2);
+    cpPole.position.set(cfg.checkpoint, 2.1, 0.2);
     scene.add(cpPole);
     const cpFlag = box(1.2, 0.8, 0.12, 0x7be3cb);
-    cpFlag.position.set(76.7, 3.8, 0.2);
+    cpFlag.position.set(cfg.checkpoint + 0.7, 3.8, 0.2);
     scene.add(cpFlag);
-    checkpoint = { x: 76, y: 2.6 };
+    levelProps.push(cpPole, cpFlag);
+    checkpoint = { x: cfg.checkpoint, y: 2.8 };
 
     // Goal flag.
+    goal = { x: cfg.goal, y: 6 };
     const pole = box(0.25, 8.5, 0.25, 0xf4f7fb);
     pole.position.set(goal.x, 4.25, 0);
     scene.add(pole);
@@ -218,7 +232,9 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     const star = makeLabel('GOAL', { accent: '#ffc93c', scale: 3, height: 0.8 });
     star.position.set(goal.x, 9.6, 0);
     scene.add(star);
-    levelEnd = 150;
+    levelProps.push(pole, flag, star);
+    levelEnd = cfg.goal + 12;
+    if (element.level) element.level.textContent = `Level ${levelIndex + 1}/${LEVELS.length} · ${cfg.name}`;
   }
 
   // ------------------------------------------------------------- player ------
@@ -257,6 +273,7 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     coins: document.querySelector('#bros-coins'),
     best: document.querySelector('#bros-best'),
     objective: document.querySelector('#bros-objective'),
+    level: document.querySelector('#bros-level'),
     toast: document.querySelector('#bros-toast'),
     pause: document.querySelector('#bros-pause'),
     finish: document.querySelector('#bros-finish'),
@@ -283,7 +300,7 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
 
   function objectiveText() {
     if (finished) return won ? 'Flag raised — you win!' : 'Out of lives!';
-    if (player.x < checkpoint.x) return 'Run right · collect coins · stomp the blobs';
+    if (player.x < checkpoint.x) return `Level ${levelIndex + 1} · run right · collect coins · stomp the blobs`;
     return 'Reach the flag at the end of the level';
   }
 
@@ -325,9 +342,9 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function finishOverlay() {
-    const result = onFinish?.({ time: elapsed, coins: player.coins, won }) || { isBest: false, best: best };
+    const result = onFinish?.(levelIndex + 1, { time: elapsed, coins: player.coins, won }) || { isBest: false, best: best };
     best = result.best || best;
-    if (element.finishTitle) element.finishTitle.textContent = won ? 'Flag Raised!' : 'Game Over';
+    if (element.finishTitle) element.finishTitle.textContent = won ? `Level ${levelIndex + 1} Cleared!` : 'Game Over';
     if (element.finishTime) element.finishTime.textContent = formatTime(elapsed);
     if (element.finishCoins) element.finishCoins.textContent = `${player.coins} coins · ${player.lives} ${player.lives === 1 ? 'life' : 'lives'} left`;
     if (element.finishBest) element.finishBest.textContent = result.isBest ? 'New best time!' : `Best ${formatTime(best.bestTime)}`;
@@ -363,7 +380,7 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     player.lives = 3;
     player.coins = 0;
     player.invulnerable = 0;
-    best = getBest?.() || {};
+    best = getBest?.(levelIndex + 1) || {};
     cameraX = START_X;
     setOverlay(element.pause, false);
     setOverlay(element.finish, false);
@@ -371,10 +388,10 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     snapCamera();
   }
 
-  function resetRun() {
+  function resetRun(level = levelIndex + 1) {
+    levelIndex = clamp(level - 1, 0, LEVELS.length - 1);
     resetLevel();
-    buildLevel();
-    checkpoint = { x: 76, y: 2.6 };
+    buildLevel(levelIndex);
     player.x = START_X;
     player.y = START_Y;
     updateHud();
@@ -428,6 +445,7 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
       const action = button.dataset.brosPanel;
       if (action === 'resume') resume();
       else if (action === 'restart') restart();
+      else if (action === 'next') nextLevel();
       else if (action === 'menu') leave();
     });
   }
@@ -444,9 +462,15 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     setOverlay(element.pause, false);
   }
   function restart() {
-    resetLevel();
+    resetRun(levelIndex + 1);
     setOverlay(element.finish, false);
     showToast('New run');
+  }
+
+  function nextLevel() {
+    resetRun(levelIndex + 2);
+    setOverlay(element.finish, false);
+    showToast(`Level ${levelIndex + 1} · ${LEVELS[levelIndex].name}`);
   }
   function leave() {
     active = false;
@@ -596,9 +620,9 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   // ------------------------------------------------------------- api --------
-  function start() {
+  function start(level = 1) {
     active = true;
-    resetRun();
+    resetRun(level);
     updateHud();
     snapCamera();
   }
@@ -620,7 +644,7 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     get state() {
       return {
         x: player.x, y: player.y, vx: player.vx, vy: player.vy,
-        lives: player.lives, coins: player.coins, elapsed, running, finished, won, paused,
+        level: levelIndex + 1, lives: player.lives, coins: player.coins, elapsed, running, finished, won, paused,
       };
     },
   };

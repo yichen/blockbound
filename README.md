@@ -9,21 +9,21 @@ menu:
 - **Parkour Obby** — an endless Roblox-style obstacle course: three to five checkpoints
   per level, moving platforms, lava, timer, per-level best times, rotating visual
   themes and simulated online players who actually run, fall and respawn.
-- **12 Dozen** — a 3D math platformer: you start as the number 12, step on `+ − × ÷`
-  pads to make exactly **24**, **72** and **144** (a dozen dozens). The number you
-  carry also unlocks **math powers**: multiples of 3 can climb, 4 can push, 5 can swim,
-  9 jump tall, and negative numbers flip gravity upside down. Timed runs, best time
-  saved.
-- **Jelly Run 2048** — a 3D merge-runner in the spirit of Jelly Run 2048: auto-run the
-  jelly lane, switch tracks, merge matching number cubes to double `2 → 4 → 8 … → 2048`,
-  dodge the pink blockers, and split in half if you hit the wrong number. 3 hearts,
-  score and best jelly saved.
-- **Kart Rush** — an original 3D kart-racing tribute to Mario Kart: three laps around a
-  beach circuit with boost pads, item-box turbo charges and three AI rivals. Best lap
-  and best race saved.
+- **12 Dozen** — a 3D math platformer with **three levels**, each with different gate
+  targets and pad values (24/72/144, then 48/150/144, then 36/90/144). Step on
+  `+ − × ÷` pads and use **math powers**: multiples of 3 climb, 4 push, 5 swim,
+  9 jump tall, negatives flip gravity upside down. Best time saved per level.
+- **Jelly Run 2048** — a 3D merge-runner in the spirit of Jelly Run 2048 with **four
+  themed levels** (goals 32 → 128 → 512 → 2048): auto-run the jelly lane, switch tracks,
+  merge matching number cubes to double, dodge the pink blockers, and split in half if
+  you hit the wrong number. 3 hearts; best jelly saved per level.
+- **Kart Rush** — an original 3D kart-racing tribute to Mario Kart with **three
+  circuits** and a full race loop: 3-2-1 countdown, three laps, boost pads, item-box
+  turbo charges, and three AI rivals that follow the racing line with rubber-banding.
+  Best lap/race saved per circuit; finish one race to unlock the next circuit button.
 - **Super Block Bros.** — an original side-scrolling platformer tribute to Super Mario
-  Bros.: run, jump, bonk coin blocks, stomp angry blobs, hit the checkpoint and raise
-  the flag with 3 lives. Best flag time saved.
+  Bros. with **three hand-built levels**: run, jump, bonk coin blocks, stomp angry blobs,
+  hit the checkpoint and raise the flag with 3 lives. Best flag time saved per level.
 
 These are original tributes: no Nintendo characters, sprites, music or other assets
 are used.

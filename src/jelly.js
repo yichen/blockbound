@@ -9,7 +9,12 @@ const LANES = [-2.3, 0, 2.3];
 const PLAYER_Z = 2.4;
 const SPAWN_Z = -66;
 const START_NUMBER = 2;
-const WIN_NUMBER = 2048;
+const LEVELS = [
+  { name: 'Strawberry Shores', goal: 32, sky: 0x9fe3ff, track: 0x8fe3f5, rail: 0x7be3cb, match: 0x63e6d5, decoy: 0xb58cff, barrier: 0xff7aa8, speed: 7.4, spawn: 1.15 },
+  { name: 'Lime Lagoon', goal: 128, sky: 0xbfe98f, track: 0x9be15d, rail: 0x63e6d5, match: 0x9be15d, decoy: 0xff9ff3, barrier: 0xff7a5c, speed: 8.4, spawn: 1.0 },
+  { name: 'Blueberry Bay', goal: 512, sky: 0x9fb9ff, track: 0x74a7ff, rail: 0xb58cff, match: 0x74b9ff, decoy: 0xffd166, barrier: 0xff5c8a, speed: 9.6, spawn: 0.88 },
+  { name: 'Candy Cosmos', goal: 2048, sky: 0xffc6e2, track: 0xff9ecb, rail: 0xb58cff, match: 0xff9ecb, decoy: 0x63e6d5, barrier: 0xff4d6d, speed: 10.8, spawn: 0.76 },
+];
 const BASE_SPEED = 8.2;
 const MAX_SPEED = 17;
 const JUMP_SPEED = 8.6;
@@ -202,7 +207,9 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
   let toastTimer = 0;
   let hitFlash = 0;
   let shake = 0;
-  let best = getBest?.() || {};
+  let best = getBest?.(0) || {};
+  let levelIndex = 0;
+  let goal = LEVELS[0].goal;
 
   const element = {
     screen: document.querySelector('#jelly-screen'),
@@ -213,6 +220,7 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
     next: document.querySelector('#jelly-next'),
     hearts: document.querySelector('#jelly-hearts'),
     objective: document.querySelector('#jelly-objective'),
+    level: document.querySelector('#jelly-level'),
     toast: document.querySelector('#jelly-toast'),
     pause: document.querySelector('#jelly-pause'),
     finish: document.querySelector('#jelly-finish'),
@@ -244,9 +252,9 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
     if (element.score) element.score.textContent = `${formatNumber(score)} pts`;
     if (element.best) element.best.textContent = `Best ${best.bestNumber ? formatNumber(best.bestNumber) : '–'}`;
     if (element.number) element.number.textContent = formatNumber(player.number);
-    if (element.next) element.next.textContent = player.number >= WIN_NUMBER ? 'MAX JELLY!' : `next ×2 = ${formatNumber(player.number * 2)}`;
+    if (element.next) element.next.textContent = player.number >= goal ? 'LEVEL CLEAR!' : `next ×2 = ${formatNumber(player.number * 2)}`;
     if (element.hearts) element.hearts.innerHTML = Array.from({ length: MAX_HEARTS }, (_, index) => `<span class="${index < player.hearts ? 'on' : ''}">♥</span>`).join('');
-    if (element.objective) element.objective.textContent = player.number >= WIN_NUMBER ? '2048! Keep going!' : `Merge jelly cubes to double — reach 2,048`;
+    if (element.objective) element.objective.textContent = player.number >= goal ? 'Level clear!' : `Level ${levelIndex + 1}/${LEVELS.length} · merge to ${formatNumber(goal)}`;
     if (element.pauseScore) element.pauseScore.textContent = `${formatNumber(player.number)} jelly · ${formatNumber(score)} pts`;
   }
 
@@ -345,7 +353,22 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
     return { type: 'barrier' };
   }
 
-  function resetRun() {
+  function applyLevelTheme(level) {
+    scene.background.set(level.sky);
+    fog.color.set(level.sky);
+    trackMaterial.color.set(level.track);
+    trackMaterial.emissive.set(level.track);
+    for (const rail of rails) {
+      rail.material.color.set(level.rail);
+      rail.material.emissive.set(level.rail);
+    }
+    if (element.level) element.level.textContent = `Level ${levelIndex + 1}/${LEVELS.length} · ${level.name}`;
+  }
+
+  function resetRun(level = levelIndex) {
+    levelIndex = clamp(level - 1, 0, LEVELS.length - 1);
+    goal = LEVELS[levelIndex].goal;
+    applyLevelTheme(LEVELS[levelIndex]);
     for (const entity of entities) { scene.remove(entity.group); disposeEntity(entity); }
     entities.length = 0;
     for (const effect of effects) { scene.remove(effect.mesh); effect.mesh.geometry.dispose(); effect.mesh.material.dispose(); }
@@ -364,9 +387,9 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
     player.hearts = MAX_HEARTS;
     player.invulnerable = 0;
     score = 0;
-    speed = BASE_SPEED;
-    spawnTimer = 0.6;
-    best = getBest?.() || {};
+    speed = LEVELS[levelIndex].speed;
+    spawnTimer = LEVELS[levelIndex].spawn;
+    best = getBest?.(levelIndex + 1) || {};
     setNumber(START_NUMBER);
     setOverlay(element.pause, false);
     setOverlay(element.finish, false);
@@ -441,7 +464,7 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
       spawnMergeEffect(entity.group.position.x, 0.9, PLAYER_Z, COLORS.match);
       removeEntity(entity);
       setNumber(next, `${player.number} + ${player.number} = ${next}`);
-      if (next >= WIN_NUMBER && !finished) win();
+      if (next >= goal && !finished) win();
       return;
     }
     // Wrong number: split in half.
@@ -473,9 +496,9 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function finishOverlay(title, message) {
-    const result = onFinish?.({ score, number: player.number, elapsed, won }) || { isBest: false, best: best };
+    const result = onFinish?.(levelIndex + 1, { score, number: player.number, elapsed, won }) || { isBest: false, best: best };
     best = result.best || best;
-    if (element.finishTitle) element.finishTitle.textContent = title;
+    if (element.finishTitle) element.finishTitle.textContent = won ? `Level ${levelIndex + 1} Cleared!` : title;
     if (element.finishTime) element.finishTime.textContent = formatTime(elapsed);
     if (element.finishScore) element.finishScore.textContent = `${formatNumber(player.number)} jelly · ${formatNumber(score)} pts`;
     if (element.finishBest) element.finishBest.textContent = result.isBest ? `${message} New best!` : message;
@@ -514,9 +537,15 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function restart() {
-    resetRun();
+    resetRun(levelIndex + 1);
     running = false;
     showToast('New run');
+  }
+
+  function nextLevel() {
+    resetRun(levelIndex + 2);
+    running = false;
+    showToast(`Level ${levelIndex + 1} · ${LEVELS[levelIndex].name}`);
   }
 
   function leave() {
@@ -582,6 +611,7 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
       const action = button.dataset.jellyPanel;
       if (action === 'resume') resume();
       else if (action === 'restart') restart();
+      else if (action === 'next') nextLevel();
       else if (action === 'menu') leave();
     });
   }
@@ -590,13 +620,13 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
   function update(dt) {
     if (!active || paused || finished) return;
     if (running) elapsed += dt;
-    speed = Math.min(MAX_SPEED, BASE_SPEED + elapsed * 0.18);
+    speed = Math.min(MAX_SPEED, LEVELS[levelIndex].speed + elapsed * 0.2);
     if (running) spawnTimer -= dt;
     if (spawnTimer <= 0) {
       const spawn = chooseSpawn();
       spawnEntity(spawn.type, spawn.number, Math.floor(Math.random() * LANES.length));
-      spawnTimer = Math.max(0.5, 1.05 - elapsed * 0.012) + Math.random() * 0.35;
-      if (Math.random() < 0.28 && player.number < WIN_NUMBER) spawnEntity('match', player.number, Math.floor(Math.random() * LANES.length));
+      spawnTimer = Math.max(0.5, LEVELS[levelIndex].spawn - elapsed * 0.012) + Math.random() * 0.35;
+      if (Math.random() < 0.28 && player.number < goal) spawnEntity('match', player.number, Math.floor(Math.random() * LANES.length));
     }
 
     for (const entity of entities) {
@@ -646,8 +676,8 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   // ------------------------------------------------------------- API --------
-  function start() {
-    resetRun();
+  function start(level = 1) {
+    resetRun(level);
     running = false;
     updateHud();
   }
@@ -669,7 +699,7 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
     get state() {
       return {
         number: player.number, score, hearts: player.hearts, lane: player.lane,
-        elapsed, running, finished, won, paused,
+        level: levelIndex + 1, goal, elapsed, running, finished, won, paused,
         entities: entities.length, speed,
       };
     },

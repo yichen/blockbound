@@ -49,6 +49,24 @@ const POWER_DEFS = [
   { id: 'flip', label: 'Upside down', rule: 'negative numbers', short: '< 0', test: (value) => value < 0 },
 ];
 
+const LEVELS = [
+  {
+    name: 'Sunny Stones', sky: 0x9fdcff,
+    gates: [24, 72, 144],
+    pads: { a1: ['+', 12], a2: ['×', 2], a3: ['+', 6], b1: ['+', 1], b2: ['×', 3], b3: ['−', 3], c1: null, c3: ['×', 2] },
+  },
+  {
+    name: 'Canyon Numbers', sky: 0xffc48a,
+    gates: [48, 150, 144],
+    pads: { a1: ['+', 12], a2: ['+', 24], a3: ['+', 6], b1: ['+', 2], b2: ['×', 3], b3: ['−', 3], c1: ['−', 6], c3: ['×', 2] },
+  },
+  {
+    name: 'Sky Sums', sky: 0xa8e6ff,
+    gates: [36, 90, 144],
+    pads: { a1: ['+', 12], a2: ['+', 12], a3: ['×', 2], b1: ['+', 4], b2: ['+', 50], b3: ['−', 3], c1: null, c3: ['+', 54] },
+  },
+];
+
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 function formatTime(seconds) {
@@ -294,7 +312,11 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     }
   }
 
-  function buildLevel() {
+  function buildLevel(index = levelIndex) {
+    levelIndex = clamp(index, 0, LEVELS.length - 1);
+    const cfg = LEVELS[levelIndex];
+    scene.background.set(cfg.sky);
+    fog.color.set(cfg.sky);
     disposeGroup(levelGroup);
     platforms.length = 0;
     pads.length = 0;
@@ -306,41 +328,48 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     gateCheckpoints.length = 0;
     finishPoint = null;
 
-    // Start plaza — 12 already carries climb (÷3) and push (÷4).
+    const addConfigPad = (key, position) => {
+      const spec = cfg.pads[key];
+      if (spec) addPad({ ...position, op: spec[0], amount: spec[1] });
+    };
+
     addPlatform({ x: 0, z: 0, top: 0, w: 14, d: 14, h: 1.4, color: COLORS.white });
     addDozenDecor();
 
-    // ---- Section A: climb (÷3), push (÷4), gate 24. ----
+    // Section A: climb / push.
     addPlatform({ x: 0, z: -9, top: 0.4, w: 5.8, d: 4.8, color: COLORS.teal });
-    addPad({ x: 0, z: -9, top: 0.4, op: '+', amount: 12 });
+    addConfigPad('a1', { x: 0, z: -9, top: 0.4 });
     addPlatform({ x: 2.4, z: -14.5, top: 0.9, w: 5.2, d: 4.6, color: COLORS.lime });
+    addConfigPad('a2', { x: 2.4, z: -14.5, top: 0.9 });
     addClimbWall({ x: 2.4, z: -19.0, top: 4.3 });
     addPlatform({ x: 2.4, z: -21.5, top: 4.3, w: 5.4, d: 3.4, color: COLORS.teal });
     addPlatform({ x: 2.4, z: -24.2, top: 4.3, w: 3.0, d: 2.6, color: COLORS.yellow });
     addCrate({ x: 2.4, z: -24.2, top: 4.3 });
+    addConfigPad('a3', { x: 2.4, z: -24.2, top: 4.3 });
     const gate1Top = 4.3;
     addPlatform({ x: 0, z: -28.4, top: gate1Top, w: 12, d: 5.2, color: COLORS.blue });
-    const gate1 = addGate({ x: 0, z: -31.0, top: gate1Top, required: 24 });
-    gateCheckpoints.push({ gate: gate1, position: new THREE.Vector3(0, 4.5 + 0.06, -33.6), value: 24 });
+    const gate1 = addGate({ x: 0, z: -31.0, top: gate1Top, required: cfg.gates[0] });
+    gateCheckpoints.push({ gate: gate1, position: new THREE.Vector3(0, 4.5 + 0.06, -33.6), value: cfg.gates[0] });
     addPlatform({ x: 0, z: -33.6, top: 4.5, w: 7.4, d: 4.8, color: COLORS.teal });
 
-    // ---- Section B: swim (÷5), gate 72. ----
+    // Section B: swim.
     addPlatform({ x: 0, z: -37.8, top: 3.6, w: 5.4, d: 4.6, color: COLORS.lime });
     addPlatform({ x: 0, z: -41.6, top: 2.6, w: 5.2, d: 4.4, color: COLORS.yellow });
-    addPad({ x: 0, z: -41.6, top: 2.6, op: '+', amount: 1 });
+    addConfigPad('b1', { x: 0, z: -41.6, top: 2.6 });
     addWater({ x: 0, z: -46.6, w: 14, d: 6.6, surface: 2.2, bottom: -0.4 });
     addPlatform({ x: 0, z: -52.4, top: 1.9, w: 7, d: 4.8, color: COLORS.teal });
-    addPad({ x: 0, z: -52.4, top: 1.9, op: '×', amount: 3 });
+    addConfigPad('b2', { x: 0, z: -52.4, top: 1.9 });
     addPlatform({ x: 0, z: -56.4, top: 2.1, w: 5.2, d: 4.4, color: COLORS.lime });
-    addPad({ x: 0, z: -56.4, top: 2.1, op: '−', amount: 3 });
+    addConfigPad('b3', { x: 0, z: -56.4, top: 2.1 });
     const gate2Top = 2.3;
     addPlatform({ x: 0, z: -60.6, top: gate2Top, w: 12, d: 5.2, color: COLORS.blue });
-    const gate2 = addGate({ x: 0, z: -63.2, top: gate2Top, required: 72 });
-    gateCheckpoints.push({ gate: gate2, position: new THREE.Vector3(0, 2.5 + 0.06, -65.6), value: 72 });
+    const gate2 = addGate({ x: 0, z: -63.2, top: gate2Top, required: cfg.gates[1] });
+    gateCheckpoints.push({ gate: gate2, position: new THREE.Vector3(0, 2.5 + 0.06, -65.6), value: cfg.gates[1] });
     addPlatform({ x: 0, z: -65.6, top: 2.5, w: 7.4, d: 4.8, color: COLORS.teal });
 
-    // ---- Section C: tall jump (÷9), upside down (negative), gate 144. ----
+    // Section C: tall jump / upside down.
     addPlatform({ x: 0, z: -69.8, top: 2.7, w: 5.4, d: 4.6, color: COLORS.lime });
+    addConfigPad('c1', { x: 0, z: -69.8, top: 2.7 });
     addSign('TALL JUMP ×9', { x: 5.4, y: 4.6, z: -71.4, accent: '#ffc93c', scale: 4.0, height: 1 });
     addPlatform({ x: 0, z: -74.8, top: 5.9, w: 7.2, d: 4.8, color: COLORS.gold });
     addPad({ x: 0, z: -76.4, top: 5.9, op: '×', amount: -1 });
@@ -348,10 +377,10 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     const ceiling = addPlatform({ x: 0, z: -79.0, top: 9.2, w: 8, d: 6.0, h: 1.2, color: COLORS.purple });
     addPad({ x: 0, z: -80.9, top: ceiling.minY, op: '×', amount: -1, underside: true });
     addPlatform({ x: 0, z: -83.6, top: 1.2, w: 9, d: 6.0, color: COLORS.teal });
-    addPad({ x: 0, z: -84.2, top: 1.2, op: '×', amount: 2 });
+    addConfigPad('c3', { x: 0, z: -84.2, top: 1.2 });
     const finishTop = 1.6;
     addPlatform({ x: 0, z: -89.6, top: finishTop, w: 16, d: 10, color: COLORS.gold });
-    const finishGate = addGate({ x: 0, z: -94.6, top: finishTop, required: 144, finish: true });
+    const finishGate = addGate({ x: 0, z: -94.6, top: finishTop, required: cfg.gates[2], finish: true });
     finishGate.finish = true;
     finishPoint = { x: 0, y: finishTop + 0.1, z: -94.6 };
     addSign('144 = 12 DOZEN', { x: 0, y: finishTop + 6.4, z: -101, accent: '#ffc93c', scale: 7.0, height: 1.7 });
@@ -360,6 +389,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     levelGroup.add(pad);
 
     checkpoint = { position: START_POSITION.clone(), value: START_VALUE };
+    if (element.level) element.level.textContent = `Level ${levelIndex + 1}/${LEVELS.length} · ${cfg.name}`;
   }
 
   // ------------------------------------------------------------- player ------
@@ -405,6 +435,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   let paused = false;
   let active = false;
   let gateIndex = 0;
+  let levelIndex = 0;
   let cameraTarget = new THREE.Vector3();
   let toastTimer = 0;
   let respawnTimer = 0;
@@ -420,9 +451,11 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     equation: document.querySelector('#dozen-equation'),
     powers: document.querySelector('#dozen-powers'),
     objective: document.querySelector('#dozen-objective'),
+    level: document.querySelector('#dozen-level'),
     toast: document.querySelector('#dozen-toast'),
     pause: document.querySelector('#dozen-pause'),
     finish: document.querySelector('#dozen-finish'),
+    finishTitle: document.querySelector('#dozen-finish-title'),
     finishTime: document.querySelector('#dozen-finish-time'),
     finishBest: document.querySelector('#dozen-finish-best'),
     finishValue: document.querySelector('#dozen-finish-value'),
@@ -480,7 +513,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
       element.objective.textContent = finished
         ? 'Twelve dozen!'
         : gate
-          ? `Make ${gate.required} — you have ${value}`
+          ? `Level ${levelIndex + 1}: make ${gate.required} — you have ${value}`
           : 'Reach the finish';
     }
     if (element.pauseValue) element.pauseValue.textContent = `Your number: ${value} · ${equation}`;
@@ -599,8 +632,9 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     running = false;
     paused = false;
     setOverlay(element.pause, false);
-    const result = onFinish?.(elapsed) || { isBest: false, best: elapsed };
+    const result = onFinish?.(levelIndex + 1, elapsed) || { isBest: false, best: elapsed };
     bestTime = result.best;
+    if (element.finishTitle) element.finishTitle.textContent = `Level ${levelIndex + 1} Complete!`;
     if (element.finishTime) element.finishTime.textContent = formatTime(elapsed);
     if (element.finishBest) element.finishBest.textContent = result.isBest ? 'New best time!' : `Best ${formatTime(result.best)}`;
     if (element.finishValue) element.finishValue.textContent = '144 = 12 × 12';
@@ -608,19 +642,20 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     updateHud();
   }
 
-  function resetRun() {
+  function resetRun(level = levelIndex + 1) {
     mapView = false;
     scene.fog = fog;
     if (element.mapToggle) { element.mapToggle.textContent = '2D'; element.mapToggle.setAttribute('aria-pressed', 'false'); }
     if (element.mapCaption) element.mapCaption.hidden = true;
     element.screen?.classList.remove('dozen-map-open');
+    levelIndex = clamp(level - 1, 0, LEVELS.length - 1);
     elapsed = 0;
     running = false;
     finished = false;
     paused = false;
     gateIndex = 0;
     checkpoint = { position: START_POSITION.clone(), value: START_VALUE };
-    buildLevel();
+    buildLevel(levelIndex);
     resetPads();
     resetCrates();
     for (const gate of gates) {
@@ -639,7 +674,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     setValue(START_VALUE, 'Start · 12');
     setOverlay(element.pause, false);
     setOverlay(element.finish, false);
-    bestTime = getBest?.() ?? null;
+    bestTime = getBest?.(levelIndex + 1) ?? null;
     updateHud();
     snapCamera();
   }
@@ -767,9 +802,17 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function restart() {
-    resetRun();
+    resetRun(levelIndex + 1);
     running = false;
     showToast('Run reset');
+  }
+
+  function nextLevel() {
+    if (!active) return;
+    resetRun(levelIndex + 2);
+    setOverlay(element.pause, false);
+    setOverlay(element.finish, false);
+    showToast(`Level ${levelIndex + 1} · ${LEVELS[levelIndex].name}`);
   }
 
   function leave() {
@@ -809,6 +852,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
       const action = button.dataset.dozenAction;
       if (action === 'resume') resume();
       else if (action === 'restart') restart();
+      else if (action === 'next') nextLevel();
       else if (action === 'menu') leave();
     });
   }
@@ -1138,9 +1182,9 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   // ------------------------------------------------------------- API ---------
-  function start() {
+  function start(level = 1) {
     active = true;
-    resetRun();
+    resetRun(level);
     updateHud();
   }
 
@@ -1190,7 +1234,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     get finished() { return finished; },
     get state() {
       return {
-        value, equation, activePowers, gravity: gravityDirection(),
+        level: levelIndex + 1, value, equation, activePowers, gravity: gravityDirection(),
         gateIndex, elapsed, running, finished, paused,
         gates: gates.map((gate) => ({ required: gate.required, open: gate.open, x: gate.x, z: gate.z })),
         position: player.position.toArray(),

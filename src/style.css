@@ -1661,6 +1661,37 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
 .kart-touch .kart-boost { width: 120px; background: rgba(255, 183, 3, .26); border-color: rgba(255, 183, 3, .6); color: #ffe9b3; }
 .bros-touch .bros-jump { width: 120px; background: rgba(123, 227, 203, .24); border-color: rgba(123, 227, 203, .6); }
 
+.kart-item-slot {
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 999px;
+  background: rgba(8, 18, 26, .62);
+  color: #ffe27a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.kart-countdown {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  color: #ffe27a;
+  font: 800 clamp(72px, 16vw, 150px)/1 "Trebuchet MS", "Arial Black", sans-serif;
+  text-shadow: 0 8px 0 rgba(4, 14, 18, .5), 0 0 40px rgba(255, 226, 122, .5);
+  pointer-events: none;
+}
+
+.kart-finish-track {
+  color: #ffe27a;
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+
 .kart-pause-line, .kart-finish-lap, .bros-pause-line, .bros-finish-coins {
   color: #ffe27a;
   font-size: 14px;

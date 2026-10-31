@@ -17,8 +17,8 @@
     <meta name="twitter:description" content="Six browser games: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush and Super Block Bros." />
     <meta name="twitter:image" content="/blockbound/og.jpg" />
     <title>Blockbound — Game Launcher</title>
-    <script type="module" crossorigin src="/blockbound/assets/index-mGy6Dt0k.js"></script>
-    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-Dnwyi6Wf.css">
+    <script type="module" crossorigin src="/blockbound/assets/index-Ca01U5zG.js"></script>
+    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-FphZAScM.css">
   </head>
   <body>
     <canvas id="world" aria-label="A blocky landscape"></canvas>
@@ -85,7 +85,7 @@
                   <h2 id="parkour-card-title">Parkour Obby</h2>
                   <span class="game-status server-badge">Roblox Server</span>
                 </div>
-                <p class="game-description">A Roblox-style obby: hop moving platforms, dodge the lava and beat the course timer with your best run.</p>
+                <p class="game-description">An endless Roblox-style obby: hop moving platforms, dodge the lava and beat the course timer with your best run.</p>
                 <ul class="game-meta">
                   <li id="parkour-server">Server · Obby #1</li>
                   <li id="parkour-best">No best time yet</li>
@@ -119,7 +119,7 @@
                 </div>
                 <p class="game-description">A 3D math platformer: make 24, 72 and 144 with + − × ÷ pads. Your number unlocks math powers — multiples of 3 climb, 4 push, 5 swim, 9 jump tall, and negative numbers flip gravity upside down.</p>
                 <ul class="game-meta">
-                  <li>Target · 144</li>
+                  <li>3 levels · target 144</li>
                   <li id="dozen-best">No best time yet</li>
                   <li>3 gates · timed</li>
                 </ul>
@@ -151,7 +151,7 @@
                 </div>
                 <p class="game-description">Auto-run the jelly lane, switch tracks and merge matching number cubes to double your jelly — 2 → 4 → 8 → 2048. Dodge the pink blockers; hit the wrong number and you split in half.</p>
                 <ul class="game-meta">
-                  <li>Target · 2,048</li>
+                  <li>4 levels · goals</li>
                   <li id="jelly-best">No best jelly yet</li>
                   <li>3 hearts · timed</li>
                 </ul>
@@ -176,9 +176,9 @@
                   <h2 id="kart-card-title">Kart Rush</h2>
                   <span class="game-status kart-badge">Racing · 3 Laps</span>
                 </div>
-                <p class="game-description">A Mario Kart–style 3D racer: three laps around a beach circuit with boost pads, spinning item boxes and three AI rivals. Drive clean, hit the boosts, set the best lap.</p>
+                <p class="game-description">A Mario Kart–style 3D racer: three circuits, three laps each, countdown starts, boost pads, spinning item boxes and three AI rivals that actually follow the racing line. Set the best lap, then hit the next circuit.</p>
                 <ul class="game-meta">
-                  <li>Circuit · 3 laps</li>
+                  <li>3 circuits · 3 laps</li>
                   <li id="kart-best-card">No best lap yet</li>
                   <li>4 racers</li>
                 </ul>
@@ -205,9 +205,9 @@
                   <h2 id="bros-card-title">Super Block Bros.</h2>
                   <span class="game-status bros-badge">Platformer</span>
                 </div>
-                <p class="game-description">A Super Mario Bros.–style side-scroller: sprint and jump across blocks, bonk coin blocks, stomp angry blobs and race to the flag before you run out of lives.</p>
+                <p class="game-description">A Super Mario Bros.–style side-scroller across three levels: sprint and jump across blocks, bonk coin blocks, stomp angry blobs and race to the flag before you run out of lives.</p>
                 <ul class="game-meta">
-                  <li>Level · 1-1</li>
+                  <li>3 levels · flag run</li>
                   <li id="bros-best-card">No best time yet</li>
                   <li>3 lives</li>
                 </ul>
@@ -233,7 +233,7 @@
         </div>
 
         <footer class="launcher-footer">
-          <span>Blockbound Launcher 0.5.0 <span class="muted">· Web Edition</span></span>
+          <span>Blockbound Launcher 0.6.0 <span class="muted">· Web Edition</span></span>
           <span class="muted">Not an official Minecraft or Roblox product. Fan-built voxel demo.</span>
         </footer>
       </section>
@@ -461,7 +461,7 @@
           <header class="parkour-topbar">
             <div class="parkour-brand">
               <span id="dozen-title" class="parkour-logo">12 Dozen</span>
-              <span class="parkour-server">Math platformer · Dozen dozens</span>
+              <span id="dozen-level" class="parkour-server">Level 1/3 · Sunny Stones</span>
             </div>
             <div class="parkour-timer" id="dozen-timer" aria-label="Run time">00:00.0</div>
             <div class="parkour-stats">
@@ -508,12 +508,13 @@
 
         <div id="dozen-finish" class="parkour-overlay" hidden>
           <div class="parkour-panel parkour-finish-panel">
-            <h2>TWELVE DOZEN!</h2>
+            <h2 id="dozen-finish-title">TWELVE DOZEN!</h2>
             <p class="parkour-finish-time" id="dozen-finish-time">00:00.0</p>
             <p class="parkour-finish-best" id="dozen-finish-best">New best time!</p>
             <p class="dozen-finish-value" id="dozen-finish-value">144 = 12 × 12</p>
             <div class="parkour-panel-actions">
-              <button class="mc-button wide" data-dozen-action="restart" type="button">Run it again ▶</button>
+              <button class="mc-button wide" data-dozen-action="next" type="button">Next level ▶</button>
+              <button class="mc-button wide" data-dozen-action="restart" type="button">Replay level</button>
               <button class="mc-button wide" data-dozen-action="menu" type="button">Back to launcher</button>
             </div>
           </div>
@@ -525,7 +526,7 @@
           <header class="parkour-topbar">
             <div class="parkour-brand">
               <span id="jelly-title" class="parkour-logo">Jelly Run 2048</span>
-              <span class="parkour-server">Merge runner · reach 2,048</span>
+              <span id="jelly-level" class="parkour-server">Level 1/4 · Strawberry Shores</span>
             </div>
             <div class="parkour-timer" id="jelly-timer" aria-label="Run time">00:00.0</div>
             <div class="parkour-stats">
@@ -571,7 +572,8 @@
             <p class="jelly-finish-score" id="jelly-finish-score">2 jelly · 0 pts</p>
             <p class="parkour-finish-best" id="jelly-finish-best">New best!</p>
             <div class="parkour-panel-actions">
-              <button class="mc-button wide" data-jelly-panel="restart" type="button">Run again ▶</button>
+              <button class="mc-button wide" data-jelly-panel="next" type="button">Next level ▶</button>
+              <button class="mc-button wide" data-jelly-panel="restart" type="button">Replay level</button>
               <button class="mc-button wide" data-jelly-panel="menu" type="button">Back to launcher</button>
             </div>
           </div>
@@ -583,7 +585,7 @@
           <header class="parkour-topbar">
             <div class="parkour-brand">
               <span id="kart-title" class="parkour-logo">Kart Rush</span>
-              <span class="parkour-server">Grand Prix · 3 laps</span>
+              <span id="kart-track" class="parkour-server">Beach Circuit · sunny coast</span>
             </div>
             <div class="parkour-timer" id="kart-timer" aria-label="Race time">00:00.0</div>
             <div class="parkour-stats">
@@ -594,6 +596,8 @@
             </div>
           </header>
           <p class="parkour-objective" id="kart-objective">Three laps — hit the boost pads</p>
+          <div class="kart-item-slot" id="kart-item">ITEM: empty</div>
+          <div id="kart-countdown" class="kart-countdown">3</div>
           <p class="parkour-controls">W/S accelerate · A/D steer · SPACE boost item · R restart · ESC pause</p>
           <div class="parkour-toast" id="kart-toast" role="status" aria-live="polite"></div>
         </div>
@@ -622,10 +626,12 @@
           <div class="parkour-panel parkour-finish-panel">
             <h2 id="kart-finish-title">Race Complete!</h2>
             <p class="parkour-finish-time" id="kart-finish-time">00:00.0</p>
+            <p class="kart-finish-track" id="kart-finish-track">Beach Circuit · 1st place</p>
             <p class="kart-finish-lap" id="kart-finish-lap">Best lap 00:00.0</p>
             <p class="parkour-finish-best" id="kart-finish-best">New best race time!</p>
             <div class="parkour-panel-actions">
-              <button class="mc-button wide" data-kart-panel="restart" type="button">Race again ▶</button>
+              <button class="mc-button wide" data-kart-panel="next" type="button">Next circuit ▶</button>
+              <button class="mc-button wide" data-kart-panel="restart" type="button">Race again</button>
               <button class="mc-button wide" data-kart-panel="menu" type="button">Back to launcher</button>
             </div>
           </div>
@@ -637,7 +643,7 @@
           <header class="parkour-topbar">
             <div class="parkour-brand">
               <span id="bros-title" class="parkour-logo">Super Block Bros.</span>
-              <span class="parkour-server">World 1-1 · Flag run</span>
+              <span id="bros-level" class="parkour-server">Level 1/3 · Block Meadow</span>
             </div>
             <div class="parkour-timer" id="bros-timer" aria-label="Run time">00:00.0</div>
             <div class="parkour-stats">
@@ -678,7 +684,8 @@
             <p class="bros-finish-coins" id="bros-finish-coins">0 coins · 3 lives left</p>
             <p class="parkour-finish-best" id="bros-finish-best">New best time!</p>
             <div class="parkour-panel-actions">
-              <button class="mc-button wide" data-bros-panel="restart" type="button">Run it again ▶</button>
+              <button class="mc-button wide" data-bros-panel="next" type="button">Next level ▶</button>
+              <button class="mc-button wide" data-bros-panel="restart" type="button">Replay level</button>
               <button class="mc-button wide" data-bros-panel="menu" type="button">Back to launcher</button>
             </div>
           </div>

@@ -1762,7 +1762,7 @@ const GAMES = {
   },
   dozen: {
     name: '12 Dozen',
-    version: 'Math Platformer · 144',
+    version: 'Math Platformer · 3 Levels',
     linkLabel: '/?play=dozen',
     movement: true,
     controls: [
@@ -1775,7 +1775,7 @@ const GAMES = {
   },
   jelly: {
     name: 'Jelly Run 2048',
-    version: 'Merge Runner · 2048',
+    version: 'Merge Runner · 4 Levels',
     linkLabel: '/?play=jelly',
     movement: true,
     controls: [
@@ -1787,7 +1787,7 @@ const GAMES = {
   },
   kart: {
     name: 'Kart Rush',
-    version: 'Racing · 3 Laps',
+    version: 'Racing · 3 Circuits',
     linkLabel: '/?play=kart',
     movement: true,
     controls: [
@@ -1800,7 +1800,7 @@ const GAMES = {
   },
   bros: {
     name: 'Super Block Bros.',
-    version: 'Platformer · Flag Run',
+    version: 'Platformer · 3 Levels',
     linkLabel: '/?play=bros',
     movement: true,
     controls: [
@@ -1860,66 +1860,97 @@ function parkourOnline() {
 }
 
 function dozenRecord() {
-  return readStore(STORAGE.dozen, {}) || {};
+  const record = readStore(STORAGE.dozen, {}) || {};
+  if (!record.levels || typeof record.levels !== 'object') record.levels = {};
+  return record;
 }
 
-function dozenBest() {
-  const record = dozenRecord();
-  return typeof record.best === 'number' ? record.best : null;
+function dozenLevelBest(level) {
+  return dozenRecord().levels?.[level] ?? null;
 }
 
-function saveDozenFinish(seconds) {
+function saveDozenFinish(level, seconds) {
   const record = dozenRecord();
-  const isBest = typeof record.best !== 'number' || seconds < record.best;
-  const best = isBest ? seconds : record.best;
-  writeStore(STORAGE.dozen, { best, runs: (record.runs || 0) + 1 });
+  const previous = record.levels[level];
+  const isBest = previous == null || seconds < previous;
+  record.levels[level] = isBest ? seconds : previous;
+  record.lastLevel = level;
+  record.runs = (record.runs || 0) + 1;
+  writeStore(STORAGE.dozen, record);
   renderLauncher();
-  return { isBest, best };
+  return { isBest, best: record.levels[level] };
 }
 
 function jellyRecord() {
-  return readStore(STORAGE.jelly, {}) || {};
+  const record = readStore(STORAGE.jelly, {}) || {};
+  if (!record.levels || typeof record.levels !== 'object') record.levels = {};
+  return record;
 }
 
-function saveJellyFinish(result) {
+function jellyLevelBest(level) {
+  return jellyRecord().levels?.[level] ?? {};
+}
+
+function saveJellyFinish(level, result) {
   const record = jellyRecord();
-  const bestScore = Math.max(record.bestScore || 0, result.score || 0);
-  const bestNumber = Math.max(record.bestNumber || 0, result.number || 0);
-  const bestTime = record.bestTime ?? (result.elapsed || 0);
-  const isBest = bestScore > (record.bestScore || 0) || bestNumber > (record.bestNumber || 0);
-  const next = { bestScore, bestNumber, bestTime, runs: (record.runs || 0) + 1 };
-  writeStore(STORAGE.jelly, next);
+  const previous = record.levels[level] || {};
+  const bestNumber = Math.max(previous.bestNumber || 0, result.number || 0);
+  const bestScore = Math.max(previous.bestScore || 0, result.score || 0);
+  const bestTime = previous.bestTime == null ? result.elapsed : Math.min(previous.bestTime, result.elapsed);
+  const isBest = bestNumber > (previous.bestNumber || 0) || bestScore > (previous.bestScore || 0);
+  record.levels[level] = { bestNumber, bestScore, bestTime };
+  record.lastLevel = level;
+  record.runs = (record.runs || 0) + 1;
+  writeStore(STORAGE.jelly, record);
   renderLauncher();
-  return { isBest, best: next };
+  return { isBest, best: record.levels[level] };
 }
 
 function kartRecord() {
-  return readStore(STORAGE.kart, {}) || {};
+  const record = readStore(STORAGE.kart, {}) || {};
+  if (!record.tracks || typeof record.tracks !== 'object') record.tracks = {};
+  return record;
 }
 
-function saveKartFinish(result) {
+function kartTrackBest(trackIndex) {
+  return kartRecord().tracks?.[trackIndex] ?? {};
+}
+
+function saveKartFinish(trackIndex, result) {
   const record = kartRecord();
-  const bestRace = record.bestRace == null ? result.raceTime : Math.min(record.bestRace, result.raceTime);
-  const bestLap = record.bestLap == null ? result.bestLap : Math.min(record.bestLap, result.bestLap || Infinity);
-  const isBest = record.bestRace == null || result.raceTime < record.bestRace;
-  const next = { bestRace, bestLap, runs: (record.runs || 0) + 1 };
-  writeStore(STORAGE.kart, next);
+  const previous = record.tracks[trackIndex] || {};
+  const bestRace = previous.bestRace == null ? result.raceTime : Math.min(previous.bestRace, result.raceTime);
+  const bestLap = previous.bestLap == null ? result.bestLap : Math.min(previous.bestLap, result.bestLap || Infinity);
+  const isBest = previous.bestRace == null || result.raceTime < previous.bestRace;
+  record.tracks[trackIndex] = { bestRace, bestLap };
+  record.lastTrack = trackIndex;
+  record.runs = (record.runs || 0) + 1;
+  writeStore(STORAGE.kart, record);
   renderLauncher();
-  return { isBest, best: next };
+  return { isBest, best: record.tracks[trackIndex] };
 }
 
 function brosRecord() {
-  return readStore(STORAGE.bros, {}) || {};
+  const record = readStore(STORAGE.bros, {}) || {};
+  if (!record.levels || typeof record.levels !== 'object') record.levels = {};
+  return record;
 }
 
-function saveBrosFinish(result) {
+function brosLevelBest(level) {
+  return brosRecord().levels?.[level] ?? {};
+}
+
+function saveBrosFinish(level, result) {
   const record = brosRecord();
-  const isBest = result.won && (record.bestTime == null || result.time < record.bestTime);
-  const bestTime = isBest ? result.time : record.bestTime ?? null;
-  const next = { bestTime, runs: (record.runs || 0) + 1 };
-  writeStore(STORAGE.bros, next);
+  const previous = record.levels[level] || {};
+  const isBest = result.won && (previous.bestTime == null || result.time < previous.bestTime);
+  const bestTime = isBest ? result.time : previous.bestTime ?? null;
+  record.levels[level] = { bestTime, coins: Math.max(previous.coins || 0, result.coins || 0) };
+  record.lastLevel = level;
+  record.runs = (record.runs || 0) + 1;
+  writeStore(STORAGE.bros, record);
   renderLauncher();
-  return { isBest, best: next };
+  return { isBest, best: record.levels[level] };
 }
 
 let settings = { ...defaultSettings, ...readStore(STORAGE.settings, {}) };
@@ -2105,7 +2136,9 @@ function renderLauncher() {
   }
 
   // --- 12 Dozen math platformer card --------------------------------------
-  const dozenTime = dozenBest();
+  const dozenRecordData = dozenRecord();
+  const dozenLevel = Math.min((dozenRecordData.lastLevel ?? 0) + 1, 3);
+  const dozenTime = dozenRecordData.levels?.[dozenLevel] ?? null;
   const dozenLink = document.querySelector('#dozen-launch-link');
   if (dozenLink) {
     const href = `?${LAUNCH_PARAM}=dozen`;
@@ -2114,13 +2147,11 @@ function renderLauncher() {
     dozenLink.title = `Direct launch link for ${GAMES.dozen.name}`;
   }
   const dozenBestNode = document.querySelector('#dozen-best');
-  if (dozenBestNode) dozenBestNode.textContent = dozenTime != null ? `Best ${formatParkourTime(dozenTime)}` : 'No best time yet';
+  if (dozenBestNode) dozenBestNode.textContent = dozenTime != null ? `Level ${dozenLevel}/3 · best ${formatParkourTime(dozenTime)}` : `Level ${dozenLevel}/3 · no best yet`;
   const dozenHint = document.querySelector('#dozen-hint');
   if (dozenHint) {
-    const runs = dozenRecord().runs || 0;
-    dozenHint.innerHTML = dozenTime != null
-      ? `Target <strong>144</strong> · best ${formatParkourTime(dozenTime)}${runs ? ` · ${runs} run${runs === 1 ? '' : 's'}` : ''}`
-      : 'Start at 12 · build up to 144';
+    const runs = dozenRecordData.runs || 0;
+    dozenHint.innerHTML = `3 math levels · next up <strong>Level ${dozenLevel}</strong>${runs ? ` · ${runs} run${runs === 1 ? '' : 's'}` : ''}`;
   }
 
   // --- Jelly Run 2048 card ------------------------------------------------
@@ -2134,13 +2165,15 @@ function renderLauncher() {
   }
   const jellyBestNode = document.querySelector('#jelly-best');
   if (jellyBestNode) {
-    jellyBestNode.textContent = jelly.bestNumber ? `Best jelly ${jelly.bestNumber.toLocaleString('en-US')}${jelly.bestScore ? ` · ${jelly.bestScore.toLocaleString('en-US')} pts` : ''}` : 'No best jelly yet';
+    const levels = Object.keys(jelly.levels || {}).length;
+    const latest = jelly.levels?.[jelly.lastLevel ?? 0];
+    jellyBestNode.textContent = latest?.bestNumber ? `${levels}/4 levels · best ${latest.bestNumber.toLocaleString('en-US')}` : 'No best jelly yet';
   }
   const jellyHint = document.querySelector('#jelly-hint');
   if (jellyHint) {
-    jellyHint.innerHTML = jelly.bestNumber
-      ? `Best <strong>${jelly.bestNumber.toLocaleString('en-US')}</strong> · ${jelly.runs ? `${jelly.runs} run${jelly.runs === 1 ? '' : 's'}` : 'merge runner'}`
-      : 'Merge · dodge · double up';
+    jellyHint.innerHTML = jelly.runs
+      ? `4 levels · ${jelly.runs} run${jelly.runs === 1 ? '' : 's'} · merge to the goal`
+      : '4 levels · merge · dodge · split';
   }
 
   // --- Kart Rush card -----------------------------------------------------
@@ -2153,12 +2186,18 @@ function renderLauncher() {
     kartLink.title = `Direct launch link for ${GAMES.kart.name}`;
   }
   const kartBestCard = document.querySelector('#kart-best-card');
-  if (kartBestCard) kartBestCard.textContent = kart.bestLap != null ? `Best lap ${formatParkourTime(kart.bestLap)}` : 'No best lap yet';
+  if (kartBestCard) {
+    const tracks = kart.tracks ? Object.keys(kart.tracks).length : 0;
+    const latest = kart.tracks?.[kart.lastTrack ?? 0];
+    kartBestCard.textContent = latest?.bestLap != null
+      ? `${tracks}/3 circuits · best lap ${formatParkourTime(latest.bestLap)}`
+      : 'No best lap yet';
+  }
   const kartHint = document.querySelector('#kart-hint');
   if (kartHint) {
-    kartHint.innerHTML = kart.bestRace != null
-      ? `Best race <strong>${formatParkourTime(kart.bestRace)}</strong>${kart.runs ? ` · ${kart.runs} run${kart.runs === 1 ? '' : 's'}` : ''}`
-      : 'Boost pads · item boxes · rivals';
+    kartHint.innerHTML = kart.runs
+      ? `3 circuits · ${kart.runs} race${kart.runs === 1 ? '' : 's'} · item boxes`
+      : '3 circuits · items · better AI';
   }
 
   // --- Super Block Bros. card --------------------------------------------
@@ -2171,12 +2210,14 @@ function renderLauncher() {
     brosLink.title = `Direct launch link for ${GAMES.bros.name}`;
   }
   const brosBestCard = document.querySelector('#bros-best-card');
-  if (brosBestCard) brosBestCard.textContent = bros.bestTime != null ? `Best ${formatParkourTime(bros.bestTime)}` : 'No best time yet';
+  if (brosBestCard) {
+    const levels = Object.keys(bros.levels || {}).length;
+    const latest = bros.levels?.[bros.lastLevel ?? 0];
+    brosBestCard.textContent = latest?.bestTime != null ? `${levels}/3 levels · best ${formatParkourTime(latest.bestTime)}` : 'No best time yet';
+  }
   const brosHint = document.querySelector('#bros-hint');
   if (brosHint) {
-    brosHint.innerHTML = bros.bestTime != null
-      ? `Flag time <strong>${formatParkourTime(bros.bestTime)}</strong>${bros.runs ? ` · ${bros.runs} run${bros.runs === 1 ? '' : 's'}` : ''}`
-      : 'Run · jump · stomp · flag';
+    brosHint.innerHTML = bros.runs ? `3 levels · ${bros.runs} run${bros.runs === 1 ? '' : 's'} · flag time` : '3 levels · run · jump · flag';
   }
 
   renderGameControlsRows();
@@ -2285,8 +2326,8 @@ function launchDozen() {
   dozen ??= createDozen({
     canvas,
     renderer,
-    getBest: () => dozenBest(),
-    onFinish: (seconds) => saveDozenFinish(seconds),
+    getBest: (level) => dozenLevelBest(level),
+    onFinish: (level, seconds) => saveDozenFinish(level, seconds),
     onExit: () => {
       showScreen('launcher');
       syncLaunchUrl(null);
@@ -2296,7 +2337,8 @@ function launchDozen() {
   closeLan();
   showScreen('dozen', { focus: false });
   syncLaunchUrl('dozen');
-  dozen.start();
+  const dozenLast = dozenRecord().lastLevel;
+  dozen.start(dozenLast == null ? 1 : Math.min(dozenLast + 1, 3));
 }
 
 let jelly = null;
@@ -2304,8 +2346,8 @@ function launchJelly() {
   jelly ??= createJelly({
     canvas,
     renderer,
-    getBest: () => jellyRecord(),
-    onFinish: (result) => saveJellyFinish(result),
+    getBest: (level) => jellyLevelBest(level),
+    onFinish: (level, result) => saveJellyFinish(level, result),
     onExit: () => {
       showScreen('launcher');
       syncLaunchUrl(null);
@@ -2315,7 +2357,8 @@ function launchJelly() {
   closeLan();
   showScreen('jelly', { focus: false });
   syncLaunchUrl('jelly');
-  jelly.start();
+  const jellyLast = jellyRecord().lastLevel;
+  jelly.start(jellyLast == null ? 1 : Math.min(jellyLast + 1, 4));
 }
 
 let kart = null;
@@ -2323,8 +2366,8 @@ function launchKart() {
   kart ??= createKart({
     canvas,
     renderer,
-    getBest: () => kartRecord(),
-    onFinish: (result) => saveKartFinish(result),
+    getBest: (trackIndex) => kartTrackBest(trackIndex),
+    onFinish: (trackIndex, result) => saveKartFinish(trackIndex, result),
     onExit: () => {
       showScreen('launcher');
       syncLaunchUrl(null);
@@ -2334,7 +2377,9 @@ function launchKart() {
   closeLan();
   showScreen('kart', { focus: false });
   syncLaunchUrl('kart');
-  kart.start();
+  const record = kartRecord();
+  const nextTrack = Math.min((record.lastTrack ?? -1) + 1, (kart.trackCount || 3) - 1) + 1;
+  kart.start(record.lastTrack == null ? 1 : nextTrack);
 }
 
 let bros = null;
@@ -2342,8 +2387,8 @@ function launchBros() {
   bros ??= createBros({
     canvas,
     renderer,
-    getBest: () => brosRecord(),
-    onFinish: (result) => saveBrosFinish(result),
+    getBest: (level) => brosLevelBest(level),
+    onFinish: (level, result) => saveBrosFinish(level, result),
     onExit: () => {
       showScreen('launcher');
       syncLaunchUrl(null);
@@ -2353,7 +2398,8 @@ function launchBros() {
   closeLan();
   showScreen('bros', { focus: false });
   syncLaunchUrl('bros');
-  bros.start();
+  const brosLast = brosRecord().lastLevel;
+  bros.start(brosLast == null ? 1 : Math.min(brosLast + 1, 3));
 }
 
 function launchGame(game = 'minecraft') {
