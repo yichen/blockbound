@@ -1,0 +1,19 @@
+{
+  "name": "blockbound",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "build:pages": "vite build --base=/blockbound/ --outDir docs --emptyOutDir && touch docs/.nojekyll"
+  },
+  "dependencies": {
+    "three": "^0.178.0"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  },
+  "description": "Browser game launcher (Minecraft-style voxel world + endless Roblox-style parkour obby) built with Vite and three.js."
+}

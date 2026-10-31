@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141f26" />
+    <meta name="description" content="Blockbound: a game launcher with a fully interactive voxel world and an endless Roblox-style parkour obby. Play right in your browser." />
+    <link rel="icon" type="image/png" href="/icon-512.png" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Blockbound" />
+    <meta property="og:title" content="Blockbound — Game Launcher" />
+    <meta property="og:description" content="Minecraft-style voxel worlds plus an endless Roblox-style parkour obby. Play free in your browser." />
+    <meta property="og:image" content="/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Blockbound — Game Launcher" />
+    <meta name="twitter:description" content="Minecraft-style voxel worlds plus an endless Roblox-style parkour obby. Play free in your browser." />
+    <meta name="twitter:image" content="/og.jpg" />
+    <title>Blockbound — Game Launcher</title>
+  </head>
+  <body>
+    <canvas id="world" aria-label="A blocky landscape"></canvas>
+
+    <main id="app" data-screen="launcher">
+      <section id="launcher-screen" class="screen launcher-screen active" aria-labelledby="launcher-title">
+        <header class="launcher-topbar">
+          <span class="launcher-kicker">Game Launcher</span>
+          <div class="launcher-tools">
+            <button class="square-button" data-action="language" type="button" aria-label="Language">🌐</button>
+            <button class="square-button" data-action="accessibility" type="button" aria-label="Accessibility">♿</button>
+          </div>
+        </header>
+
+        <div class="launcher-content">
+          <div class="launcher-brand">
+            <h1 id="launcher-title" class="logo-word launcher-wordmark">BLOCKBOUND</h1>
+            <p class="launcher-tagline"><span id="splash-text">Now with more blocks!</span></p>
+          </div>
+
+          <div class="game-list" role="list" aria-label="Games in this launcher">
+            <article class="game-card" data-game-card="minecraft" aria-labelledby="game-card-title">
+              <div class="game-art" aria-hidden="true">
+                <div class="game-cube">
+                  <span class="cube-face cube-top"></span>
+                  <span class="cube-face cube-left"></span>
+                  <span class="cube-face cube-right"></span>
+                </div>
+              </div>
+              <div class="game-details">
+                <div class="game-heading">
+                  <h2 id="game-card-title">Minecraft</h2>
+                  <span class="game-status">Ready</span>
+                </div>
+                <p class="game-description">Mine, build and survive in a 359-block voxel world. Play alone or open a shared world on your Wi-Fi.</p>
+                <ul class="game-meta">
+                  <li id="launcher-world-count">1 world</li>
+                  <li id="launcher-last-played">Last played today</li>
+                  <li class="game-version">Java Edition 1.21.8</li>
+                </ul>
+                <div class="game-actions">
+                  <button class="mc-button launch-button" data-action="launch" data-game="minecraft" data-autofocus type="button">Play</button>
+                  <p id="launch-hint" class="launch-hint">Continue <strong>My World</strong></p>
+                  <p class="game-link-row">
+                    <span class="game-link-label">Launch link</span>
+                    <a id="game-launch-link" class="game-link" href="?play=minecraft" title="Direct launch link for Minecraft">/?play=minecraft</a>
+                    <button class="game-link-copy" type="button" data-action="copy-launch-link" data-game="minecraft">Copy</button>
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article class="game-card game-card-parkour" data-game-card="parkour" aria-labelledby="parkour-card-title">
+              <div class="game-art parkour-art" aria-hidden="true">
+                <div class="obby-stack">
+                  <span class="obby-block obby-1"></span>
+                  <span class="obby-block obby-2"></span>
+                  <span class="obby-block obby-3"></span>
+                  <span class="obby-avatar"><i></i></span>
+                </div>
+              </div>
+              <div class="game-details">
+                <div class="game-heading">
+                  <h2 id="parkour-card-title">Parkour Obby</h2>
+                  <span class="game-status server-badge">Roblox Server</span>
+                </div>
+                <p class="game-description">A Roblox-style obby: hop moving platforms, dodge the lava and beat the course timer with your best run.</p>
+                <ul class="game-meta">
+                  <li id="parkour-server">Server · Obby #1</li>
+                  <li id="parkour-best">No best time yet</li>
+                  <li id="parkour-online">12 online</li>
+                </ul>
+                <div class="game-actions">
+                  <button class="mc-button launch-button" data-action="launch" data-game="parkour" type="button">Play</button>
+                  <p id="parkour-hint" class="launch-hint">Checkpoints · timer · best time</p>
+                  <p class="game-link-row">
+                    <span class="game-link-label">Launch link</span>
+                    <a id="parkour-launch-link" class="game-link" href="?play=parkour" title="Direct launch link for Parkour Obby">/?play=parkour</a>
+                    <button class="game-link-copy" type="button" data-action="copy-launch-link" data-game="parkour">Copy</button>
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <nav class="launcher-actions" aria-label="Launcher">
+            <button class="mc-button" data-action="singleplayer" type="button">Worlds</button>
+            <button class="mc-button" data-action="multiplayer" type="button">Join a World</button>
+            <button class="mc-button" data-action="options" type="button">Settings</button>
+            <button class="mc-button" data-action="quit" type="button">Quit</button>
+          </nav>
+        </div>
+
+        <footer class="launcher-footer">
+          <span>Blockbound Launcher 0.1.0 <span class="muted">· Web Edition</span></span>
+          <span class="muted">Not an official Minecraft or Roblox product. Fan-built voxel demo.</span>
+        </footer>
+      </section>
+
+      <section id="singleplayer-screen" class="screen panel-screen" aria-labelledby="singleplayer-title">
+        <header class="screen-header"><h1 id="singleplayer-title">Select World</h1></header>
+        <div id="world-list" class="selection-list world-list" role="listbox" aria-label="Saved worlds"></div>
+        <footer class="button-tray">
+          <div class="menu-row three">
+            <button id="play-world" class="mc-button" type="button">Play Selected World</button>
+            <button class="mc-button" data-action="create-world" type="button">Create New World</button>
+            <button id="edit-world" class="mc-button" type="button">Edit</button>
+          </div>
+          <div class="menu-row three">
+            <button id="delete-world" class="mc-button" type="button">Delete</button>
+            <button id="recreate-world" class="mc-button" type="button">Re-Create</button>
+            <button class="mc-button" data-action="launcher" type="button">Cancel</button>
+          </div>
+        </footer>
+      </section>
+
+      <section id="create-world-screen" class="screen form-screen" aria-labelledby="create-title">
+        <header class="screen-header"><h1 id="create-title">Create New World</h1></header>
+        <form id="world-form" class="mc-form">
+          <label for="world-name">World Name</label>
+          <input id="world-name" class="mc-input" maxlength="32" value="New World" autocomplete="off" />
+          <p class="folder-hint">Will be saved as: <span id="folder-name">New World</span></p>
+          <button id="game-mode" class="mc-button wide" type="button" data-value="survival">Game Mode: Survival</button>
+          <p id="game-mode-help" class="form-help">Search for resources, craft, gain levels, health and hunger.</p>
+          <button id="difficulty" class="mc-button wide" type="button" data-value="peaceful">Difficulty: Peaceful</button>
+          <button id="allow-cheats" class="mc-button wide" type="button" data-value="false">Allow Cheats: OFF</button>
+          <div class="menu-row form-actions">
+            <button class="mc-button" type="submit">Create New World</button>
+            <button class="mc-button" data-action="create-world-cancel" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="edit-world-screen" class="screen form-screen" aria-labelledby="edit-title">
+        <header class="screen-header"><h1 id="edit-title">Edit World</h1></header>
+        <form id="edit-world-form" class="mc-form compact-form">
+          <label for="edit-world-name">World Name</label>
+          <input id="edit-world-name" class="mc-input" maxlength="32" autocomplete="off" />
+          <div class="menu-row form-actions">
+            <button class="mc-button" type="submit">Save</button>
+            <button class="mc-button" data-action="singleplayer" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="multiplayer-screen" class="screen panel-screen" aria-labelledby="multiplayer-title">
+        <header class="screen-header"><h1 id="multiplayer-title">Play Together</h1><p>Both players open this website on the same Wi-Fi, then join the shared world.</p></header>
+        <label class="lan-name">Your name <input id="lan-player-name" class="mc-input" maxlength="16" value="Player" /></label>
+        <button id="lan-join" class="mc-button wide" type="button">Join shared world</button>
+        <div id="server-list" class="selection-list server-list" role="listbox" aria-label="Saved servers"></div>
+        <footer class="button-tray">
+          <div class="menu-row three">
+            <button id="join-server" class="mc-button" type="button">Join Server</button>
+            <button class="mc-button" data-action="direct-connect" type="button">Direct Connection</button>
+            <button class="mc-button" data-action="add-server" type="button">Add Server</button>
+          </div>
+          <div class="menu-row three">
+            <button id="edit-server" class="mc-button" type="button">Edit</button>
+            <button id="delete-server" class="mc-button" type="button">Delete</button>
+            <button class="mc-button" data-action="launcher" type="button">Cancel</button>
+          </div>
+        </footer>
+      </section>
+
+      <section id="server-form-screen" class="screen form-screen" aria-labelledby="server-form-title">
+        <header class="screen-header"><h1 id="server-form-title">Add Server</h1></header>
+        <form id="server-form" class="mc-form compact-form">
+          <label for="server-name">Server Name</label>
+          <input id="server-name" class="mc-input" maxlength="32" value="Minecraft Server" autocomplete="off" />
+          <label for="server-address">Server Address</label>
+          <input id="server-address" class="mc-input" placeholder="play.example.net" autocomplete="off" />
+          <div class="menu-row form-actions">
+            <button class="mc-button" type="submit">Done</button>
+            <button class="mc-button" data-action="multiplayer" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="direct-connect-screen" class="screen form-screen" aria-labelledby="direct-title">
+        <header class="screen-header"><h1 id="direct-title">Direct Connection</h1></header>
+        <form id="direct-form" class="mc-form compact-form">
+          <label for="direct-address">Server Address</label>
+          <input id="direct-address" class="mc-input" placeholder="localhost:25565" autocomplete="off" />
+          <div class="menu-row form-actions">
+            <button class="mc-button" type="submit">Join Server</button>
+            <button class="mc-button" data-action="multiplayer" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="options-screen" class="screen options-screen" aria-labelledby="options-title">
+        <header class="screen-header"><h1 id="options-title">Options</h1><p>FOV: <span id="fov-value">72</span></p></header>
+        <div class="options-grid">
+          <label class="slider-button">FOV: <span id="fov-label">Normal</span><input id="fov-slider" type="range" min="55" max="100" value="72" /></label>
+          <label class="slider-button">Render Distance: <span id="distance-value">4 chunks</span><input id="render-distance" type="range" min="2" max="6" value="4" /></label>
+          <label class="slider-button">Master Volume: <span id="volume-value">70%</span><input id="volume-slider" type="range" min="0" max="100" value="70" /></label>
+          <button id="world-difficulty" class="mc-button" type="button" hidden>Difficulty: Peaceful</button>
+          <button id="fullscreen-toggle" class="mc-button" type="button">Fullscreen: OFF</button>
+          <button class="mc-button" data-action="controls" type="button">Controls...</button>
+          <button class="mc-button" data-action="accessibility" type="button">Accessibility Settings...</button>
+          <button id="bob-toggle" class="mc-button" type="button" data-value="true">View Bobbing: ON</button>
+          <button id="reset-settings" class="mc-button" type="button">Reset Settings</button>
+        </div>
+        <button class="mc-button done-button" data-action="options-done" type="button">Done</button>
+      </section>
+
+      <section id="controls-screen" class="screen options-screen" aria-labelledby="controls-title">
+        <header class="screen-header"><h1 id="controls-title">Controls</h1></header>
+        <div class="controls-list">
+          <div><span>Move</span><kbd>W A S D</kbd></div><div><span>Jump</span><kbd>SPACE</kbd></div>
+          <div><span>Sprint</span><kbd>LEFT SHIFT</kbd></div><div><span>Pause</span><kbd>ESC</kbd></div>
+          <div><span>Attack / Destroy</span><kbd>LEFT CLICK</kbd></div><div><span>Use / Place</span><kbd>T</kbd></div>
+          <div><span>Select Hotbar</span><kbd>1 – 9 / WHEEL</kbd></div><div><span>Inventory / Backpack</span><kbd>E</kbd></div>
+          <div><span>Eat food</span><kbd>R</kbd></div><div><span>Swap Offhand</span><kbd>F</kbd></div><div><span>Look</span><kbd>MOUSE</kbd></div>
+        </div>
+        <button class="mc-button done-button" data-action="options" type="button">Done</button>
+      </section>
+
+      <section id="language-screen" class="screen panel-screen language-screen" aria-labelledby="language-title">
+        <header class="screen-header"><h1 id="language-title">Language</h1><p>Language translations may not be 100% accurate</p></header>
+        <div id="language-list" class="selection-list" role="listbox">
+          <button class="list-item" data-lang="en" type="button"><strong>English (US)</strong><span>English</span></button>
+          <button class="list-item" data-lang="zh" type="button"><strong>简体中文（中国大陆）</strong><span>Chinese, Simplified</span></button>
+          <button class="list-item" data-lang="es" type="button"><strong>Español (España)</strong><span>Spanish</span></button>
+          <button class="list-item" data-lang="de" type="button"><strong>Deutsch</strong><span>German</span></button>
+        </div>
+        <button class="mc-button done-button" data-action="language-done" type="button">Done</button>
+      </section>
+
+      <section id="accessibility-screen" class="screen options-screen" aria-labelledby="accessibility-title">
+        <header class="screen-header"><h1 id="accessibility-title">Accessibility Settings</h1></header>
+        <div class="options-grid one-column">
+          <button id="high-contrast" class="mc-button" type="button" data-value="false">High Contrast: OFF</button>
+          <button id="menu-background" class="mc-button" type="button" data-value="true">Menu Background Blur: ON</button>
+          <button id="auto-jump" class="mc-button" type="button" data-value="false">Auto-Jump: OFF</button>
+          <button id="narrator" class="mc-button" type="button" data-value="false">Narrator: OFF</button>
+        </div>
+        <button class="mc-button done-button" data-action="accessibility-done" type="button">Done</button>
+      </section>
+
+      <section id="connecting-screen" class="screen message-screen" aria-labelledby="connection-title">
+        <h1 id="connection-title">Connecting to the server...</h1><p id="connection-detail">Encrypting...</p>
+        <button class="mc-button wide" data-action="cancel-connect" type="button">Cancel</button>
+      </section>
+
+      <section id="pause-screen" class="screen pause-screen" aria-labelledby="pause-title">
+        <h1 id="pause-title">Game Menu</h1>
+        <div class="menu-stack">
+          <button class="mc-button wide" data-action="resume" type="button">Back to Game</button>
+          <button class="mc-button wide" data-action="options" type="button">Options...</button>
+          <button class="mc-button wide" data-action="save-quit" type="button">Save and Quit to Launcher</button>
+        </div>
+      </section>
+
+      <section id="quit-screen" class="screen message-screen" aria-labelledby="quit-title">
+        <h1 id="quit-title">Thanks for playing!</h1><p>Your worlds and settings have been saved in this browser.</p>
+        <button class="mc-button wide" data-action="launcher" type="button">Back to Launcher</button>
+      </section>
+
+      <section id="parkour-screen" class="screen parkour-screen" aria-labelledby="parkour-title">
+        <div class="parkour-hud">
+          <header class="parkour-topbar">
+            <div class="parkour-brand">
+              <span id="parkour-title" class="parkour-logo">Parkour Obby</span>
+              <span id="parkour-server-label" class="parkour-server">Roblox Server · Obby #1</span>
+            </div>
+            <div class="parkour-timer" id="parkour-timer" aria-label="Course time">00:00.0</div>
+            <div class="parkour-stats">
+              <span id="parkour-checkpoints">Checkpoint 0/3</span>
+              <span id="parkour-best-hud">Best –</span>
+            </div>
+          </header>
+          <p class="parkour-objective" id="parkour-objective">Reach the first checkpoint</p>
+          <p class="parkour-controls">WASD move · SPACE jump · SHIFT sprint · R respawn · ESC menu</p>
+          <div class="parkour-toast" id="parkour-toast" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="parkour-touch" aria-label="Touch controls">
+          <div class="parkour-dpad">
+            <button data-parkour-move="forward" type="button" aria-label="Forward">▲</button>
+            <div>
+              <button data-parkour-move="left" type="button" aria-label="Left">◀</button>
+              <button data-parkour-move="back" type="button" aria-label="Back">▼</button>
+              <button data-parkour-move="right" type="button" aria-label="Right">▶</button>
+            </div>
+          </div>
+          <button class="parkour-jump" data-parkour-jump="true" type="button">JUMP</button>
+        </div>
+
+        <button id="parkour-click-hint" class="parkour-click-hint" type="button">Click to play · ESC for menu</button>
+
+        <div id="parkour-pause" class="parkour-overlay" hidden>
+          <div class="parkour-panel">
+            <h2>Paused</h2>
+            <p class="parkour-server-line">Parkour Obby · Obby #1</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-parkour-action="resume" type="button">Resume</button>
+              <button class="mc-button wide" data-parkour-action="restart" type="button">Restart course</button>
+              <button class="mc-button wide" data-parkour-action="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="parkour-finish" class="parkour-overlay" hidden>
+          <div class="parkour-panel parkour-finish-panel">
+            <h2 id="parkour-finish-title">Level 1 Complete!</h2>
+            <p class="parkour-finish-time" id="parkour-finish-time">00:00.0</p>
+            <p class="parkour-finish-best" id="parkour-finish-best">New best time!</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-parkour-action="next" type="button">Next level ▶</button>
+              <button class="mc-button wide" data-parkour-action="restart" type="button">Replay level</button>
+              <button class="mc-button wide" data-parkour-action="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="confirm-dialog" class="dialog-backdrop" aria-hidden="true">
+        <div class="mc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+          <h2 id="confirm-title">Are you sure?</h2><p id="confirm-message"></p>
+          <div class="menu-row"><button id="confirm-yes" class="mc-button" type="button">Yes</button><button id="confirm-no" class="mc-button" type="button">Cancel</button></div>
+        </div>
+      </div>
+
+      <div id="game-controls-dialog" class="dialog-backdrop" aria-hidden="true">
+        <div class="mc-dialog game-controls-dialog" role="dialog" aria-modal="true" aria-labelledby="game-controls-title">
+          <h2 id="game-controls-title">Controls</h2>
+          <p id="game-controls-game" class="game-controls-game"></p>
+          <div id="game-controls-list" class="game-controls-list"></div>
+          <div class="menu-row"><button class="mc-button" type="button" data-action="close-game-controls">Close</button></div>
+        </div>
+      </div>
+
+      <div id="hud" aria-hidden="true">
+        <div class="crosshair"></div>
+        <div id="block-label" class="block-label">GRASS</div>
+        <div id="coordinates" class="coordinates">0 / 0 / 0</div>
+        <div class="world-status"><span id="food-count"></span><span id="mode-label">SURVIVAL</span><strong id="biome-label">Plains</strong><span id="day-label">Day 1</span></div>
+        <div id="survival-bars" class="survival-bars">
+          <div id="health-bar" class="vital-row" aria-label="Health"></div>
+          <div id="hunger-bar" class="vital-row hunger" aria-label="Hunger"></div>
+        </div>
+        <div class="xp-bar"><i id="xp-fill"></i><span id="xp-level">1</span></div>
+        <div id="offhand-slot" class="offhand-slot" title="Offhand — press F to swap">
+          <span>F</span><i id="offhand-icon" class="block-icon"></i>
+        </div>
+        <div id="hotbar" class="hotbar"></div>
+        <button id="open-inventory" class="inventory-hint" type="button"><kbd>E</kbd> 359 BLOCKS</button>
+      </div>
+
+      <section id="creative-inventory" class="creative-inventory" aria-hidden="true" aria-label="Creative inventory">
+        <div class="inventory-panel">
+          <header class="inventory-header">
+            <div><h2>Creative Inventory</h2><span id="inventory-result-count">359 / 359 blocks</span></div>
+            <button id="close-inventory" class="inventory-close" type="button" aria-label="Close inventory">×</button>
+          </header>
+          <div id="block-categories" class="inventory-tabs" aria-label="Block categories"></div>
+          <label class="inventory-search">
+            <span>Search</span>
+            <input id="block-search" type="search" placeholder="Search all 359 blocks..." autocomplete="off" />
+          </label>
+          <div id="block-grid" class="block-grid" role="listbox" aria-label="All blocks"></div>
+          <section class="crafting-section" aria-label="Crafting recipes"><h3>Crafting</h3><div id="crafting-recipes" class="crafting-recipes"></div></section>
+          <footer class="inventory-footer">Choose a hotbar slot with <kbd>1–9</kbd>, then click a block to equip it · <kbd>E</kbd> to close</footer>
+        </div>
+      </section>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <div id="touch-controls" class="touch-controls" aria-label="Touch controls">
+        <div class="touch-move"><button data-move="KeyW">▲</button><div><button data-move="KeyA">◀</button><button data-move="KeyS">▼</button><button data-move="KeyD">▶</button></div></div>
+        <div class="touch-actions"><button data-touch="jump">Jump</button><button data-touch="mine">Mine</button><button data-touch="place">Place</button><button data-touch="use">Use</button><button data-touch="eat">Eat</button><button data-touch="inventory">Bag</button><button data-touch="pause">Pause</button></div>
+      </div>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
