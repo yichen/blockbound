@@ -1681,6 +1681,49 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   letter-spacing: .02em;
 }
 
+.dozen-powers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: min(680px, 92vw);
+  pointer-events: none;
+}
+
+.dozen-power {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 999px;
+  background: rgba(8, 18, 26, .55);
+  color: #93aab5;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.dozen-power b { font-weight: 700; letter-spacing: .06em; }
+
+.dozen-power i {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, .09);
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.dozen-power.on {
+  border-color: rgba(123, 227, 203, .6);
+  background: rgba(16, 52, 48, .85);
+  box-shadow: 0 0 14px rgba(123, 227, 203, .18);
+  color: #e2fff9;
+}
+
+.dozen-power.on i { background: #7be3cb; color: #04221f; }
+
 .dozen-map-toggle {
   pointer-events: auto;
   min-height: 26px;
@@ -2198,5 +2241,7 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   .dozen-readout { padding: 7px 16px 8px; }
   .dozen-value { font-size: 32px; }
   .dozen-equation { font-size: 11px; }
+  .dozen-powers { max-width: 94vw; gap: 4px; }
+  .dozen-power { padding: 3px 7px; font-size: 9px; }
 }
 

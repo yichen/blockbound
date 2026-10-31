@@ -10,8 +10,10 @@ menu:
   per level, moving platforms, lava, timer, per-level best times, rotating visual
   themes and simulated online players who actually run, fall and respawn.
 - **12 Dozen** — a 3D math platformer: you start as the number 12, step on `+ − × ÷`
-  pads to change your value, and pass gates that only open at exactly **24**, **72**
-  and **144** (a dozen dozens). Timed runs, best time saved.
+  pads to make exactly **24**, **72** and **144** (a dozen dozens). The number you
+  carry also unlocks **math powers**: multiples of 3 can climb, 4 can push, 5 can swim,
+  9 jump tall, and negative numbers flip gravity upside down. Timed runs, best time
+  saved.
 
 Live site (GitHub Pages): https://yichen.github.io/blockbound/
 
@@ -32,6 +34,16 @@ when running through `npm run dev` on the same Wi-Fi network.
 - `W` `A` `S` `D` or arrow keys — move (it is a 3D game but uses a fixed chase camera)
 - `SPACE` — jump
 - `M` or the **2D** button — top-down map of the whole course (run pauses)
+
+Math powers come from the number on your block:
+
+| Power | Rule | Used for |
+| --- | --- | --- |
+| Climb | multiple of 3 | scaling the green wall |
+| Push | multiple of 4 | shoving the crate off the bridge |
+| Swim | multiple of 5 | crossing the pool (25 from 24 + 1) |
+| Tall jump | multiple of 9 | leaping to the high gold ledge |
+| Upside down | negative number | walking the ceiling at `-72` |
 - `R` — reset to the last gate checkpoint
 - `ESC` — pause menu
 - On touch devices use the on-screen D-pad and JUMP button.
