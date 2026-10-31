@@ -5,3 +5,7 @@ screenshots/
 .npm-cache/
 .lan-world.json
 .DS_Store
+.venv-aws/
+
+# Local build artifact for Amplify manual uploads
+blockbound-amplify.zip
