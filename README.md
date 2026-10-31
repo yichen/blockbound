@@ -44,6 +44,25 @@ npm run preview    # serves the production build locally
 
 ## Deploy
 
+### AWS Amplify Hosting
+
+This repo includes `amplify.yml` and `scripts/deploy-amplify.sh` for Amplify Hosting.
+
+Git-based deploy: AWS Console → Amplify → Host web app → GitHub → repository
+`yichen/blockbound`, branch `main`. The included `amplify.yml` builds `dist/`.
+
+CLI deploy (manual zip, no Git connection):
+
+```bash
+aws configure          # or: export AWS_PROFILE=...
+./scripts/deploy-amplify.sh
+```
+
+The script creates the `blockbound` Amplify app/branch if needed, uploads the build,
+waits for the deployment job and prints the `https://<branch>.<app-id>.amplifyapp.com`
+URL. The build is also available as `blockbound-amplify.zip` for Amplify's
+"Deploy without Git" upload.
+
 The repository includes a `vercel.json` for Vercel and builds as a pure static site.
 
 ```bash
