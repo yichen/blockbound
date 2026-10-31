@@ -4,17 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#141f26" />
-    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, 12 Dozen — a 3D math platformer, and Jelly Run 2048 — a 3D merge-runner. Play free in your browser." />
+    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush and Super Block Bros. — six games playable free in your browser." />
     <link rel="icon" type="image/png" href="/icon-512.png" />
     <link rel="apple-touch-icon" href="/icon-180.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Blockbound" />
     <meta property="og:title" content="Blockbound — Game Launcher" />
-    <meta property="og:description" content="Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, and Jelly Run 2048 — all playable free in your browser." />
+    <meta property="og:description" content="Six browser games: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush and Super Block Bros." />
     <meta property="og:image" content="/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Blockbound — Game Launcher" />
-    <meta name="twitter:description" content="Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, and Jelly Run 2048 — all playable free in your browser." />
+    <meta name="twitter:description" content="Six browser games: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush and Super Block Bros." />
     <meta name="twitter:image" content="/og.jpg" />
     <title>Blockbound — Game Launcher</title>
   </head>
@@ -164,6 +164,62 @@
                 </div>
               </div>
             </article>
+            <article class="game-card game-card-kart" data-game-card="kart" aria-labelledby="kart-card-title">
+              <div class="game-art kart-art" aria-hidden="true">
+                <div class="kart-road"><i></i><i></i><i></i></div>
+                <div class="kart-mascot"><span class="kart-body"></span><span class="kart-driver"></span></div>
+              </div>
+              <div class="game-details">
+                <div class="game-heading">
+                  <h2 id="kart-card-title">Kart Rush</h2>
+                  <span class="game-status kart-badge">Racing · 3 Laps</span>
+                </div>
+                <p class="game-description">A Mario Kart–style 3D racer: three laps around a beach circuit with boost pads, spinning item boxes and three AI rivals. Drive clean, hit the boosts, set the best lap.</p>
+                <ul class="game-meta">
+                  <li>Circuit · 3 laps</li>
+                  <li id="kart-best-card">No best lap yet</li>
+                  <li>4 racers</li>
+                </ul>
+                <div class="game-actions">
+                  <button class="mc-button launch-button" data-action="launch" data-game="kart" type="button">Play</button>
+                  <p id="kart-hint" class="launch-hint">Boost pads · item boxes · rivals</p>
+                  <p class="game-link-row">
+                    <span class="game-link-label">Launch link</span>
+                    <a id="kart-launch-link" class="game-link" href="?play=kart" title="Direct launch link for Kart Rush">/?play=kart</a>
+                    <button class="game-link-copy" type="button" data-action="copy-launch-link" data-game="kart">Copy</button>
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article class="game-card game-card-bros" data-game-card="bros" aria-labelledby="bros-card-title">
+              <div class="game-art bros-art" aria-hidden="true">
+                <div class="bros-platforms"><span></span><span></span><span></span></div>
+                <div class="bros-hero"><i></i><b></b></div>
+                <div class="bros-coin">★</div>
+              </div>
+              <div class="game-details">
+                <div class="game-heading">
+                  <h2 id="bros-card-title">Super Block Bros.</h2>
+                  <span class="game-status bros-badge">Platformer</span>
+                </div>
+                <p class="game-description">A Super Mario Bros.–style side-scroller: sprint and jump across blocks, bonk coin blocks, stomp angry blobs and race to the flag before you run out of lives.</p>
+                <ul class="game-meta">
+                  <li>Level · 1-1</li>
+                  <li id="bros-best-card">No best time yet</li>
+                  <li>3 lives</li>
+                </ul>
+                <div class="game-actions">
+                  <button class="mc-button launch-button" data-action="launch" data-game="bros" type="button">Play</button>
+                  <p id="bros-hint" class="launch-hint">Run · jump · stomp · flag</p>
+                  <p class="game-link-row">
+                    <span class="game-link-label">Launch link</span>
+                    <a id="bros-launch-link" class="game-link" href="?play=bros" title="Direct launch link for Super Block Bros.">/?play=bros</a>
+                    <button class="game-link-copy" type="button" data-action="copy-launch-link" data-game="bros">Copy</button>
+                  </p>
+                </div>
+              </div>
+            </article>
           </div>
 
           <nav class="launcher-actions" aria-label="Launcher">
@@ -175,7 +231,7 @@
         </div>
 
         <footer class="launcher-footer">
-          <span>Blockbound Launcher 0.4.0 <span class="muted">· Web Edition</span></span>
+          <span>Blockbound Launcher 0.5.0 <span class="muted">· Web Edition</span></span>
           <span class="muted">Not an official Minecraft or Roblox product. Fan-built voxel demo.</span>
         </footer>
       </section>
@@ -515,6 +571,113 @@
             <div class="parkour-panel-actions">
               <button class="mc-button wide" data-jelly-panel="restart" type="button">Run again ▶</button>
               <button class="mc-button wide" data-jelly-panel="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="kart-screen" class="screen parkour-screen kart-screen" aria-labelledby="kart-title">
+        <div class="parkour-hud">
+          <header class="parkour-topbar">
+            <div class="parkour-brand">
+              <span id="kart-title" class="parkour-logo">Kart Rush</span>
+              <span class="parkour-server">Grand Prix · 3 laps</span>
+            </div>
+            <div class="parkour-timer" id="kart-timer" aria-label="Race time">00:00.0</div>
+            <div class="parkour-stats">
+              <span id="kart-lap">Lap 1/3</span>
+              <span id="kart-rank">4th/4</span>
+              <span id="kart-speed">0 km/h</span>
+              <span id="kart-best">Best lap –</span>
+            </div>
+          </header>
+          <p class="parkour-objective" id="kart-objective">Three laps — hit the boost pads</p>
+          <p class="parkour-controls">W/S accelerate · A/D steer · SPACE boost item · R restart · ESC pause</p>
+          <div class="parkour-toast" id="kart-toast" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="parkour-touch kart-touch" aria-label="Touch controls">
+          <div class="kart-touch-row">
+            <button data-kart-action="left" type="button" aria-label="Steer left">◀</button>
+            <button class="kart-boost" data-kart-action="boost" type="button">BOOST</button>
+            <button data-kart-action="right" type="button" aria-label="Steer right">▶</button>
+          </div>
+        </div>
+
+        <div id="kart-pause" class="parkour-overlay" hidden>
+          <div class="parkour-panel">
+            <h2>Paused</h2>
+            <p class="kart-pause-line" id="kart-pause-line">Lap 1/3 · 4th place</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-kart-panel="resume" type="button">Resume</button>
+              <button class="mc-button wide" data-kart-panel="restart" type="button">Restart race</button>
+              <button class="mc-button wide" data-kart-panel="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="kart-finish" class="parkour-overlay" hidden>
+          <div class="parkour-panel parkour-finish-panel">
+            <h2 id="kart-finish-title">Race Complete!</h2>
+            <p class="parkour-finish-time" id="kart-finish-time">00:00.0</p>
+            <p class="kart-finish-lap" id="kart-finish-lap">Best lap 00:00.0</p>
+            <p class="parkour-finish-best" id="kart-finish-best">New best race time!</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-kart-panel="restart" type="button">Race again ▶</button>
+              <button class="mc-button wide" data-kart-panel="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="bros-screen" class="screen parkour-screen bros-screen" aria-labelledby="bros-title">
+        <div class="parkour-hud">
+          <header class="parkour-topbar">
+            <div class="parkour-brand">
+              <span id="bros-title" class="parkour-logo">Super Block Bros.</span>
+              <span class="parkour-server">World 1-1 · Flag run</span>
+            </div>
+            <div class="parkour-timer" id="bros-timer" aria-label="Run time">00:00.0</div>
+            <div class="parkour-stats">
+              <span id="bros-lives">3 lives</span>
+              <span id="bros-coins">0 coins</span>
+              <span id="bros-best">Best –</span>
+            </div>
+          </header>
+          <p class="parkour-objective" id="bros-objective">Run right · collect coins · stomp the blobs</p>
+          <p class="parkour-controls">A/D or ←/→ run · SPACE jump · R restart · ESC pause</p>
+          <div class="parkour-toast" id="bros-toast" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="parkour-touch bros-touch" aria-label="Touch controls">
+          <div class="bros-touch-row">
+            <button data-bros-action="left" type="button" aria-label="Run left">◀</button>
+            <button class="bros-jump" data-bros-action="jump" type="button">JUMP</button>
+            <button data-bros-action="right" type="button" aria-label="Run right">▶</button>
+          </div>
+        </div>
+
+        <div id="bros-pause" class="parkour-overlay" hidden>
+          <div class="parkour-panel">
+            <h2>Paused</h2>
+            <p class="bros-pause-line" id="bros-pause-line">0 coins · 00:00.0</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-bros-panel="resume" type="button">Resume</button>
+              <button class="mc-button wide" data-bros-panel="restart" type="button">Restart level</button>
+              <button class="mc-button wide" data-bros-panel="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="bros-finish" class="parkour-overlay" hidden>
+          <div class="parkour-panel parkour-finish-panel">
+            <h2 id="bros-finish-title">Flag Raised!</h2>
+            <p class="parkour-finish-time" id="bros-finish-time">00:00.0</p>
+            <p class="bros-finish-coins" id="bros-finish-coins">0 coins · 3 lives left</p>
+            <p class="parkour-finish-best" id="bros-finish-best">New best time!</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-bros-panel="restart" type="button">Run it again ▶</button>
+              <button class="mc-button wide" data-bros-panel="menu" type="button">Back to launcher</button>
             </div>
           </div>
         </div>

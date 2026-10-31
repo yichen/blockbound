@@ -1635,6 +1635,90 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   pointer-events: none;
 }
 
+#app[data-screen="kart"]::before,
+#app[data-screen="bros"]::before {
+  opacity: 0;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+.kart-screen { --pk-coral: #ffb703; --pk-yellow: #ffe27a; }
+.bros-screen { --pk-coral: #7be3cb; --pk-yellow: #ffd166; }
+
+.kart-touch, .bros-touch { display: none; }
+.kart-touch-row, .bros-touch-row { display: flex; width: 100%; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.kart-touch button, .bros-touch button {
+  width: 74px;
+  height: 62px;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 14px;
+  background: rgba(8, 18, 26, .62);
+  color: #fff;
+  font: 700 18px/1 "Trebuchet MS", "Arial Black", sans-serif;
+  pointer-events: auto;
+  touch-action: none;
+}
+.kart-touch .kart-boost { width: 120px; background: rgba(255, 183, 3, .26); border-color: rgba(255, 183, 3, .6); color: #ffe9b3; }
+.bros-touch .bros-jump { width: 120px; background: rgba(123, 227, 203, .24); border-color: rgba(123, 227, 203, .6); }
+
+.kart-pause-line, .kart-finish-lap, .bros-pause-line, .bros-finish-coins {
+  color: #ffe27a;
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+
+/* Kart Rush card */
+.game-card-kart {
+  border-color: rgba(255, 183, 3, .34);
+  background: linear-gradient(145deg, rgba(48, 38, 20, .95), rgba(16, 24, 30, .96));
+}
+.game-card-kart .game-heading h2 { color: #ffebc2; }
+.kart-badge { border-color: rgba(255, 183, 3, .5) !important; background: rgba(255, 183, 3, .14) !important; color: #ffe6ad !important; }
+.kart-art {
+  border-color: rgba(255, 183, 3, .26);
+  background: radial-gradient(circle at 50% 44%, rgba(255, 183, 3, .2), transparent 62%), linear-gradient(160deg, #332a18 0%, #1a2029 60%, #101720 100%);
+}
+.kart-road {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 18px;
+  transform: perspective(160px) rotateX(38deg);
+  opacity: .6;
+}
+.kart-road i { display: block; height: 5px; border-radius: 4px; background: repeating-linear-gradient(90deg, #ffe27a 0 18px, transparent 18px 36px); }
+.kart-mascot { position: relative; z-index: 1; width: 92px; height: 74px; }
+.kart-body { position: absolute; bottom: 0; left: 0; width: 92px; height: 38px; border-radius: 12px 16px 8px 8px; background: linear-gradient(160deg, #ffb703, #e07a00); box-shadow: inset 0 -6px rgba(0, 0, 0, .25), 0 12px 22px rgba(0, 0, 0, .35); }
+.kart-driver { position: absolute; bottom: 30px; left: 26px; width: 34px; height: 34px; border-radius: 40% 40% 30% 30%; background: linear-gradient(160deg, #ffe27a, #ffb703); box-shadow: inset 0 -4px rgba(0, 0, 0, .18); }
+.kart-driver::after { content: ""; position: absolute; top: 10px; left: 8px; width: 18px; height: 7px; border-radius: 4px; background: #24313a; }
+
+/* Super Block Bros card */
+.game-card-bros {
+  border-color: rgba(123, 227, 203, .34);
+  background: linear-gradient(145deg, rgba(20, 42, 40, .95), rgba(14, 24, 30, .96));
+}
+.game-card-bros .game-heading h2 { color: #d8fff5; }
+.bros-badge { border-color: rgba(123, 227, 203, .5) !important; background: rgba(123, 227, 203, .14) !important; color: #c8fff3 !important; }
+.bros-art {
+  border-color: rgba(123, 227, 203, .26);
+  background: radial-gradient(circle at 50% 44%, rgba(123, 227, 203, .18), transparent 62%), linear-gradient(160deg, #16302f 0%, #17242c 60%, #0e171d 100%);
+}
+.bros-platforms { position: absolute; inset: 0; }
+.bros-platforms span { position: absolute; display: block; height: 14px; border-radius: 3px; background: linear-gradient(180deg, #a6f27a 0 6px, #8a5a2b 6px); box-shadow: 0 8px 14px rgba(0, 0, 0, .3); }
+.bros-platforms span:nth-child(1) { left: 12%; bottom: 22%; width: 38%; }
+.bros-platforms span:nth-child(2) { right: 10%; bottom: 44%; width: 34%; }
+.bros-platforms span:nth-child(3) { left: 26%; bottom: 64%; width: 22%; }
+.bros-hero { position: absolute; left: 18%; bottom: 32%; z-index: 1; width: 44px; height: 56px; }
+.bros-hero i { position: absolute; inset: 0 0 14px; border-radius: 10px; background: linear-gradient(160deg, #63e6d5, #2ab7a6); box-shadow: inset 0 -6px rgba(0, 0, 0, .2), 0 10px 18px rgba(0, 0, 0, .32); }
+.bros-hero b { position: absolute; left: 6px; bottom: 0; width: 32px; height: 16px; border-radius: 6px; background: #f8e6cf; }
+.bros-coin { position: absolute; right: 18%; top: 18%; z-index: 1; display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #fff6c9, #ffc93c 60%, #e09a00); color: #8a5a00; font-size: 16px; box-shadow: 0 8px 16px rgba(0, 0, 0, .3); }
+
+@media (pointer: coarse) {
+  .kart-touch, .bros-touch { display: flex; }
+}
 #app[data-screen="jelly"]::before {
   opacity: 0;
   backdrop-filter: none;
@@ -2374,5 +2458,7 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   .jelly-number { font-size: 32px; }
   .jelly-touch button { width: 64px; height: 56px; }
   .jelly-touch .jelly-jump { width: 104px; height: 58px; }
+  .kart-touch button, .bros-touch button { width: 64px; height: 56px; }
+  .kart-touch .kart-boost, .bros-touch .bros-jump { width: 104px; }
 }
 

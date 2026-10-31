@@ -8,6 +8,8 @@ import templates from './structure-templates.json';
 import { createParkour, formatTime as formatParkourTime } from './parkour.js';
 import { createDozen } from './dozen.js';
 import { createJelly } from './jelly.js';
+import { createKart } from './kart.js';
+import { createBros } from './bros.js';
 
 // Public asset URLs must respect the deployment base (e.g. /blockbound/ on GitHub
 // Pages) as well as the root deployment used locally and on Vercel.
@@ -1715,6 +1717,8 @@ const STORAGE = {
   parkour: 'java-menu-parkour-v1',
   dozen: 'java-menu-dozen-v1',
   jelly: 'java-menu-jelly-v1',
+  kart: 'java-menu-kart-v1',
+  bros: 'java-menu-bros-v1',
 };
 const defaultSettings = { fov: 72, distance: 4, volume: 70, bobbing: true, highContrast: false, blur: true, autoJump: false, narrator: false, language: 'en' };
 
@@ -1778,6 +1782,31 @@ const GAMES = {
       { keys: ['A', 'D', '←', '→'], label: 'Switch lane' },
       { keys: ['SPACE'], label: 'Jump' },
       { keys: ['R'], label: 'New run' },
+      { keys: ['ESC'], label: 'Pause menu' },
+    ],
+  },
+  kart: {
+    name: 'Kart Rush',
+    version: 'Racing · 3 Laps',
+    linkLabel: '/?play=kart',
+    movement: true,
+    controls: [
+      { keys: ['W', 'S'], label: 'Accelerate / brake' },
+      { keys: ['A', 'D'], label: 'Steer' },
+      { keys: ['SPACE'], label: 'Use boost item' },
+      { keys: ['R'], label: 'Restart race' },
+      { keys: ['ESC'], label: 'Pause menu' },
+    ],
+  },
+  bros: {
+    name: 'Super Block Bros.',
+    version: 'Platformer · Flag Run',
+    linkLabel: '/?play=bros',
+    movement: true,
+    controls: [
+      { keys: ['A', 'D'], label: 'Run' },
+      { keys: ['SPACE'], label: 'Jump' },
+      { keys: ['R'], label: 'Restart level' },
       { keys: ['ESC'], label: 'Pause menu' },
     ],
   },
@@ -1860,6 +1889,35 @@ function saveJellyFinish(result) {
   const isBest = bestScore > (record.bestScore || 0) || bestNumber > (record.bestNumber || 0);
   const next = { bestScore, bestNumber, bestTime, runs: (record.runs || 0) + 1 };
   writeStore(STORAGE.jelly, next);
+  renderLauncher();
+  return { isBest, best: next };
+}
+
+function kartRecord() {
+  return readStore(STORAGE.kart, {}) || {};
+}
+
+function saveKartFinish(result) {
+  const record = kartRecord();
+  const bestRace = record.bestRace == null ? result.raceTime : Math.min(record.bestRace, result.raceTime);
+  const bestLap = record.bestLap == null ? result.bestLap : Math.min(record.bestLap, result.bestLap || Infinity);
+  const isBest = record.bestRace == null || result.raceTime < record.bestRace;
+  const next = { bestRace, bestLap, runs: (record.runs || 0) + 1 };
+  writeStore(STORAGE.kart, next);
+  renderLauncher();
+  return { isBest, best: next };
+}
+
+function brosRecord() {
+  return readStore(STORAGE.bros, {}) || {};
+}
+
+function saveBrosFinish(result) {
+  const record = brosRecord();
+  const isBest = result.won && (record.bestTime == null || result.time < record.bestTime);
+  const bestTime = isBest ? result.time : record.bestTime ?? null;
+  const next = { bestTime, runs: (record.runs || 0) + 1 };
+  writeStore(STORAGE.bros, next);
   renderLauncher();
   return { isBest, best: next };
 }
@@ -2085,6 +2143,42 @@ function renderLauncher() {
       : 'Merge · dodge · double up';
   }
 
+  // --- Kart Rush card -----------------------------------------------------
+  const kart = kartRecord();
+  const kartLink = document.querySelector('#kart-launch-link');
+  if (kartLink) {
+    const href = `?${LAUNCH_PARAM}=kart`;
+    kartLink.setAttribute('href', href);
+    kartLink.textContent = `/${href}`;
+    kartLink.title = `Direct launch link for ${GAMES.kart.name}`;
+  }
+  const kartBestCard = document.querySelector('#kart-best-card');
+  if (kartBestCard) kartBestCard.textContent = kart.bestLap != null ? `Best lap ${formatParkourTime(kart.bestLap)}` : 'No best lap yet';
+  const kartHint = document.querySelector('#kart-hint');
+  if (kartHint) {
+    kartHint.innerHTML = kart.bestRace != null
+      ? `Best race <strong>${formatParkourTime(kart.bestRace)}</strong>${kart.runs ? ` · ${kart.runs} run${kart.runs === 1 ? '' : 's'}` : ''}`
+      : 'Boost pads · item boxes · rivals';
+  }
+
+  // --- Super Block Bros. card --------------------------------------------
+  const bros = brosRecord();
+  const brosLink = document.querySelector('#bros-launch-link');
+  if (brosLink) {
+    const href = `?${LAUNCH_PARAM}=bros`;
+    brosLink.setAttribute('href', href);
+    brosLink.textContent = `/${href}`;
+    brosLink.title = `Direct launch link for ${GAMES.bros.name}`;
+  }
+  const brosBestCard = document.querySelector('#bros-best-card');
+  if (brosBestCard) brosBestCard.textContent = bros.bestTime != null ? `Best ${formatParkourTime(bros.bestTime)}` : 'No best time yet';
+  const brosHint = document.querySelector('#bros-hint');
+  if (brosHint) {
+    brosHint.innerHTML = bros.bestTime != null
+      ? `Flag time <strong>${formatParkourTime(bros.bestTime)}</strong>${bros.runs ? ` · ${bros.runs} run${bros.runs === 1 ? '' : 's'}` : ''}`
+      : 'Run · jump · stomp · flag';
+  }
+
   renderGameControlsRows();
 }
 
@@ -2224,10 +2318,50 @@ function launchJelly() {
   jelly.start();
 }
 
+let kart = null;
+function launchKart() {
+  kart ??= createKart({
+    canvas,
+    renderer,
+    getBest: () => kartRecord(),
+    onFinish: (result) => saveKartFinish(result),
+    onExit: () => {
+      showScreen('launcher');
+      syncLaunchUrl(null);
+    },
+  });
+  inWorld = false;
+  closeLan();
+  showScreen('kart', { focus: false });
+  syncLaunchUrl('kart');
+  kart.start();
+}
+
+let bros = null;
+function launchBros() {
+  bros ??= createBros({
+    canvas,
+    renderer,
+    getBest: () => brosRecord(),
+    onFinish: (result) => saveBrosFinish(result),
+    onExit: () => {
+      showScreen('launcher');
+      syncLaunchUrl(null);
+    },
+  });
+  inWorld = false;
+  closeLan();
+  showScreen('bros', { focus: false });
+  syncLaunchUrl('bros');
+  bros.start();
+}
+
 function launchGame(game = 'minecraft') {
   if (game === 'parkour') launchParkour();
   else if (game === 'dozen') launchDozen();
   else if (game === 'jelly') launchJelly();
+  else if (game === 'kart') launchKart();
+  else if (game === 'bros') launchBros();
   else launchMinecraft();
 }
 
@@ -2754,6 +2888,18 @@ let worldTime = 65;
 let nextAnimalSpawn = 0;
 function animate() {
   const delta = Math.min(clock.getDelta(), .05);
+  if (kart?.active) {
+    kart.update(delta);
+    kart.render();
+    requestAnimationFrame(animate);
+    return;
+  }
+  if (bros?.active) {
+    bros.update(delta);
+    bros.render();
+    requestAnimationFrame(animate);
+    return;
+  }
   if (jelly?.active) {
     jelly.update(delta);
     jelly.render();

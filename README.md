@@ -18,6 +18,15 @@ menu:
   jelly lane, switch tracks, merge matching number cubes to double `2 → 4 → 8 … → 2048`,
   dodge the pink blockers, and split in half if you hit the wrong number. 3 hearts,
   score and best jelly saved.
+- **Kart Rush** — an original 3D kart-racing tribute to Mario Kart: three laps around a
+  beach circuit with boost pads, item-box turbo charges and three AI rivals. Best lap
+  and best race saved.
+- **Super Block Bros.** — an original side-scrolling platformer tribute to Super Mario
+  Bros.: run, jump, bonk coin blocks, stomp angry blobs, hit the checkpoint and raise
+  the flag with 3 lives. Best flag time saved.
+
+These are original tributes: no Nintendo characters, sprites, music or other assets
+are used.
 
 Live site (GitHub Pages): https://yichen.github.io/blockbound/
 
@@ -58,6 +67,19 @@ Math powers come from the number on your block:
 - `SPACE` — jump over pink jelly blockers
 - `R` — restart the run · `ESC` — pause
 - Touch: ◀ / JUMP / ▶ buttons, or swipe left/right and up.
+
+## Kart Rush controls
+
+- `W` / `S` — accelerate / brake · `A` / `D` — steer
+- `SPACE` — spend a boost item (collected from spinning boxes)
+- `R` — restart race · `ESC` — pause
+- Touch: ◀ / BOOST / ▶ buttons; swipe left/right to steer.
+
+## Super Block Bros. controls
+
+- `A` / `D` or `←` / `→` — run · `SPACE` — jump
+- `R` — restart level · `ESC` — pause
+- Touch: ◀ / JUMP / ▶ buttons.
 
 ## Production build
 
