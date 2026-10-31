@@ -1762,6 +1762,7 @@ const GAMES = {
     controls: [
       { keys: ['W', 'A', 'S', 'D'], label: 'Move' },
       { keys: ['SPACE'], label: 'Jump' },
+      { keys: ['M'], label: 'Toggle 2D map view' },
       { keys: ['R'], label: 'Reset to checkpoint' },
       { keys: ['ESC'], label: 'Pause menu' },
     ],

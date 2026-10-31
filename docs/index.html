@@ -17,8 +17,8 @@
     <meta name="twitter:description" content="Minecraft-style voxel worlds, an endless parkour obby, and 12 Dozen — a 3D math platformer. Play free in your browser." />
     <meta name="twitter:image" content="/blockbound/og.jpg" />
     <title>Blockbound — Game Launcher</title>
-    <script type="module" crossorigin src="/blockbound/assets/index--UByzP5W.js"></script>
-    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-CPo-zYeN.css">
+    <script type="module" crossorigin src="/blockbound/assets/index-DYm1MpIF.js"></script>
+    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-C6PGiDqc.css">
   </head>
   <body>
     <canvas id="world" aria-label="A blocky landscape"></canvas>
@@ -117,7 +117,7 @@
                   <h2 id="dozen-card-title">12 Dozen</h2>
                   <span class="game-status dozen-badge">Math Platformer</span>
                 </div>
-                <p class="game-description">Start at 12 and reach a dozen dozens. Hop across 3D platforms, step on + − × ÷ pads and unlock gates that need exactly 24, 72 and 144.</p>
+                <p class="game-description">Start at 12 and reach a dozen dozens. Hop across 3D platforms, step on + − × ÷ pads and unlock gates that need exactly 24, 72 and 144. Stuck? Hit 2D for a top-down map of the whole course.</p>
                 <ul class="game-meta">
                   <li>Target · 144</li>
                   <li id="dozen-best">No best time yet</li>
@@ -379,6 +379,7 @@
             <div class="parkour-stats">
               <span id="dozen-gates">Gate 1/3</span>
               <span id="dozen-best-hud">Best –</span>
+              <button id="dozen-map-toggle" class="dozen-map-toggle" type="button" aria-pressed="false" title="Toggle 2D map view (M)">2D</button>
             </div>
           </header>
           <p class="parkour-objective" id="dozen-objective">Next gate needs 24 · you have 12</p>
@@ -387,7 +388,8 @@
             <span class="dozen-value" id="dozen-value">12</span>
             <span class="dozen-equation" id="dozen-equation">Start · 12</span>
           </div>
-          <p class="parkour-controls">WASD move · SPACE jump · R reset · ESC pause</p>
+          <p class="dozen-map-caption" id="dozen-map-caption" hidden>2D map · pads, gates and the whole course · press M or 2D to return</p>
+          <p class="parkour-controls">WASD move · SPACE jump · M 2D map · R reset · ESC pause</p>
           <div class="parkour-toast" id="dozen-toast" role="status" aria-live="polite"></div>
         </div>
 

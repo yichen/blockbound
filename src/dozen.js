@@ -104,10 +104,13 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   const scene = new THREE.Scene();
   const sky = new THREE.Color(0x9fdcff);
   scene.background = sky;
-  scene.fog = new THREE.Fog(sky.clone(), 65, 220);
+  const fog = new THREE.Fog(sky.clone(), 65, 220);
+  scene.fog = fog;
 
   const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.1, 400);
   camera.position.set(0, 6.4, 12);
+  const mapCamera = new THREE.OrthographicCamera(-60, 60, 40, -40, 0.1, 400);
+  let mapView = false;
 
   scene.add(new THREE.HemisphereLight(0xe9f8ff, 0x6a7f8c, 1.7));
   const sun = new THREE.DirectionalLight(0xfff6df, 2.1);
@@ -167,6 +170,8 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
       height: 0.65,
     });
     label.position.set(x, top + 1.9, z);
+    label.userData.baseScale = label.scale.clone();
+    label.userData.mapScale = label.scale.clone().multiplyScalar(2.6);
     levelGroup.add(tile, label);
     pads.push({ x, z, top, op, amount, color, tile, label, used: false });
   }
@@ -188,9 +193,12 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     barrier.position.set(x, top + 2.0, z);
     const sign = makeLabelSprite(`NEEDS ${required}`, { accent: '#ff9ff3', scale: 4.4, height: 1.1 });
     sign.position.set(x, top + 5.3, z);
+    sign.userData.baseScale = sign.scale.clone();
+    sign.userData.mapScale = sign.scale.clone().multiplyScalar(2.2);
     levelGroup.add(bar, barrier, sign);
     gate.barrier = barrier;
     gate.bar = bar;
+    gate.sign = sign;
     gate.minX = x - 5.4; gate.maxX = x + 5.4;
     gate.minZ = z - 0.5; gate.maxZ = z + 0.5;
     gate.minY = top; gate.maxY = top + 3.9;
@@ -314,6 +322,10 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   valueSprite.position.y = 2.0;
   playerGroup.add(valueSprite);
 
+  const youMarker = makeLabelSprite('YOU', { accent: '#ffc93c', scale: 4.4, height: 1.1 });
+  youMarker.visible = false;
+  scene.add(youMarker);
+
   const player = {
     position: START_POSITION.clone(),
     velocity: new THREE.Vector3(),
@@ -351,6 +363,8 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     finishBest: document.querySelector('#dozen-finish-best'),
     finishValue: document.querySelector('#dozen-finish-value'),
     pauseValue: document.querySelector('#dozen-pause-value'),
+    mapToggle: document.querySelector('#dozen-map-toggle'),
+    mapCaption: document.querySelector('#dozen-map-caption'),
   };
 
   const isTouch = matchMedia('(pointer: coarse)').matches;
@@ -500,6 +514,11 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function resetRun() {
+    mapView = false;
+    scene.fog = fog;
+    element.mapToggle && (element.mapToggle.textContent = '2D', element.mapToggle.setAttribute('aria-pressed', 'false'));
+    if (element.mapCaption) element.mapCaption.hidden = true;
+    element.screen?.classList.remove('dozen-map-open');
     elapsed = 0;
     running = false;
     finished = false;
@@ -527,6 +546,88 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     snapCamera();
   }
 
+  // ---------------------------------------------------------- 2D map ---------
+  // A frozen top-down view of the whole course so players can see the pads and
+  // gates ahead. Toggled with the 2D button or M; gameplay pauses while it is open.
+  function courseBounds() {
+    let minX = Infinity; let maxX = -Infinity; let minZ = Infinity; let maxZ = -Infinity;
+    for (const platform of platforms) {
+      minX = Math.min(minX, platform.minX);
+      maxX = Math.max(maxX, platform.maxX);
+      minZ = Math.min(minZ, platform.minZ);
+      maxZ = Math.max(maxZ, platform.maxZ);
+    }
+    return { minX, maxX, minZ, maxZ };
+  }
+
+  function updateMapCamera(aspect) {
+    const bounds = courseBounds();
+    const margin = 12;
+    const width = bounds.maxX - bounds.minX + margin * 2;
+    const length = bounds.maxZ - bounds.minZ + margin * 2;
+    const centerX = (bounds.minX + bounds.maxX) / 2;
+    const centerZ = (bounds.minZ + bounds.maxZ) / 2;
+    mapCamera.position.set(centerX, 160, centerZ);
+    if (aspect >= 1) {
+      // Landscape: course runs left→right (start on the left, finish on the right).
+      const halfHeight = Math.max(length / 2 / aspect, width / 2);
+      mapCamera.left = -halfHeight * aspect;
+      mapCamera.right = halfHeight * aspect;
+      mapCamera.top = halfHeight;
+      mapCamera.bottom = -halfHeight;
+      mapCamera.up.set(-1, 0, 0);
+    } else {
+      // Portrait: course runs bottom→top (start at the bottom, finish at the top).
+      const halfHeight = length / 2;
+      const halfWidth = Math.max(halfHeight * aspect, width / 2);
+      mapCamera.left = -halfWidth;
+      mapCamera.right = halfWidth;
+      mapCamera.top = halfHeight;
+      mapCamera.bottom = -halfHeight;
+      mapCamera.up.set(0, 0, -1);
+    }
+    mapCamera.lookAt(centerX, 0, centerZ);
+    mapCamera.updateProjectionMatrix();
+  }
+
+  function setMapView(next) {
+    if (!active || paused || finished) return;
+    if (mapView === next) return;
+    mapView = next;
+    keys.clear();
+    // Enlarge the floating labels so pad operations and gate requirements stay
+    // readable from the top-down camera; hide the ambient math-symbol clutter.
+    for (const pad of pads) {
+      pad.label.scale.copy(mapView ? pad.label.userData.mapScale : pad.label.userData.baseScale);
+    }
+    for (const gate of gates) {
+      for (const child of gate.sign ? [gate.sign] : []) child.scale.copy(mapView ? child.userData.mapScale : child.userData.baseScale);
+    }
+    for (const decoration of decorations) decoration.mesh.visible = !mapView;
+    youMarker.visible = mapView;
+    if (mapView) {
+      scene.fog = null;
+      youMarker.position.copy(player.position).add(new THREE.Vector3(0, 1.2, 0));
+      updateMapCamera(camera.aspect || innerWidth / innerHeight);
+    } else {
+      scene.fog = fog;
+      snapCamera();
+    }
+    if (element.mapToggle) {
+      element.mapToggle.textContent = mapView ? '3D' : '2D';
+      element.mapToggle.setAttribute('aria-pressed', mapView ? 'true' : 'false');
+    }
+    if (element.mapCaption) element.mapCaption.hidden = !mapView;
+    element.screen?.classList.toggle('dozen-map-open', mapView);
+    updateHud();
+  }
+
+  function toggleMap() {
+    setMapView(!mapView);
+  }
+
+  element.mapToggle?.addEventListener('click', () => toggleMap());
+
   // ---------------------------------------------------------- input ----------
   function down(event) {
     if (!active || event.repeat) return;
@@ -537,8 +638,10 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     else if (code === 'KeyD' || code === 'ArrowRight') keys.add('right');
     else if (code === 'Space') { keys.add('jump'); player.jumpBuffer = 0.16; }
     else if (code === 'KeyR') { if (!paused && !finished) respawn('Reset to checkpoint'); }
+    else if (code === 'KeyM') { toggleMap(); }
     else if (code === 'Escape') {
-      if (finished) leave();
+      if (mapView) setMapView(false);
+      else if (finished) leave();
       else if (paused) resume();
       else pause();
     } else return;
@@ -586,6 +689,8 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     paused = false;
     finished = false;
     running = false;
+    mapView = false;
+    scene.fog = fog;
     keys.clear();
     setOverlay(element.pause, false);
     setOverlay(element.finish, false);
@@ -811,6 +916,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
 
   function update(dt) {
     if (!active) return;
+    if (mapView) return;
     if (respawnTimer > 0) respawnTimer = Math.max(0, respawnTimer - dt);
     if (!paused && !finished) {
       if (running) elapsed += dt;
@@ -824,12 +930,17 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   const renderSize = new THREE.Vector2();
   function render() {
     const size = renderer.getSize(renderSize);
+    const aspect = size.x > 0 && size.y > 0 ? size.x / size.y : camera.aspect;
     if (size.x > 0 && size.y > 0) {
-      const aspect = size.x / size.y;
       if (Math.abs(camera.aspect - aspect) > 0.0005) {
         camera.aspect = aspect;
         camera.updateProjectionMatrix();
       }
+    }
+    if (mapView) {
+      updateMapCamera(aspect);
+      renderer.render(scene, mapCamera);
+      return;
     }
     renderer.render(scene, camera);
   }
@@ -855,6 +966,8 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     api.debugFinishPoint = () => finishPoint;
     api.debugGate = (index) => gates[index] ? { x: gates[index].x, z: gates[index].z, top: gates[index].top, required: gates[index].required, open: gates[index].open } : null;
     api.debugCheckpoint = () => ({ position: checkpoint.position.toArray(), value: checkpoint.value });
+    api.debugMap = () => ({ mapView, toggleText: element.mapToggle?.textContent ?? null });
+    api.debugToggleMap = () => toggleMap();
     window.__dozen = api;
   }
 

@@ -31,6 +31,7 @@ when running through `npm run dev` on the same Wi-Fi network.
 
 - `W` `A` `S` `D` or arrow keys — move (it is a 3D game but uses a fixed chase camera)
 - `SPACE` — jump
+- `M` or the **2D** button — top-down map of the whole course (run pauses)
 - `R` — reset to the last gate checkpoint
 - `ESC` — pause menu
 - On touch devices use the on-screen D-pad and JUMP button.
