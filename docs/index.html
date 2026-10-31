@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#141f26" />
-    <meta name="description" content="Blockbound: a game launcher with a fully interactive voxel world and an endless Roblox-style parkour obby. Play right in your browser." />
+    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, and 12 Dozen — a 3D math platformer. Play free in your browser." />
     <link rel="icon" type="image/png" href="/blockbound/icon-512.png" />
     <link rel="apple-touch-icon" href="/blockbound/icon-180.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Blockbound" />
     <meta property="og:title" content="Blockbound — Game Launcher" />
-    <meta property="og:description" content="Minecraft-style voxel worlds plus an endless Roblox-style parkour obby. Play free in your browser." />
+    <meta property="og:description" content="Minecraft-style voxel worlds, an endless parkour obby, and 12 Dozen — a 3D math platformer. Play free in your browser." />
     <meta property="og:image" content="/blockbound/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Blockbound — Game Launcher" />
-    <meta name="twitter:description" content="Minecraft-style voxel worlds plus an endless Roblox-style parkour obby. Play free in your browser." />
+    <meta name="twitter:description" content="Minecraft-style voxel worlds, an endless parkour obby, and 12 Dozen — a 3D math platformer. Play free in your browser." />
     <meta name="twitter:image" content="/blockbound/og.jpg" />
     <title>Blockbound — Game Launcher</title>
-    <script type="module" crossorigin src="/blockbound/assets/index-B0Qk-EI2.js"></script>
-    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-CWWz79A4.css">
+    <script type="module" crossorigin src="/blockbound/assets/index--UByzP5W.js"></script>
+    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-CPo-zYeN.css">
   </head>
   <body>
     <canvas id="world" aria-label="A blocky landscape"></canvas>
@@ -36,7 +36,7 @@
         <div class="launcher-content">
           <div class="launcher-brand">
             <h1 id="launcher-title" class="logo-word launcher-wordmark">BLOCKBOUND</h1>
-            <p class="launcher-tagline"><span id="splash-text">Now with more blocks!</span></p>
+            <p class="launcher-tagline"><span id="splash-text">Now with twelve dozen math!</span></p>
           </div>
 
           <div class="game-list" role="list" aria-label="Games in this launcher">
@@ -102,6 +102,38 @@
                 </div>
               </div>
             </article>
+
+            <article class="game-card game-card-dozen" data-game-card="dozen" aria-labelledby="dozen-card-title">
+              <div class="game-art dozen-art" aria-hidden="true">
+                <div class="dozen-stack">
+                  <span class="dozen-tile dozen-tile-a">144</span>
+                  <span class="dozen-tile dozen-tile-b">+12</span>
+                  <span class="dozen-tile dozen-tile-c">×2</span>
+                  <span class="dozen-cube-char">12</span>
+                </div>
+              </div>
+              <div class="game-details">
+                <div class="game-heading">
+                  <h2 id="dozen-card-title">12 Dozen</h2>
+                  <span class="game-status dozen-badge">Math Platformer</span>
+                </div>
+                <p class="game-description">Start at 12 and reach a dozen dozens. Hop across 3D platforms, step on + − × ÷ pads and unlock gates that need exactly 24, 72 and 144.</p>
+                <ul class="game-meta">
+                  <li>Target · 144</li>
+                  <li id="dozen-best">No best time yet</li>
+                  <li>3 gates · timed</li>
+                </ul>
+                <div class="game-actions">
+                  <button class="mc-button launch-button" data-action="launch" data-game="dozen" type="button">Play</button>
+                  <p id="dozen-hint" class="launch-hint">Math · platforms · twelve dozen</p>
+                  <p class="game-link-row">
+                    <span class="game-link-label">Launch link</span>
+                    <a id="dozen-launch-link" class="game-link" href="?play=dozen" title="Direct launch link for 12 Dozen">/?play=dozen</a>
+                    <button class="game-link-copy" type="button" data-action="copy-launch-link" data-game="dozen">Copy</button>
+                  </p>
+                </div>
+              </div>
+            </article>
           </div>
 
           <nav class="launcher-actions" aria-label="Launcher">
@@ -113,7 +145,7 @@
         </div>
 
         <footer class="launcher-footer">
-          <span>Blockbound Launcher 0.1.0 <span class="muted">· Web Edition</span></span>
+          <span>Blockbound Launcher 0.2.0 <span class="muted">· Web Edition</span></span>
           <span class="muted">Not an official Minecraft or Roblox product. Fan-built voxel demo.</span>
         </footer>
       </section>
@@ -331,6 +363,67 @@
               <button class="mc-button wide" data-parkour-action="next" type="button">Next level ▶</button>
               <button class="mc-button wide" data-parkour-action="restart" type="button">Replay level</button>
               <button class="mc-button wide" data-parkour-action="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="dozen-screen" class="screen parkour-screen dozen-screen" aria-labelledby="dozen-title">
+        <div class="parkour-hud">
+          <header class="parkour-topbar">
+            <div class="parkour-brand">
+              <span id="dozen-title" class="parkour-logo">12 Dozen</span>
+              <span class="parkour-server">Math platformer · Dozen dozens</span>
+            </div>
+            <div class="parkour-timer" id="dozen-timer" aria-label="Run time">00:00.0</div>
+            <div class="parkour-stats">
+              <span id="dozen-gates">Gate 1/3</span>
+              <span id="dozen-best-hud">Best –</span>
+            </div>
+          </header>
+          <p class="parkour-objective" id="dozen-objective">Next gate needs 24 · you have 12</p>
+          <div class="dozen-readout">
+            <span class="dozen-readout-label">Your number</span>
+            <span class="dozen-value" id="dozen-value">12</span>
+            <span class="dozen-equation" id="dozen-equation">Start · 12</span>
+          </div>
+          <p class="parkour-controls">WASD move · SPACE jump · R reset · ESC pause</p>
+          <div class="parkour-toast" id="dozen-toast" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="parkour-touch" aria-label="Touch controls">
+          <div class="parkour-dpad">
+            <button data-dozen-move="forward" type="button" aria-label="Forward">▲</button>
+            <div>
+              <button data-dozen-move="left" type="button" aria-label="Left">◀</button>
+              <button data-dozen-move="back" type="button" aria-label="Back">▼</button>
+              <button data-dozen-move="right" type="button" aria-label="Right">▶</button>
+            </div>
+          </div>
+          <button class="parkour-jump" data-dozen-jump="true" type="button">JUMP</button>
+        </div>
+
+        <div id="dozen-pause" class="parkour-overlay" hidden>
+          <div class="parkour-panel">
+            <h2>Paused</h2>
+            <p class="dozen-pause-line" id="dozen-pause-value">Your number: 12 · Start · 12</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-dozen-action="resume" type="button">Resume</button>
+              <button class="mc-button wide" data-dozen-action="restart" type="button">Restart run</button>
+              <button class="mc-button wide" data-dozen-action="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="dozen-finish" class="parkour-overlay" hidden>
+          <div class="parkour-panel parkour-finish-panel">
+            <h2>TWELVE DOZEN!</h2>
+            <p class="parkour-finish-time" id="dozen-finish-time">00:00.0</p>
+            <p class="parkour-finish-best" id="dozen-finish-best">New best time!</p>
+            <p class="dozen-finish-value" id="dozen-finish-value">144 = 12 × 12</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-dozen-action="restart" type="button">Run it again ▶</button>
+              <button class="mc-button wide" data-dozen-action="menu" type="button">Back to launcher</button>
             </div>
           </div>
         </div>

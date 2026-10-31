@@ -6,6 +6,7 @@ import textureNames from './texture-names.json';
 import { findMobGround } from './mob-spawn.js';
 import templates from './structure-templates.json';
 import { createParkour, formatTime as formatParkourTime } from './parkour.js';
+import { createDozen } from './dozen.js';
 
 // Public asset URLs must respect the deployment base (e.g. /blockbound/ on GitHub
 // Pages) as well as the root deployment used locally and on Vercel.
@@ -1711,6 +1712,7 @@ const STORAGE = {
   servers: 'java-menu-servers-v1',
   settings: 'java-menu-settings-v1',
   parkour: 'java-menu-parkour-v1',
+  dozen: 'java-menu-dozen-v1',
 };
 const defaultSettings = { fov: 72, distance: 4, volume: 70, bobbing: true, highContrast: false, blur: true, autoJump: false, narrator: false, language: 'en' };
 
@@ -1749,6 +1751,18 @@ const GAMES = {
       { keys: ['SPACE'], label: 'Jump' },
       { keys: ['SHIFT'], label: 'Sprint' },
       { keys: ['R'], label: 'Respawn at checkpoint' },
+      { keys: ['ESC'], label: 'Pause menu' },
+    ],
+  },
+  dozen: {
+    name: '12 Dozen',
+    version: 'Math Platformer · 144',
+    linkLabel: '/?play=dozen',
+    movement: true,
+    controls: [
+      { keys: ['W', 'A', 'S', 'D'], label: 'Move' },
+      { keys: ['SPACE'], label: 'Jump' },
+      { keys: ['R'], label: 'Reset to checkpoint' },
       { keys: ['ESC'], label: 'Pause menu' },
     ],
   },
@@ -1801,6 +1815,24 @@ function parkourOnline() {
   return 6 + ((hour * 7 + 3) % 19);
 }
 
+function dozenRecord() {
+  return readStore(STORAGE.dozen, {}) || {};
+}
+
+function dozenBest() {
+  const record = dozenRecord();
+  return typeof record.best === 'number' ? record.best : null;
+}
+
+function saveDozenFinish(seconds) {
+  const record = dozenRecord();
+  const isBest = typeof record.best !== 'number' || seconds < record.best;
+  const best = isBest ? seconds : record.best;
+  writeStore(STORAGE.dozen, { best, runs: (record.runs || 0) + 1 });
+  renderLauncher();
+  return { isBest, best };
+}
+
 let settings = { ...defaultSettings, ...readStore(STORAGE.settings, {}) };
 let worlds = readStore(STORAGE.worlds, [{
   id: 'first-world', name: 'My World', mode: 'survival', difficulty: 'peaceful', cheats: false,
@@ -1834,10 +1866,10 @@ camera.fov = settings.fov;
 camera.updateProjectionMatrix();
 
 const translations = {
-  en: { launch: 'Play', singleplayer: 'Worlds', multiplayer: 'Join a World', options: 'Settings', quit: 'Quit', splash: 'Now with more blocks!' },
-  zh: { launch: '开始游戏', singleplayer: '世界', multiplayer: '加入世界', options: '设置', quit: '退出', splash: '方块更多了！' },
-  es: { launch: 'Jugar', singleplayer: 'Mundos', multiplayer: 'Unirse a un mundo', options: 'Ajustes', quit: 'Salir', splash: '¡Ahora con más bloques!' },
-  de: { launch: 'Spielen', singleplayer: 'Welten', multiplayer: 'Welt beitreten', options: 'Einstellungen', quit: 'Beenden', splash: 'Jetzt mit mehr Blöcken!' },
+  en: { launch: 'Play', singleplayer: 'Worlds', multiplayer: 'Join a World', options: 'Settings', quit: 'Quit', splash: 'Now with twelve dozen math!' },
+  zh: { launch: '开始游戏', singleplayer: '世界', multiplayer: '加入世界', options: '设置', quit: '退出', splash: '现在有十二打数学了！' },
+  es: { launch: 'Jugar', singleplayer: 'Mundos', multiplayer: 'Unirse a un mundo', options: 'Ajustes', quit: 'Salir', splash: '¡Ahora con doce docenas de mates!' },
+  de: { launch: 'Spielen', singleplayer: 'Welten', multiplayer: 'Welt beitreten', options: 'Einstellungen', quit: 'Beenden', splash: 'Jetzt mit zwölf Dutzend Mathe!' },
 };
 
 function applyLanguage() {
@@ -1983,6 +2015,25 @@ function renderLauncher() {
       : 'Endless levels · timer · best time';
   }
 
+  // --- 12 Dozen math platformer card --------------------------------------
+  const dozenTime = dozenBest();
+  const dozenLink = document.querySelector('#dozen-launch-link');
+  if (dozenLink) {
+    const href = `?${LAUNCH_PARAM}=dozen`;
+    dozenLink.setAttribute('href', href);
+    dozenLink.textContent = `/${href}`;
+    dozenLink.title = `Direct launch link for ${GAMES.dozen.name}`;
+  }
+  const dozenBestNode = document.querySelector('#dozen-best');
+  if (dozenBestNode) dozenBestNode.textContent = dozenTime != null ? `Best ${formatParkourTime(dozenTime)}` : 'No best time yet';
+  const dozenHint = document.querySelector('#dozen-hint');
+  if (dozenHint) {
+    const runs = dozenRecord().runs || 0;
+    dozenHint.innerHTML = dozenTime != null
+      ? `Target <strong>144</strong> · best ${formatParkourTime(dozenTime)}${runs ? ` · ${runs} run${runs === 1 ? '' : 's'}` : ''}`
+      : 'Start at 12 · build up to 144';
+  }
+
   renderGameControlsRows();
 }
 
@@ -2084,8 +2135,28 @@ function launchParkour() {
   parkour.start(parkourNextLevel());
 }
 
+let dozen = null;
+function launchDozen() {
+  dozen ??= createDozen({
+    canvas,
+    renderer,
+    getBest: () => dozenBest(),
+    onFinish: (seconds) => saveDozenFinish(seconds),
+    onExit: () => {
+      showScreen('launcher');
+      syncLaunchUrl(null);
+    },
+  });
+  inWorld = false;
+  closeLan();
+  showScreen('dozen', { focus: false });
+  syncLaunchUrl('dozen');
+  dozen.start();
+}
+
 function launchGame(game = 'minecraft') {
   if (game === 'parkour') launchParkour();
+  else if (game === 'dozen') launchDozen();
   else launchMinecraft();
 }
 
@@ -2612,6 +2683,12 @@ let worldTime = 65;
 let nextAnimalSpawn = 0;
 function animate() {
   const delta = Math.min(clock.getDelta(), .05);
+  if (dozen?.active) {
+    dozen.update(delta);
+    dozen.render();
+    requestAnimationFrame(animate);
+    return;
+  }
   if (parkour?.active) {
     parkour.update(delta);
     parkour.render();

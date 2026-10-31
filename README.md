@@ -9,6 +9,11 @@ menu:
 - **Parkour Obby** — an endless Roblox-style obstacle course: three to five checkpoints
   per level, moving platforms, lava, timer, per-level best times, rotating visual
   themes and simulated online players who actually run, fall and respawn.
+- **12 Dozen** — a 3D math platformer: you start as the number 12, step on `+ − × ÷`
+  pads to change your value, and pass gates that only open at exactly **24**, **72**
+  and **144** (a dozen dozens). Timed runs, best time saved.
+
+Live site (GitHub Pages): https://yichen.github.io/blockbound/
 
 There is also a shared-world LAN mode for local development (see below).
 
@@ -21,6 +26,14 @@ npm run dev        # http://localhost:5173
 
 The Vite dev server includes the LAN multiplayer plugin, so "Join a World" only works
 when running through `npm run dev` on the same Wi-Fi network.
+
+## 12 Dozen controls
+
+- `W` `A` `S` `D` or arrow keys — move (it is a 3D game but uses a fixed chase camera)
+- `SPACE` — jump
+- `R` — reset to the last gate checkpoint
+- `ESC` — pause menu
+- On touch devices use the on-screen D-pad and JUMP button.
 
 ## Production build
 

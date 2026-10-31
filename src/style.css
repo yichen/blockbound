@@ -1635,6 +1635,123 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   pointer-events: none;
 }
 
+#app[data-screen="dozen"]::before {
+  opacity: 0;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+#app[data-screen="dozen"] #dozen-screen { pointer-events: auto; }
+
+.dozen-screen {
+  --pk-coral: #ff9ff3;
+  --pk-yellow: #ffd166;
+}
+
+.dozen-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 26px 12px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 16px;
+  background: rgba(8, 18, 26, .7);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .32), inset 0 1px rgba(255, 255, 255, .08);
+  pointer-events: none;
+  text-align: center;
+}
+
+.dozen-readout-label {
+  color: #a9c3cf;
+  font-size: 10px;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+}
+
+.dozen-value {
+  color: #ffffff;
+  font: 800 clamp(34px, 5vw, 54px)/1 "Trebuchet MS", "Arial Black", sans-serif;
+  text-shadow: 0 4px 0 rgba(4, 14, 18, .55), 0 0 24px rgba(123, 227, 203, .45);
+}
+
+.dozen-equation {
+  color: var(--pk-yellow);
+  font-size: 13px;
+  letter-spacing: .02em;
+}
+
+.dozen-pause-line,
+.dozen-finish-value {
+  color: var(--pk-yellow);
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+
+/* 12 Dozen launcher card ------------------------------------------------ */
+.game-card-dozen {
+  border-color: rgba(255, 159, 243, .34);
+  background: linear-gradient(145deg, rgba(43, 26, 52, .95), rgba(13, 20, 34, .96));
+}
+
+.game-card-dozen .game-heading h2 { color: #ffe1fa; }
+
+.dozen-badge {
+  border-color: rgba(255, 159, 243, .5) !important;
+  background: rgba(255, 159, 243, .14) !important;
+  color: #ffd9f7 !important;
+}
+
+.dozen-art {
+  border-color: rgba(255, 159, 243, .26);
+  background:
+    radial-gradient(circle at 52% 40%, rgba(255, 159, 243, .2), transparent 62%),
+    linear-gradient(160deg, #2c1b38 0%, #191a2e 60%, #0d1424 100%);
+}
+
+.dozen-stack {
+  position: relative;
+  z-index: 1;
+  width: 122px;
+  height: 118px;
+}
+
+.dozen-tile {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  min-width: 50px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  color: #101a22;
+  font: 800 18px/1 "Trebuchet MS", "Arial Black", sans-serif;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, .35), inset 0 -3px rgba(0, 0, 0, .22);
+}
+
+.dozen-tile-a { top: 0; right: 4px; background: #ffd166; transform: rotate(-7deg); }
+.dozen-tile-b { top: 38px; left: 0; background: #7bed9f; transform: rotate(6deg); }
+.dozen-tile-c { bottom: 6px; right: 0; background: #b38bff; transform: rotate(-4deg); }
+
+.dozen-cube-char {
+  position: absolute;
+  bottom: 0;
+  left: 4px;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 9px;
+  background: #63e6d5;
+  color: #073d38;
+  font: 800 17px/1 "Trebuchet MS", "Arial Black", sans-serif;
+  box-shadow: inset 0 -5px rgba(0, 0, 0, .24), 0 10px 18px rgba(0, 0, 0, .32);
+  transform: rotate(9deg);
+}
+
+.game-card-dozen .game-controls-row { border-top-color: rgba(255, 159, 243, .22); }
+.game-card-dozen .game-controls-keys kbd { border-color: rgba(255, 159, 243, .38); background: rgba(34, 18, 40, .9); color: #ffdff8; }
+.game-card-dozen .game-controls-keys span { color: #e7c7dd; }
+
 #app[data-screen="parkour"] #parkour-screen { pointer-events: none; }
 
 .parkour-screen {
@@ -2036,5 +2153,8 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   .mc-button.launch-button { min-height: 44px; margin-top: 0; }
   .game-link-row { padding-top: 7px; }
   .parkour-timer { font-size: 34px; }
+  .dozen-readout { padding: 7px 16px 8px; }
+  .dozen-value { font-size: 32px; }
+  .dozen-equation { font-size: 11px; }
 }
 
