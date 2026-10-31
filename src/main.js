@@ -7,6 +7,7 @@ import { findMobGround } from './mob-spawn.js';
 import templates from './structure-templates.json';
 import { createParkour, formatTime as formatParkourTime } from './parkour.js';
 import { createDozen } from './dozen.js';
+import { createJelly } from './jelly.js';
 
 // Public asset URLs must respect the deployment base (e.g. /blockbound/ on GitHub
 // Pages) as well as the root deployment used locally and on Vercel.
@@ -1713,6 +1714,7 @@ const STORAGE = {
   settings: 'java-menu-settings-v1',
   parkour: 'java-menu-parkour-v1',
   dozen: 'java-menu-dozen-v1',
+  jelly: 'java-menu-jelly-v1',
 };
 const defaultSettings = { fov: 72, distance: 4, volume: 70, bobbing: true, highContrast: false, blur: true, autoJump: false, narrator: false, language: 'en' };
 
@@ -1764,6 +1766,18 @@ const GAMES = {
       { keys: ['SPACE'], label: 'Jump' },
       { keys: ['M'], label: 'Toggle 2D map view' },
       { keys: ['R'], label: 'Reset to checkpoint' },
+      { keys: ['ESC'], label: 'Pause menu' },
+    ],
+  },
+  jelly: {
+    name: 'Jelly Run 2048',
+    version: 'Merge Runner · 2048',
+    linkLabel: '/?play=jelly',
+    movement: true,
+    controls: [
+      { keys: ['A', 'D', '←', '→'], label: 'Switch lane' },
+      { keys: ['SPACE'], label: 'Jump' },
+      { keys: ['R'], label: 'New run' },
       { keys: ['ESC'], label: 'Pause menu' },
     ],
   },
@@ -1832,6 +1846,22 @@ function saveDozenFinish(seconds) {
   writeStore(STORAGE.dozen, { best, runs: (record.runs || 0) + 1 });
   renderLauncher();
   return { isBest, best };
+}
+
+function jellyRecord() {
+  return readStore(STORAGE.jelly, {}) || {};
+}
+
+function saveJellyFinish(result) {
+  const record = jellyRecord();
+  const bestScore = Math.max(record.bestScore || 0, result.score || 0);
+  const bestNumber = Math.max(record.bestNumber || 0, result.number || 0);
+  const bestTime = record.bestTime ?? (result.elapsed || 0);
+  const isBest = bestScore > (record.bestScore || 0) || bestNumber > (record.bestNumber || 0);
+  const next = { bestScore, bestNumber, bestTime, runs: (record.runs || 0) + 1 };
+  writeStore(STORAGE.jelly, next);
+  renderLauncher();
+  return { isBest, best: next };
 }
 
 let settings = { ...defaultSettings, ...readStore(STORAGE.settings, {}) };
@@ -2035,6 +2065,26 @@ function renderLauncher() {
       : 'Start at 12 · build up to 144';
   }
 
+  // --- Jelly Run 2048 card ------------------------------------------------
+  const jelly = jellyRecord();
+  const jellyLink = document.querySelector('#jelly-launch-link');
+  if (jellyLink) {
+    const href = `?${LAUNCH_PARAM}=jelly`;
+    jellyLink.setAttribute('href', href);
+    jellyLink.textContent = `/${href}`;
+    jellyLink.title = `Direct launch link for ${GAMES.jelly.name}`;
+  }
+  const jellyBestNode = document.querySelector('#jelly-best');
+  if (jellyBestNode) {
+    jellyBestNode.textContent = jelly.bestNumber ? `Best jelly ${jelly.bestNumber.toLocaleString('en-US')}${jelly.bestScore ? ` · ${jelly.bestScore.toLocaleString('en-US')} pts` : ''}` : 'No best jelly yet';
+  }
+  const jellyHint = document.querySelector('#jelly-hint');
+  if (jellyHint) {
+    jellyHint.innerHTML = jelly.bestNumber
+      ? `Best <strong>${jelly.bestNumber.toLocaleString('en-US')}</strong> · ${jelly.runs ? `${jelly.runs} run${jelly.runs === 1 ? '' : 's'}` : 'merge runner'}`
+      : 'Merge · dodge · double up';
+  }
+
   renderGameControlsRows();
 }
 
@@ -2155,9 +2205,29 @@ function launchDozen() {
   dozen.start();
 }
 
+let jelly = null;
+function launchJelly() {
+  jelly ??= createJelly({
+    canvas,
+    renderer,
+    getBest: () => jellyRecord(),
+    onFinish: (result) => saveJellyFinish(result),
+    onExit: () => {
+      showScreen('launcher');
+      syncLaunchUrl(null);
+    },
+  });
+  inWorld = false;
+  closeLan();
+  showScreen('jelly', { focus: false });
+  syncLaunchUrl('jelly');
+  jelly.start();
+}
+
 function launchGame(game = 'minecraft') {
   if (game === 'parkour') launchParkour();
   else if (game === 'dozen') launchDozen();
+  else if (game === 'jelly') launchJelly();
   else launchMinecraft();
 }
 
@@ -2684,6 +2754,12 @@ let worldTime = 65;
 let nextAnimalSpawn = 0;
 function animate() {
   const delta = Math.min(clock.getDelta(), .05);
+  if (jelly?.active) {
+    jelly.update(delta);
+    jelly.render();
+    requestAnimationFrame(animate);
+    return;
+  }
   if (dozen?.active) {
     dozen.update(delta);
     dozen.render();

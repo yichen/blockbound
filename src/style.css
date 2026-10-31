@@ -1635,6 +1635,133 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   pointer-events: none;
 }
 
+#app[data-screen="jelly"]::before {
+  opacity: 0;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+.jelly-screen {
+  --pk-coral: #ff7aa8;
+  --pk-yellow: #ffe27a;
+}
+
+.jelly-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 28px 10px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 18px;
+  background: rgba(8, 18, 26, .68);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .3), inset 0 1px rgba(255, 255, 255, .1);
+  pointer-events: none;
+  text-align: center;
+}
+
+.jelly-readout-label {
+  color: #a9c3cf;
+  font-size: 10px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
+
+.jelly-number {
+  color: #ffe27a;
+  font: 800 clamp(34px, 5vw, 52px)/1 "Trebuchet MS", "Arial Black", sans-serif;
+  text-shadow: 0 4px 0 rgba(4, 14, 18, .5), 0 0 26px rgba(255, 226, 122, .4);
+}
+
+.jelly-next {
+  color: #bff4ff;
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+
+.jelly-hearts {
+  display: flex;
+  gap: 4px;
+  color: rgba(255, 255, 255, .18);
+  font-size: 18px;
+  letter-spacing: .08em;
+  pointer-events: none;
+}
+
+.jelly-hearts .on { color: #ff7aa8; text-shadow: 0 0 12px rgba(255, 122, 168, .6); }
+
+.jelly-touch { display: none; }
+.jelly-lane-buttons { display: flex; width: 100%; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.jelly-touch button {
+  width: 74px;
+  height: 62px;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 14px;
+  background: rgba(8, 18, 26, .62);
+  color: #fff;
+  font: 700 18px/1 "Trebuchet MS", "Arial Black", sans-serif;
+  pointer-events: auto;
+  touch-action: none;
+}
+.jelly-touch .jelly-jump { width: 120px; height: 66px; background: rgba(255, 122, 168, .28); border-color: rgba(255, 122, 168, .6); }
+
+/* Jelly Run 2048 launcher card */
+.game-card-jelly {
+  border-color: rgba(255, 122, 168, .34);
+  background: linear-gradient(145deg, rgba(46, 26, 46, .95), rgba(15, 24, 32, .96));
+}
+
+.game-card-jelly .game-heading h2 { color: #ffdfe9; }
+
+.jelly-badge {
+  border-color: rgba(255, 122, 168, .5) !important;
+  background: rgba(255, 122, 168, .14) !important;
+  color: #ffd6e2 !important;
+}
+
+.jelly-art {
+  border-color: rgba(255, 122, 168, .26);
+  background:
+    radial-gradient(circle at 52% 42%, rgba(255, 122, 168, .22), transparent 62%),
+    linear-gradient(160deg, #2e1a2c 0%, #19202e 60%, #0d1520 100%);
+}
+
+.jelly-stack { position: relative; z-index: 1; width: 128px; height: 120px; }
+
+.jelly-tile {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  min-width: 50px;
+  height: 40px;
+  padding: 0 9px;
+  border-radius: 12px;
+  font: 800 18px/1 "Trebuchet MS", "Arial Black", sans-serif;
+  color: #14232b;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, .35), inset 0 -4px rgba(0, 0, 0, .2), inset 0 3px rgba(255, 255, 255, .35);
+}
+
+.jelly-tile-2 { top: 2px; left: 2px; background: #63e6d5; transform: rotate(-8deg); }
+.jelly-tile-4 { top: 32px; right: 2px; background: #ffe27a; transform: rotate(7deg); }
+.jelly-tile-8 { top: 66px; left: 0; background: #b58cff; transform: rotate(-4deg); }
+.jelly-tile-2048 { bottom: 0; right: 4px; background: #ff7aa8; color: #fff; transform: rotate(6deg); }
+
+.jelly-blob {
+  position: absolute;
+  right: 6px;
+  top: 0;
+  width: 40px;
+  height: 34px;
+  border-radius: 46% 54% 60% 40% / 55% 45% 55% 45%;
+  background: radial-gradient(circle at 36% 32%, #ffffff, #63e6d5 55%, #2ab7a6);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, .3);
+  transform: rotate(-12deg);
+}
+
+@media (pointer: coarse) {
+  .jelly-touch { display: flex; }
+}
+
 #app[data-screen="dozen"]::before {
   opacity: 0;
   backdrop-filter: none;
@@ -2243,5 +2370,9 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   .dozen-equation { font-size: 11px; }
   .dozen-powers { max-width: 94vw; gap: 4px; }
   .dozen-power { padding: 3px 7px; font-size: 9px; }
+  .jelly-readout { padding: 6px 18px 8px; }
+  .jelly-number { font-size: 32px; }
+  .jelly-touch button { width: 64px; height: 56px; }
+  .jelly-touch .jelly-jump { width: 104px; height: 58px; }
 }
 

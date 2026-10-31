@@ -14,6 +14,10 @@ menu:
   carry also unlocks **math powers**: multiples of 3 can climb, 4 can push, 5 can swim,
   9 jump tall, and negative numbers flip gravity upside down. Timed runs, best time
   saved.
+- **Jelly Run 2048** — a 3D merge-runner in the spirit of Jelly Run 2048: auto-run the
+  jelly lane, switch tracks, merge matching number cubes to double `2 → 4 → 8 … → 2048`,
+  dodge the pink blockers, and split in half if you hit the wrong number. 3 hearts,
+  score and best jelly saved.
 
 Live site (GitHub Pages): https://yichen.github.io/blockbound/
 
@@ -47,6 +51,13 @@ Math powers come from the number on your block:
 - `R` — reset to the last gate checkpoint
 - `ESC` — pause menu
 - On touch devices use the on-screen D-pad and JUMP button.
+
+## Jelly Run 2048 controls
+
+- `A` / `D` or `←` / `→` — switch lane
+- `SPACE` — jump over pink jelly blockers
+- `R` — restart the run · `ESC` — pause
+- Touch: ◀ / JUMP / ▶ buttons, or swipe left/right and up.
 
 ## Production build
 

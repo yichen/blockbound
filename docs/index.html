@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#141f26" />
-    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, and 12 Dozen — a 3D math platformer. Play free in your browser." />
+    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, 12 Dozen — a 3D math platformer, and Jelly Run 2048 — a 3D merge-runner. Play free in your browser." />
     <link rel="icon" type="image/png" href="/blockbound/icon-512.png" />
     <link rel="apple-touch-icon" href="/blockbound/icon-180.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Blockbound" />
     <meta property="og:title" content="Blockbound — Game Launcher" />
-    <meta property="og:description" content="Minecraft-style voxel worlds, an endless parkour obby, and 12 Dozen — a 3D math platformer. Play free in your browser." />
+    <meta property="og:description" content="Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, and Jelly Run 2048 — all playable free in your browser." />
     <meta property="og:image" content="/blockbound/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Blockbound — Game Launcher" />
-    <meta name="twitter:description" content="Minecraft-style voxel worlds, an endless parkour obby, and 12 Dozen — a 3D math platformer. Play free in your browser." />
+    <meta name="twitter:description" content="Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, and Jelly Run 2048 — all playable free in your browser." />
     <meta name="twitter:image" content="/blockbound/og.jpg" />
     <title>Blockbound — Game Launcher</title>
-    <script type="module" crossorigin src="/blockbound/assets/index-CbHxd5ck.js"></script>
-    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-BCntngOo.css">
+    <script type="module" crossorigin src="/blockbound/assets/index-CbqjwqAr.js"></script>
+    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-D-XTzpUb.css">
   </head>
   <body>
     <canvas id="world" aria-label="A blocky landscape"></canvas>
@@ -134,6 +134,38 @@
                 </div>
               </div>
             </article>
+            <article class="game-card game-card-jelly" data-game-card="jelly" aria-labelledby="jelly-card-title">
+              <div class="game-art jelly-art" aria-hidden="true">
+                <div class="jelly-stack">
+                  <span class="jelly-tile jelly-tile-2">2</span>
+                  <span class="jelly-tile jelly-tile-4">4</span>
+                  <span class="jelly-tile jelly-tile-8">8</span>
+                  <span class="jelly-tile jelly-tile-2048">2048</span>
+                  <span class="jelly-blob"></span>
+                </div>
+              </div>
+              <div class="game-details">
+                <div class="game-heading">
+                  <h2 id="jelly-card-title">Jelly Run 2048</h2>
+                  <span class="game-status jelly-badge">Merge Runner</span>
+                </div>
+                <p class="game-description">Auto-run the jelly lane, switch tracks and merge matching number cubes to double your jelly — 2 → 4 → 8 → 2048. Dodge the pink blockers; hit the wrong number and you split in half.</p>
+                <ul class="game-meta">
+                  <li>Target · 2,048</li>
+                  <li id="jelly-best">No best jelly yet</li>
+                  <li>3 hearts · timed</li>
+                </ul>
+                <div class="game-actions">
+                  <button class="mc-button launch-button" data-action="launch" data-game="jelly" type="button">Play</button>
+                  <p id="jelly-hint" class="launch-hint">Merge · dodge · double up</p>
+                  <p class="game-link-row">
+                    <span class="game-link-label">Launch link</span>
+                    <a id="jelly-launch-link" class="game-link" href="?play=jelly" title="Direct launch link for Jelly Run 2048">/?play=jelly</a>
+                    <button class="game-link-copy" type="button" data-action="copy-launch-link" data-game="jelly">Copy</button>
+                  </p>
+                </div>
+              </div>
+            </article>
           </div>
 
           <nav class="launcher-actions" aria-label="Launcher">
@@ -145,7 +177,7 @@
         </div>
 
         <footer class="launcher-footer">
-          <span>Blockbound Launcher 0.3.0 <span class="muted">· Web Edition</span></span>
+          <span>Blockbound Launcher 0.4.0 <span class="muted">· Web Edition</span></span>
           <span class="muted">Not an official Minecraft or Roblox product. Fan-built voxel demo.</span>
         </footer>
       </section>
@@ -427,6 +459,64 @@
             <div class="parkour-panel-actions">
               <button class="mc-button wide" data-dozen-action="restart" type="button">Run it again ▶</button>
               <button class="mc-button wide" data-dozen-action="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="jelly-screen" class="screen parkour-screen jelly-screen" aria-labelledby="jelly-title">
+        <div class="parkour-hud">
+          <header class="parkour-topbar">
+            <div class="parkour-brand">
+              <span id="jelly-title" class="parkour-logo">Jelly Run 2048</span>
+              <span class="parkour-server">Merge runner · reach 2,048</span>
+            </div>
+            <div class="parkour-timer" id="jelly-timer" aria-label="Run time">00:00.0</div>
+            <div class="parkour-stats">
+              <span id="jelly-score">0 pts</span>
+              <span id="jelly-best">Best –</span>
+            </div>
+          </header>
+          <p class="parkour-objective" id="jelly-objective">Merge jelly cubes to double — reach 2,048</p>
+          <div class="jelly-readout">
+            <span class="jelly-readout-label">Your jelly</span>
+            <span class="jelly-number" id="jelly-number">2</span>
+            <span class="jelly-next" id="jelly-next">next ×2 = 4</span>
+          </div>
+          <div class="jelly-hearts" id="jelly-hearts" aria-label="Hearts"><span class="on">♥</span><span class="on">♥</span><span class="on">♥</span></div>
+          <p class="parkour-controls">A/D or ←/→ switch lane · SPACE jump · R restart · ESC pause</p>
+          <div class="parkour-toast" id="jelly-toast" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="parkour-touch jelly-touch" aria-label="Touch controls">
+          <div class="jelly-lane-buttons">
+            <button data-jelly-action="left" type="button" aria-label="Left lane">◀</button>
+            <button class="jelly-jump" data-jelly-action="jump" type="button">JUMP</button>
+            <button data-jelly-action="right" type="button" aria-label="Right lane">▶</button>
+          </div>
+        </div>
+
+        <div id="jelly-pause" class="parkour-overlay" hidden>
+          <div class="parkour-panel">
+            <h2>Paused</h2>
+            <p class="jelly-pause-line" id="jelly-pause-score">2 jelly · 0 pts</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-jelly-panel="resume" type="button">Resume</button>
+              <button class="mc-button wide" data-jelly-panel="restart" type="button">New run</button>
+              <button class="mc-button wide" data-jelly-panel="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="jelly-finish" class="parkour-overlay" hidden>
+          <div class="parkour-panel parkour-finish-panel">
+            <h2 id="jelly-finish-title">Jelly Splat!</h2>
+            <p class="parkour-finish-time" id="jelly-finish-time">00:00.0</p>
+            <p class="jelly-finish-score" id="jelly-finish-score">2 jelly · 0 pts</p>
+            <p class="parkour-finish-best" id="jelly-finish-best">New best!</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-jelly-panel="restart" type="button">Run again ▶</button>
+              <button class="mc-button wide" data-jelly-panel="menu" type="button">Back to launcher</button>
             </div>
           </div>
         </div>
