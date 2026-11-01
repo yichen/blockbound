@@ -11,58 +11,72 @@ const START_X = 0;
 
 const LEVELS = [
   {
-    name: 'Stereo Start', speed: 7.0, length: 82,
+    name: 'Stereo Start', speed: 7.0, length: 88,
     sky: 0x0d0820, floor: 0x1a1038, accent: 0x63e6d5, spikeColor: 0xff5c8a, blockColor: 0x8b5cff,
     obstacles: [
       { type: 'spike', x: 16 },
+      { type: 'saw', x: 23, y: 0.62, r: 0.62 },
       { type: 'spike', x: 30 },
+      { type: 'saw', x: 37, y: 0.62, r: 0.62 },
       { type: 'spike', x: 44 },
+      { type: 'saw', x: 51, y: 0.62, r: 0.62 },
       { type: 'spike', x: 58 },
+      { type: 'saw', x: 65, y: 0.62, r: 0.62 },
       { type: 'spike', x: 72 },
+      { type: 'saw', x: 79, y: 0.62, r: 0.62 },
     ],
   },
   {
-    name: 'Bass Drop', speed: 8.0, length: 120,
+    name: 'Bass Drop', speed: 8.0, length: 124,
     sky: 0x1a0a20, floor: 0x2a1030, accent: 0xff9ff3, spikeColor: 0xffc93c, blockColor: 0xff5c8a,
     obstacles: [
       { type: 'spike', x: 12 },
-      { type: 'block', x: 24, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 36 },
-      { type: 'block', x: 48, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 60 },
-      { type: 'block', x: 72, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 84 },
-      { type: 'block', x: 96, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 108 },
+      { type: 'saw', x: 19, y: 0.62, r: 0.6 },
+      { type: 'block', x: 26, w: 2.0, h: 1.0 },
+      { type: 'spike', x: 33 },
+      { type: 'saw', x: 40, y: 0.62, r: 0.6 },
+      { type: 'block', x: 47, y: 2.2, w: 2.4, h: 1.0 },
+      { type: 'spike', x: 54 },
+      { type: 'saw', x: 61, y: 0.62, r: 0.6 },
+      { type: 'block', x: 68, w: 2.2, h: 1.2 },
+      { type: 'spike', x: 75 },
+      { type: 'saw', x: 82, y: 0.62, r: 0.6 },
+      { type: 'block', x: 89, w: 2.0, h: 1.0 },
+      { type: 'spike', x: 96 },
+      { type: 'saw', x: 103, y: 0.62, r: 0.6 },
+      { type: 'block', x: 110, w: 2.2, h: 1.2 },
+      { type: 'spike', x: 117 },
     ],
   },
   {
-    name: 'Neon Overdrive', speed: 8.8, length: 145,
+    name: 'Neon Overdrive', speed: 8.8, length: 150,
     sky: 0x061426, floor: 0x0c2a3a, accent: 0x7be3cb, spikeColor: 0xff4d6d, blockColor: 0x74a7ff,
     obstacles: [
       { type: 'spike', x: 10 },
-      { type: 'block', x: 17, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 24 },
-      { type: 'block', x: 31, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 38 },
-      { type: 'spike', x: 39.4 },
-      { type: 'block', x: 45, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 52 },
-      { type: 'block', x: 59, w: 2.2, h: 1.2 },
+      { type: 'saw', x: 16, y: 0.62, r: 0.6 },
+      { type: 'block', x: 22, w: 2.0, h: 1.0 },
+      { type: 'spike', x: 28 },
+      { type: 'saw', x: 34, y: 0.62, r: 0.6 },
+      { type: 'block', x: 40, w: 2.2, h: 1.2 },
+      { type: 'spike', x: 46 },
+      { type: 'spike', x: 47.4 },
+      { type: 'saw', x: 54, y: 0.62, r: 0.6 },
+      { type: 'block', x: 60, w: 2.0, h: 1.0 },
       { type: 'spike', x: 66 },
-      { type: 'spike', x: 67.4 },
-      { type: 'block', x: 73, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 80 },
-      { type: 'block', x: 87, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 94 },
-      { type: 'spike', x: 95.4 },
-      { type: 'block', x: 101, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 108 },
-      { type: 'block', x: 115, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 122 },
-      { type: 'spike', x: 123.4 },
-      { type: 'block', x: 129, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 136 },
+      { type: 'saw', x: 72, y: 0.62, r: 0.6 },
+      { type: 'block', x: 78, w: 2.2, h: 1.2 },
+      { type: 'saw', x: 85, y: 2.3, r: 0.55 },
+      { type: 'spike', x: 92 },
+      { type: 'spike', x: 93.4 },
+      { type: 'saw', x: 99, y: 0.62, r: 0.6 },
+      { type: 'block', x: 105, w: 2.0, h: 1.0 },
+      { type: 'spike', x: 111 },
+      { type: 'saw', x: 117, y: 0.62, r: 0.6 },
+      { type: 'block', x: 123, w: 2.2, h: 1.2 },
+      { type: 'spike', x: 129 },
+      { type: 'spike', x: 130.4 },
+      { type: 'saw', x: 136, y: 0.62, r: 0.6 },
+      { type: 'spike', x: 143 },
     ],
   },
 ];
@@ -287,17 +301,55 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
         levelGroup.add(spike);
         obstacle.minX = obstacle.x - 0.3; obstacle.maxX = obstacle.x + 0.3;
         obstacle.minY = 0; obstacle.maxY = 1.1;
+      } else if (obstacle.type === 'saw') {
+        const radius = obstacle.r || 0.6;
+        const group = new THREE.Group();
+        const disc = new THREE.Mesh(
+          new THREE.CylinderGeometry(radius, radius, 0.16, 20),
+          new THREE.MeshStandardMaterial({ color: 0xdfe9ff, emissive: level.accent, emissiveIntensity: 0.35, roughness: 0.25, metalness: 0.8 }),
+        );
+        disc.rotation.x = Math.PI / 2;
+        group.add(disc);
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(radius * 0.92, 0.075, 8, 24),
+          new THREE.MeshStandardMaterial({ color: level.spikeColor, emissive: level.spikeColor, emissiveIntensity: 0.9, roughness: 0.3 }),
+        );
+        group.add(ring);
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          const tooth = new THREE.Mesh(
+            new THREE.ConeGeometry(radius * 0.24, radius * 0.5, 4),
+            new THREE.MeshStandardMaterial({ color: level.spikeColor, emissive: level.spikeColor, emissiveIntensity: 0.8, roughness: 0.3 }),
+          );
+          tooth.position.set(Math.cos(angle) * radius * 0.92, Math.sin(angle) * radius * 0.92, 0);
+          tooth.rotation.z = angle - Math.PI / 2;
+          group.add(tooth);
+        }
+        group.position.set(obstacle.x, obstacle.y || radius, 0);
+        levelGroup.add(group);
+        obstacle.mesh = group;
+        obstacle.spin = 0;
+        const hit = radius * 0.85;
+        obstacle.minX = obstacle.x - hit; obstacle.maxX = obstacle.x + hit;
+        obstacle.minY = (obstacle.y || radius) - hit; obstacle.maxY = (obstacle.y || radius) + hit;
       } else {
+        const baseY = obstacle.y || 0;
         const block = box(obstacle.w, obstacle.h, 1.4, level.blockColor, level.blockColor, 0.45);
-        block.position.set(obstacle.x + obstacle.w / 2, obstacle.h / 2, 0);
+        block.position.set(obstacle.x + obstacle.w / 2, baseY + obstacle.h / 2, 0);
         const edges = new THREE.LineSegments(
           new THREE.EdgesGeometry(block.geometry),
           new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 }),
         );
         edges.position.copy(block.position);
         levelGroup.add(block, edges);
+        const floaters = baseY > 0.5;
         obstacle.minX = obstacle.x; obstacle.maxX = obstacle.x + obstacle.w;
-        obstacle.minY = 0; obstacle.maxY = obstacle.h;
+        obstacle.minY = baseY; obstacle.maxY = baseY + obstacle.h;
+        if (floaters) {
+          const label = makeLabel('FLOAT', { accent: `#${level.accent.toString(16).padStart(6, '0')}`, scale: 2.4, height: 0.6 });
+          label.position.set(obstacle.x + obstacle.w / 2, baseY + obstacle.h + 0.7, 0);
+          levelGroup.add(label);
+        }
       }
     }
 
@@ -521,6 +573,12 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
       }
       die();
       return;
+    }
+    for (const obstacle of level.obstacles) {
+      if (obstacle.type === 'saw' && obstacle.mesh) {
+        obstacle.spin = (obstacle.spin || 0) + dt * 7;
+        obstacle.mesh.rotation.z = obstacle.spin;
+      }
     }
     progress = clamp((player.x / level.length) * 100, 0, 100);
     if (player.x >= level.length) {
