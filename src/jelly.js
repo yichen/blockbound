@@ -11,9 +11,12 @@ const SPAWN_Z = -66;
 const START_NUMBER = 2;
 const LEVELS = [
   { name: 'Strawberry Shores', goal: 32, sky: 0x9fe3ff, track: 0x8fe3f5, rail: 0x7be3cb, match: 0x63e6d5, decoy: 0xb58cff, barrier: 0xff7aa8, speed: 7.4, spawn: 1.15 },
-  { name: 'Lime Lagoon', goal: 128, sky: 0xbfe98f, track: 0x9be15d, rail: 0x63e6d5, match: 0x9be15d, decoy: 0xff9ff3, barrier: 0xff7a5c, speed: 8.4, spawn: 1.0 },
-  { name: 'Blueberry Bay', goal: 512, sky: 0x9fb9ff, track: 0x74a7ff, rail: 0xb58cff, match: 0x74b9ff, decoy: 0xffd166, barrier: 0xff5c8a, speed: 9.6, spawn: 0.88 },
-  { name: 'Candy Cosmos', goal: 2048, sky: 0xffc6e2, track: 0xff9ecb, rail: 0xb58cff, match: 0xff9ecb, decoy: 0x63e6d5, barrier: 0xff4d6d, speed: 10.8, spawn: 0.76 },
+  { name: 'Lime Lagoon', goal: 64, sky: 0xbfe98f, track: 0x9be15d, rail: 0x63e6d5, match: 0x9be15d, decoy: 0xff9ff3, barrier: 0xff7a5c, speed: 7.8, spawn: 1.08 },
+  { name: 'Blueberry Bay', goal: 128, sky: 0x9fb9ff, track: 0x74a7ff, rail: 0xb58cff, match: 0x74b9ff, decoy: 0xffd166, barrier: 0xff5c8a, speed: 8.2, spawn: 1.0 },
+  { name: 'Peach Peak', goal: 256, sky: 0xffc6b0, track: 0xffb38f, rail: 0xffd166, match: 0xff9f7a, decoy: 0x63e6d5, barrier: 0xff5c8a, speed: 8.7, spawn: 0.94 },
+  { name: 'Melon Marina', goal: 512, sky: 0x9ff0c8, track: 0x63e6a5, rail: 0xff9ff3, match: 0x63e6a5, decoy: 0xffd166, barrier: 0xff4d6d, speed: 9.2, spawn: 0.88 },
+  { name: 'Grape Gorge', goal: 1024, sky: 0xc6b0ff, track: 0xb58cff, rail: 0xffd166, match: 0xb58cff, decoy: 0x63e6d5, barrier: 0xff7a5c, speed: 9.8, spawn: 0.82 },
+  { name: 'Candy Cosmos', goal: 2048, sky: 0xffc6e2, track: 0xff9ecb, rail: 0xb58cff, match: 0xff9ecb, decoy: 0x63e6d5, barrier: 0xff4d6d, speed: 10.4, spawn: 0.76 },
 ];
 const BASE_SPEED = 8.2;
 const MAX_SPEED = 17;
@@ -215,7 +218,7 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
     screen: document.querySelector('#jelly-screen'),
     timer: document.querySelector('#jelly-timer'),
     score: document.querySelector('#jelly-score'),
-    best: document.querySelector('#jelly-best'),
+    best: document.querySelector('#jelly-best-hud'),
     number: document.querySelector('#jelly-number'),
     next: document.querySelector('#jelly-next'),
     hearts: document.querySelector('#jelly-hearts'),
@@ -502,6 +505,12 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
     if (element.finishTime) element.finishTime.textContent = formatTime(elapsed);
     if (element.finishScore) element.finishScore.textContent = `${formatNumber(player.number)} jelly · ${formatNumber(score)} pts`;
     if (element.finishBest) element.finishBest.textContent = result.isBest ? `${message} New best!` : message;
+    const nextButton = document.querySelector('#jelly-finish [data-jelly-panel="next"]');
+    if (nextButton) {
+      nextButton.textContent = levelIndex + 1 < LEVELS.length
+        ? `Next level · goal ${formatNumber(LEVELS[levelIndex + 1].goal)} ▶`
+        : 'Replay from level 1 ▶';
+    }
     setOverlay(element.pause, false);
     setOverlay(element.finish, true);
     updateHud();
@@ -543,9 +552,9 @@ export function createJelly({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function nextLevel() {
-    resetRun(levelIndex + 2);
+    resetRun(levelIndex + 2 > LEVELS.length ? 1 : levelIndex + 2);
     running = false;
-    showToast(`Level ${levelIndex + 1} · ${LEVELS[levelIndex].name}`);
+    showToast(`Level ${levelIndex + 1} · ${LEVELS[levelIndex].name} · goal ${formatNumber(LEVELS[levelIndex].goal)}`);
   }
 
   function leave() {

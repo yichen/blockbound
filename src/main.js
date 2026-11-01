@@ -1777,7 +1777,7 @@ const GAMES = {
   },
   jelly: {
     name: 'Jelly Run 2048',
-    version: 'Merge Runner · 4 Levels',
+    version: 'Merge Runner · 7 Stages',
     linkLabel: '/?play=jelly',
     movement: true,
     controls: [
@@ -2213,13 +2213,13 @@ function renderLauncher() {
   if (jellyBestNode) {
     const levels = Object.keys(jelly.levels || {}).length;
     const latest = jelly.levels?.[jelly.lastLevel ?? 0];
-    jellyBestNode.textContent = latest?.bestNumber ? `${levels}/4 levels · best ${latest.bestNumber.toLocaleString('en-US')}` : 'No best jelly yet';
+    jellyBestNode.textContent = latest?.bestNumber ? `${levels}/7 stages · best ${latest.bestNumber.toLocaleString('en-US')}` : 'No best jelly yet';
   }
   const jellyHint = document.querySelector('#jelly-hint');
   if (jellyHint) {
     jellyHint.innerHTML = jelly.runs
-      ? `4 levels · ${jelly.runs} run${jelly.runs === 1 ? '' : 's'} · merge to the goal`
-      : '4 levels · merge · dodge · split';
+      ? `7 stages · ${jelly.runs} run${jelly.runs === 1 ? '' : 's'} · merge to the goal`
+      : '7 stages · merge · dodge · split';
   }
 
   // --- Kart Rush card -----------------------------------------------------
@@ -2424,7 +2424,7 @@ function launchJelly() {
   showScreen('jelly', { focus: false });
   syncLaunchUrl('jelly');
   const jellyLast = jellyRecord().lastLevel;
-  jelly.start(jellyLast == null ? 1 : Math.min(jellyLast + 1, 4));
+  jelly.start(jellyLast == null ? 1 : Math.min(jellyLast + 1, 7));
 }
 
 let kart = null;

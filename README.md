@@ -13,10 +13,11 @@ menu:
   targets and pad values (24/72/144, then 48/150/144, then 36/90/144). Step on
   `+ − × ÷` pads and use **math powers**: multiples of 3 climb, 4 push, 5 swim,
   9 jump tall, negatives flip gravity upside down. Best time saved per level.
-- **Jelly Run 2048** — a 3D merge-runner in the spirit of Jelly Run 2048 with **four
-  themed levels** (goals 32 → 128 → 512 → 2048): auto-run the jelly lane, switch tracks,
-  merge matching number cubes to double, dodge the pink blockers, and split in half if
-  you hit the wrong number. 3 hearts; best jelly saved per level.
+- **Jelly Run 2048** — a 3D merge-runner in the spirit of Jelly Run 2048 with **seven
+  themed stages** that double the target every time (32 → 64 → 128 → 256 → 512 → 1024 →
+  2048): auto-run the jelly lane, switch tracks, merge matching number cubes to double,
+  dodge the pink blockers, and split in half if you hit the wrong number. 3 hearts; best
+  jelly saved per stage, with an explicit “next goal” button after each clear.
 - **Kart Rush** — an original 3D kart-racing tribute to Mario Kart with **three
   circuits** and a full race loop: 3-2-1 countdown, three laps, boost pads, item-box
   turbo charges, and three AI rivals that follow the racing line with rubber-banding.
