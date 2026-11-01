@@ -321,6 +321,7 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
     player.onGround = true;
     player.rotation = 0;
     playerGroup.rotation.z = 0;
+    playerCube.rotation.z = 0;
     playerGroup.position.set(player.x, player.y, 0);
     progress = 0;
     cameraX = 0;
@@ -487,9 +488,21 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
     if (player.y <= 0) {
       player.y = 0;
       player.vy = 0;
+      if (!player.onGround) {
+        const step = Math.PI / 2;
+        player.rotation = Math.round(player.rotation / step) * step;
+      }
       player.onGround = true;
     } else {
       player.onGround = false;
+    }
+    // Rotating a square can push its corners below the floor; lift it just enough
+    // that the visual cube never intersects the ground.
+    if (!player.onGround) {
+      const halfExtent = 0.5 * (Math.abs(Math.cos(player.rotation)) + Math.abs(Math.sin(player.rotation)));
+      playerCube.position.y = PLAYER_SIZE / 2 + Math.max(0, halfExtent - PLAYER_SIZE / 2 - player.y);
+    } else {
+      playerCube.position.y = PLAYER_SIZE / 2;
     }
     if (!player.onGround) player.rotation -= dt * 7.5;
 
@@ -499,6 +512,10 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
       if (obstacle.type === 'block' && player.vy <= 0 && previousY >= obstacle.maxY - 0.5) {
         player.y = obstacle.maxY;
         player.vy = 0;
+        if (!player.onGround) {
+          const step = Math.PI / 2;
+          player.rotation = Math.round(player.rotation / step) * step;
+        }
         player.onGround = true;
         continue;
       }
@@ -517,7 +534,8 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
     camera.position.y += (5.2 - camera.position.y) * Math.min(1, dt * 5);
     camera.lookAt(cameraX + 5, 2.6, 0);
     playerGroup.position.set(player.x, player.y, 0);
-    playerGroup.rotation.z = player.rotation;
+    playerCube.rotation.z = player.rotation;
+    playerGroup.rotation.z = 0;
     playerCube.material.emissiveIntensity = 0.4 + Math.sin(player.x * 0.6) * 0.15;
 
     // Update shards.
