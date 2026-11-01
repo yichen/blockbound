@@ -92,6 +92,104 @@ function makeFloorLabel(text, { accent = '#8ecbff' } = {}) {
   return mesh;
 }
 
+function makePanelTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#eef3f6';
+  ctx.fillRect(0, 0, 256, 256);
+  // Soft panel grid + bevels.
+  ctx.strokeStyle = 'rgba(50, 70, 80, .16)';
+  ctx.lineWidth = 3;
+  for (let i = 0; i <= 256; i += 64) {
+    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(256, i); ctx.stroke();
+  }
+  ctx.strokeStyle = 'rgba(255, 255, 255, .75)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i <= 256; i += 64) {
+    ctx.beginPath(); ctx.moveTo(i + 2, 0); ctx.lineTo(i + 2, 256); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, i + 2); ctx.lineTo(256, i + 2); ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(255, 255, 255, .15)';
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(256, 0); ctx.lineTo(0, 140); ctx.closePath(); ctx.fill();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+const PANEL_TEXTURE = makePanelTexture();
+
+function makeFaceTexture(skin, hair) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = skin;
+  ctx.fillRect(0, 0, 256, 256);
+  // Hair.
+  ctx.fillStyle = hair;
+  ctx.beginPath();
+  ctx.roundRect(0, 0, 256, 64, 18);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.16)';
+  ctx.beginPath(); ctx.ellipse(70, 30, 44, 14, -0.2, 0, Math.PI * 2); ctx.fill();
+  // Eyes.
+  for (const x of [82, 174]) {
+    ctx.fillStyle = '#f7fbff';
+    ctx.beginPath(); ctx.ellipse(x, 112, 24, 20, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1c2a36';
+    ctx.beginPath(); ctx.ellipse(x + 4, 114, 10, 13, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(x + 8, 108, 4, 5, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  // Brows.
+  ctx.strokeStyle = hair;
+  ctx.lineWidth = 7;
+  ctx.beginPath(); ctx.moveTo(58, 78); ctx.lineTo(106, 82); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(150, 82); ctx.lineTo(198, 78); ctx.stroke();
+  // Mouth.
+  ctx.strokeStyle = 'rgba(90, 45, 40, .85)';
+  ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.arc(128, 170, 34, 0.18 * Math.PI, 0.82 * Math.PI); ctx.stroke();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+function makeShirtTexture(color, accent) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, 256, 256);
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 176, 256, 30);
+  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  ctx.beginPath();
+  ctx.moveTo(96, 0); ctx.lineTo(160, 0); ctx.lineTo(128, 54); ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.22)';
+  ctx.beginPath(); ctx.ellipse(64, 100, 42, 26, -0.3, 0, Math.PI * 2); ctx.fill();
+  // Little badge.
+  ctx.fillStyle = 'rgba(15, 25, 35, .55)';
+  ctx.beginPath(); ctx.roundRect(176, 96, 50, 50, 10); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 28px "Trebuchet MS", sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('★', 201, 122);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
 function boxMesh(w, h, d, color, emissive = 0x000000, emissiveIntensity = 0) {
   const geometry = new THREE.BoxGeometry(w, h, d);
   const material = new THREE.MeshStandardMaterial({
@@ -195,6 +293,8 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
       mesh: boxMesh(w, h, d, color, emissive || color, emissiveIntensity),
     };
     platform.mesh.position.set(x, top - h / 2, z);
+    platform.mesh.material.map = PANEL_TEXTURE;
+    platform.mesh.material.needsUpdate = true;
     levelGroup.add(platform.mesh);
     platform.minX = x - w / 2; platform.maxX = x + w / 2;
     platform.minY = top - h; platform.maxY = top;
@@ -310,7 +410,7 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     if (entry.platform) {
       return {
         x: entry.platform.mesh.position.x + (entry.dx || 0),
-        y: entry.platform.maxY,
+        y: entry.platform.mesh.position.y + entry.platform.h / 2,
         z: entry.platform.mesh.position.z + (entry.dz || 0),
       };
     }
@@ -320,9 +420,22 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
   function makeRunner({ name, shirt, accent, route, speed, startIndex = 0, direction = 1, hop = 0.9, missChance = 0.16, checkpoints: checkpointStops = [0] }) {
     if (!route.length) return null;
     const group = new THREE.Group();
-    const torso = boxMesh(0.66, 0.9, 0.42, shirt, 0x0, 0);
+    const torso = boxMesh(0.66, 0.9, 0.42, 0xffffff, 0x0, 0);
+    torso.material.map = makeShirtTexture(`#${shirt.toString(16).padStart(6, '0')}`, accent);
+    torso.material.needsUpdate = true;
     torso.position.y = 0.95;
-    const head = boxMesh(0.52, 0.52, 0.52, 0xf0c49d, 0x0, 0);
+    const skin = ['#f0c49d', '#d9a06f', '#b97a50', '#f6d7ba'][Math.floor(Math.random() * 4)];
+    const hair = ['#2b1b14', '#5a3a1e', '#d8b26a', '#1c2230'][Math.floor(Math.random() * 4)];
+    const faceTexture = makeFaceTexture(skin, hair);
+    const headMaterials = [
+      new THREE.MeshStandardMaterial({ color: skin, roughness: 0.72 }),
+      new THREE.MeshStandardMaterial({ color: skin, roughness: 0.72 }),
+      new THREE.MeshStandardMaterial({ color: hair, roughness: 0.85 }),
+      new THREE.MeshStandardMaterial({ color: skin, roughness: 0.72 }),
+      new THREE.MeshStandardMaterial({ map: faceTexture, roughness: 0.68 }),
+      new THREE.MeshStandardMaterial({ color: hair, roughness: 0.85 }),
+    ];
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.52, 0.52), headMaterials);
     head.position.y = 1.68;
     const mkLimb = (width, length, color, y) => {
       const pivot = new THREE.Group();
@@ -337,6 +450,11 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     legLeft.position.x = -0.16;
     const legRight = mkLimb(0.24, 0.62, 0x2f3b57, 0.62);
     legRight.position.x = 0.16;
+    for (const leg of [legLeft, legRight]) {
+      const shoe = boxMesh(0.3, 0.14, 0.36, 0x1d242e, 0x0, 0);
+      shoe.position.set(0, -0.6, 0.06);
+      leg.add(shoe);
+    }
     const armLeft = mkLimb(0.2, 0.52, shirt, 1.32);
     armLeft.position.x = -0.45;
     const armRight = mkLimb(0.2, 0.52, shirt, 1.32);
@@ -358,6 +476,7 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
       duration: 0.6, phase: Math.random() * Math.PI * 2,
       legLeft, legRight, armLeft, armRight, distance: 0,
       state: 'run', miss: false, missAt: 0, missChance, checkpoints: checkpointStops,
+      pause: 0.18 + Math.random() * 0.18, arrived: false,
       vy: 0, fallVx: 0, fallVz: 0, falls: 0, respawnAt: 0,
     };
     const firstTarget = resolveWaypoint(route[runner.next]);
@@ -390,6 +509,8 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     runner.state = 'run';
     runner.miss = false;
     runner.vy = 0;
+    runner.pause = 0.3 + Math.random() * 0.2;
+    runner.arrived = false;
     const target = resolveWaypoint(runner.route[runner.next]);
     runner.distance = Math.hypot(target.x - spot.x, target.z - spot.z);
     runner.duration = Math.max(0.28, runner.distance / runner.speed);
@@ -434,6 +555,24 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
       return;
     }
 
+    // Grounded pause: stand on the platform between hops (prevents floating).
+    if (runner.pause > 0) {
+      runner.pause = Math.max(0, runner.pause - dt);
+      runner.phase += dt * 2.4;
+      const anchor = resolveWaypoint(runner.route[runner.index]);
+      runner.group.position.set(anchor.x, anchor.y, anchor.z);
+      const idle = Math.sin(runner.phase) * 0.08;
+      runner.legLeft.rotation.x = idle;
+      runner.legRight.rotation.x = -idle;
+      runner.armLeft.rotation.x = idle * 0.6;
+      runner.armRight.rotation.x = -idle * 0.6;
+      if (runner.pause <= 0 && runner.arrived) {
+        runner.arrived = false;
+        advanceRunner(runner);
+      }
+      return;
+    }
+
     const target = resolveWaypoint(runner.route[runner.next]);
     runner.t += dt / runner.duration;
 
@@ -452,8 +591,11 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     if (runner.t >= 1) {
       runner.t = 0;
       runner.missed = false;
-      runner.group.position.set(target.x, target.y, target.z);
-      advanceRunner(runner);
+      const live = resolveWaypoint(runner.route[runner.next]);
+      runner.group.position.set(live.x, live.y, live.z);
+      runner.index = runner.next;
+      runner.arrived = true;
+      runner.pause = 0.16 + Math.random() * 0.22;
       return;
     }
     const t = runner.t;
@@ -1185,7 +1327,7 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
   // walking the whole course.
   if (import.meta.env.DEV) {
     api.debugTeleport = (x, y, z) => { player.position.set(x, y, z); player.velocity.set(0, 0, 0); };
-    api.debugPlayers = () => otherPlayers.map((runner) => ({ name: runner.name, position: runner.group.position.toArray(), index: runner.index, state: runner.state, falls: runner.falls }));
+    api.debugPlayers = () => otherPlayers.map((runner) => ({ name: runner.name, position: runner.group.position.toArray(), index: runner.index, state: runner.state, falls: runner.falls, pause: runner.pause, arrived: runner.arrived }));
     api.debugFinish = () => finish ? { x: finish.x, y: finish.top + 0.1, z: finish.z } : null;
     api.debugLevel = () => level;
     api.debugCourse = () => ({
