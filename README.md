@@ -25,6 +25,9 @@ menu:
   Bros. with **five hand-built levels**: run, jump, bonk coin blocks, stomp angry blobs,
   hit the checkpoint and raise the flag with 3 lives. The jump arc now clears block tops
   and every pit; best flag time saved per level.
+- **Neon Dash** — an original Geometry Dash–style one-button auto-runner with **three
+  neon courses**: tap/space to jump spikes and blocks, crash restarts instantly, attempts
+  and best progress saved per level.
 
 These are original tributes: no Nintendo characters, sprites, music or other assets
 are used.
@@ -84,6 +87,12 @@ Math powers come from the number on your block:
 - `A` / `D` or `←` / `→` — run · `SPACE` — jump
 - `R` — restart level · `ESC` — pause
 - Touch: ◀ / JUMP / ▶ buttons.
+
+## Neon Dash controls
+
+- `SPACE` / `W` / `↑` / click / tap — jump (hold to auto-jump on landing)
+- `R` — restart level · `ESC` — pause
+- Touch: JUMP button.
 
 ## Production build
 

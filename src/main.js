@@ -10,6 +10,7 @@ import { createDozen } from './dozen.js';
 import { createJelly } from './jelly.js';
 import { createKart } from './kart.js';
 import { createBros } from './bros.js';
+import { createDash } from './dash.js';
 
 // Public asset URLs must respect the deployment base (e.g. /blockbound/ on GitHub
 // Pages) as well as the root deployment used locally and on Vercel.
@@ -1719,6 +1720,7 @@ const STORAGE = {
   jelly: 'java-menu-jelly-v1',
   kart: 'java-menu-kart-v1',
   bros: 'java-menu-bros-v1',
+  dash: 'java-menu-dash-v1',
 };
 const defaultSettings = { fov: 72, distance: 4, volume: 70, bobbing: true, highContrast: false, blur: true, autoJump: false, narrator: false, language: 'en' };
 
@@ -1806,6 +1808,17 @@ const GAMES = {
     controls: [
       { keys: ['A', 'D'], label: 'Run' },
       { keys: ['SPACE'], label: 'Jump' },
+      { keys: ['R'], label: 'Restart level' },
+      { keys: ['ESC'], label: 'Pause menu' },
+    ],
+  },
+  dash: {
+    name: 'Neon Dash',
+    version: 'Rhythm Runner · 3 Levels',
+    linkLabel: '/?play=dash',
+    movement: true,
+    controls: [
+      { keys: ['SPACE', 'W', 'CLICK'], label: 'Jump' },
       { keys: ['R'], label: 'Restart level' },
       { keys: ['ESC'], label: 'Pause menu' },
     ],
@@ -1951,6 +1964,39 @@ function saveBrosFinish(level, result) {
   writeStore(STORAGE.bros, record);
   renderLauncher();
   return { isBest, best: record.levels[level] };
+}
+
+function dashRecord() {
+  const record = readStore(STORAGE.dash, {}) || {};
+  if (!record.levels || typeof record.levels !== 'object') record.levels = {};
+  return record;
+}
+
+function dashLevelBest(level) {
+  return dashRecord().levels?.[level] ?? {};
+}
+
+function saveDashProgress(level, result) {
+  const record = dashRecord();
+  const previous = record.levels[level] || {};
+  const bestProgress = Math.max(previous.bestProgress || 0, result.bestProgress || 0);
+  record.levels[level] = { bestProgress, completions: previous.completions || 0 };
+  writeStore(STORAGE.dash, record);
+  return record.levels[level];
+}
+
+function saveDashFinish(level, result) {
+  const record = dashRecord();
+  const previous = record.levels[level] || {};
+  record.levels[level] = {
+    bestProgress: Math.max(previous.bestProgress || 0, result.bestProgress || 100),
+    completions: (previous.completions || 0) + 1,
+  };
+  record.lastLevel = level;
+  record.runs = (record.runs || 0) + 1;
+  writeStore(STORAGE.dash, record);
+  renderLauncher();
+  return { isBest: (previous.completions || 0) === 0, best: record.levels[level] };
 }
 
 let settings = { ...defaultSettings, ...readStore(STORAGE.settings, {}) };
@@ -2220,6 +2266,26 @@ function renderLauncher() {
     brosHint.innerHTML = bros.runs ? `5 levels · ${bros.runs} run${bros.runs === 1 ? '' : 's'} · flag time` : '5 levels · run · jump · flag';
   }
 
+  // --- Neon Dash card -----------------------------------------------------
+  const dash = dashRecord();
+  const dashLink = document.querySelector('#dash-launch-link');
+  if (dashLink) {
+    const href = `?${LAUNCH_PARAM}=dash`;
+    dashLink.setAttribute('href', href);
+    dashLink.textContent = `/${href}`;
+    dashLink.title = `Direct launch link for ${GAMES.dash.name}`;
+  }
+  const dashBestCard = document.querySelector('#dash-best-card');
+  if (dashBestCard) {
+    const levels = Object.keys(dash.levels || {}).length;
+    const latest = dash.levels?.[dash.lastLevel ?? 1];
+    dashBestCard.textContent = latest?.bestProgress != null ? `${levels}/3 levels · best ${Math.floor(latest.bestProgress)}%` : 'No best run yet';
+  }
+  const dashHint = document.querySelector('#dash-hint');
+  if (dashHint) {
+    dashHint.innerHTML = dash.runs ? `3 levels · ${dash.runs} clear${dash.runs === 1 ? '' : 's'} · one-button jumps` : '3 levels · jump · retry · 100%';
+  }
+
   renderGameControlsRows();
 }
 
@@ -2402,12 +2468,34 @@ function launchBros() {
   bros.start(brosLast == null ? 1 : Math.min(brosLast + 1, 5));
 }
 
+let dash = null;
+function launchDash() {
+  dash ??= createDash({
+    canvas,
+    renderer,
+    getBest: (level) => dashLevelBest(level),
+    onProgress: (level, result) => saveDashProgress(level, result),
+    onFinish: (level, result) => saveDashFinish(level, result),
+    onExit: () => {
+      showScreen('launcher');
+      syncLaunchUrl(null);
+    },
+  });
+  inWorld = false;
+  closeLan();
+  showScreen('dash', { focus: false });
+  syncLaunchUrl('dash');
+  const last = dashRecord().lastLevel;
+  dash.start(last == null ? 1 : Math.min(last + 1, 3));
+}
+
 function launchGame(game = 'minecraft') {
   if (game === 'parkour') launchParkour();
   else if (game === 'dozen') launchDozen();
   else if (game === 'jelly') launchJelly();
   else if (game === 'kart') launchKart();
   else if (game === 'bros') launchBros();
+  else if (game === 'dash') launchDash();
   else launchMinecraft();
 }
 
@@ -2934,6 +3022,12 @@ let worldTime = 65;
 let nextAnimalSpawn = 0;
 function animate() {
   const delta = Math.min(clock.getDelta(), .05);
+  if (dash?.active) {
+    dash.update(delta);
+    dash.render();
+    requestAnimationFrame(animate);
+    return;
+  }
   if (kart?.active) {
     kart.update(delta);
     kart.render();

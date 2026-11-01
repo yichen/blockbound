@@ -1635,6 +1635,80 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   pointer-events: none;
 }
 
+#app[data-screen="dash"]::before {
+  opacity: 0;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+.dash-screen { --pk-coral: #63e6d5; --pk-yellow: #ff5c8a; }
+.dash-pause-line { color: #bff4ff; font-size: 14px; letter-spacing: .04em; }
+
+.dash-touch { display: none; justify-content: flex-end; }
+.dash-touch .dash-jump {
+  width: 140px;
+  height: 64px;
+  border: 1px solid rgba(255, 92, 138, .7);
+  border-radius: 16px;
+  background: rgba(255, 92, 138, .22);
+  color: #fff;
+  font: 800 18px/1 "Trebuchet MS", "Arial Black", sans-serif;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+/* Neon Dash card */
+.game-card-dash {
+  border-color: rgba(99, 230, 213, .34);
+  background: linear-gradient(145deg, rgba(20, 16, 42, .96), rgba(9, 14, 24, .96));
+}
+.game-card-dash .game-heading h2 { color: #c9fff5; }
+.dash-badge { border-color: rgba(99, 230, 213, .5) !important; background: rgba(99, 230, 213, .14) !important; color: #c9fff5 !important; }
+.dash-art {
+  border-color: rgba(99, 230, 213, .26);
+  background: radial-gradient(circle at 50% 44%, rgba(99, 230, 213, .18), transparent 62%), linear-gradient(160deg, #14102a 0%, #0d1424 60%, #070b16 100%);
+  overflow: hidden;
+}
+.dash-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(99, 230, 213, .16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 230, 213, .12) 1px, transparent 1px);
+  background-size: 18px 18px;
+  transform: perspective(120px) rotateX(48deg) scale(1.4);
+  opacity: .8;
+}
+.dash-cube {
+  position: absolute;
+  left: 28%;
+  bottom: 32%;
+  z-index: 1;
+  width: 38px;
+  height: 38px;
+  border: 3px solid #63e6d5;
+  border-radius: 7px;
+  background: linear-gradient(160deg, #9ffff2, #2ab7a6);
+  box-shadow: 0 0 18px rgba(99, 230, 213, .7), inset 0 -5px rgba(0, 0, 0, .2);
+  transform: rotate(12deg);
+}
+.dash-spike {
+  position: absolute;
+  right: 24%;
+  bottom: 26%;
+  z-index: 1;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 38px solid #ff5c8a;
+  filter: drop-shadow(0 0 12px rgba(255, 92, 138, .8));
+}
+
+@media (pointer: coarse) {
+  .dash-touch { display: flex; }
+}
+
 #app[data-screen="kart"]::before,
 #app[data-screen="bros"]::before {
   opacity: 0;
