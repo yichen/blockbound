@@ -9,3 +9,6 @@ screenshots/
 
 # Local build artifact for Amplify manual uploads
 blockbound-amplify.zip
+
+# Local deploy tooling
+.railway/
