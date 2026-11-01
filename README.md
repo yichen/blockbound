@@ -28,7 +28,10 @@ menu:
 These are original tributes: no Nintendo characters, sprites, music or other assets
 are used.
 
-Live site (GitHub Pages): https://yichen.github.io/blockbound/
+Live sites:
+
+- **HTTPS (Railway): https://blockbound-production.up.railway.app/**
+- GitHub Pages (HTTP only): http://yichen.net/blockbound/
 
 There is also a shared-world LAN mode for local development (see below).
 
