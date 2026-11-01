@@ -1800,7 +1800,7 @@ const GAMES = {
   },
   bros: {
     name: 'Super Block Bros.',
-    version: 'Platformer · 3 Levels',
+    version: 'Platformer · 5 Levels',
     linkLabel: '/?play=bros',
     movement: true,
     controls: [
@@ -2213,11 +2213,11 @@ function renderLauncher() {
   if (brosBestCard) {
     const levels = Object.keys(bros.levels || {}).length;
     const latest = bros.levels?.[bros.lastLevel ?? 0];
-    brosBestCard.textContent = latest?.bestTime != null ? `${levels}/3 levels · best ${formatParkourTime(latest.bestTime)}` : 'No best time yet';
+    brosBestCard.textContent = latest?.bestTime != null ? `${levels}/5 levels · best ${formatParkourTime(latest.bestTime)}` : 'No best time yet';
   }
   const brosHint = document.querySelector('#bros-hint');
   if (brosHint) {
-    brosHint.innerHTML = bros.runs ? `3 levels · ${bros.runs} run${bros.runs === 1 ? '' : 's'} · flag time` : '3 levels · run · jump · flag';
+    brosHint.innerHTML = bros.runs ? `5 levels · ${bros.runs} run${bros.runs === 1 ? '' : 's'} · flag time` : '5 levels · run · jump · flag';
   }
 
   renderGameControlsRows();
@@ -2399,7 +2399,7 @@ function launchBros() {
   showScreen('bros', { focus: false });
   syncLaunchUrl('bros');
   const brosLast = brosRecord().lastLevel;
-  bros.start(brosLast == null ? 1 : Math.min(brosLast + 1, 3));
+  bros.start(brosLast == null ? 1 : Math.min(brosLast + 1, 5));
 }
 
 function launchGame(game = 'minecraft') {

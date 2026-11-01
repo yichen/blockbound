@@ -22,8 +22,9 @@ menu:
   turbo charges, and three AI rivals that follow the racing line with rubber-banding.
   Best lap/race saved per circuit; finish one race to unlock the next circuit button.
 - **Super Block Bros.** — an original side-scrolling platformer tribute to Super Mario
-  Bros. with **three hand-built levels**: run, jump, bonk coin blocks, stomp angry blobs,
-  hit the checkpoint and raise the flag with 3 lives. Best flag time saved per level.
+  Bros. with **five hand-built levels**: run, jump, bonk coin blocks, stomp angry blobs,
+  hit the checkpoint and raise the flag with 3 lives. The jump arc now clears block tops
+  and every pit; best flag time saved per level.
 
 These are original tributes: no Nintendo characters, sprites, music or other assets
 are used.

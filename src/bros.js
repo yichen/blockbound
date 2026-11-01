@@ -7,8 +7,8 @@ import * as THREE from 'three';
 const RUN_SPEED = 8.2;
 const ACCEL = 34;
 const AIR_ACCEL = 14;
-const JUMP_SPEED = 14.8;
-const GRAVITY = 38;
+const JUMP_SPEED = 23.0;
+const GRAVITY = 44;
 const VOID_Y = -11;
 const VIEW_HEIGHT = 20;
 const START_X = 3;
@@ -95,7 +95,99 @@ const LEVELS = [
     enemies: [[12, 8, 16, 1.2], [22, 20, 28, 1.2], [48, 36, 50, 5.2], [66, 54, 70, 1.2], [82, 74, 84, 1.2], [94, 90, 104, 5.4], [116, 112, 128, 5.2], [138, 130, 148, 1.2]],
     checkpoint: 96, goal: 152,
   },
+  {
+    name: 'Ember Ridge', sky: 0xffb07a, groundTop: 0xd98a4a, groundBody: 0x6b4a2a,
+    segments: [[0, 16], [21, 12], [37, 14], [55, 14], [73, 16], [93, 14], [111, 12], [127, 24]],
+    platforms: [[14, 3.8, 8], [38, 4.0, 8], [58, 3.8, 8], [78, 4.2, 8], [98, 3.8, 8], [118, 4.0, 8]],
+    blocks: [[5, 4.6, 'coin'], [9, 4.6, 'coin'], [42, 4.6, 'coin'], [46, 4.6, 'coin'], [82, 4.6, 'coin'], [114, 4.6, 'coin']],
+    coins: [[4, 2.8], [6.4, 2.8], [15, 5.0], [17, 5.0], [39, 5.2], [41, 5.2], [59, 5.0], [61, 5.0], [79, 5.4], [81, 5.4], [99, 5.0], [101, 5.0], [119, 5.2], [121, 5.2], [129, 2.8], [131, 2.8], [133, 2.8]],
+    enemies: [[12, 8, 16, 1.2], [28, 21, 33, 1.2], [48, 43, 51, 1.2], [68, 55, 69, 1.2], [88, 81, 89, 1.2], [104, 99, 107, 1.2], [124, 117, 127, 1.2], [140, 131, 149, 1.2]],
+    checkpoint: 82, goal: 146,
+  },
+  {
+    name: 'Moonlit Keep', sky: 0x232a4d, groundTop: 0x6fae8a, groundBody: 0x2f4a44,
+    segments: [[0, 18], [23, 12], [40, 14], [59, 12], [76, 16], [97, 12], [114, 14], [133, 22]],
+    platforms: [[15, 3.8, 7], [36, 4.2, 8], [56, 3.8, 8], [72, 4.2, 8], [93, 3.8, 8], [110, 4.2, 8], [128, 3.8, 7]],
+    blocks: [[4, 4.6, 'coin'], [8, 4.6, 'coin'], [44, 4.6, 'coin'], [48, 4.6, 'coin'], [80, 4.6, 'coin'], [84, 4.6, 'coin'], [118, 4.6, 'coin'], [122, 4.6, 'coin']],
+    coins: [[3, 2.8], [5.4, 2.8], [16, 5.0], [18, 5.0], [37, 5.4], [39, 5.4], [57, 5.0], [59, 5.0], [73, 5.4], [75, 5.4], [94, 5.0], [96, 5.0], [111, 5.4], [113, 5.4], [129, 5.0], [131, 5.0], [135, 2.8], [137, 2.8], [139, 2.8]],
+    enemies: [[13, 8, 18, 1.2], [30, 23, 35, 1.2], [50, 40, 54, 1.2], [68, 59, 71, 1.2], [86, 76, 92, 1.2], [104, 97, 109, 1.2], [122, 114, 128, 1.2], [142, 133, 153, 1.2]],
+    checkpoint: 93, goal: 150,
+  },
 ];
+
+function makeSpeckleTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#d9d9d9';
+  ctx.fillRect(0, 0, 128, 128);
+  for (let i = 0; i < 260; i++) {
+    const shade = 160 + Math.floor(Math.random() * 80);
+    ctx.fillStyle = `rgba(${shade},${shade},${shade},.5)`;
+    const size = 1 + Math.random() * 3;
+    ctx.fillRect(Math.random() * 128, Math.random() * 128, size, size);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+const SPECKLE_TEXTURE = makeSpeckleTexture();
+
+function makeQuestionBlockTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffc93c';
+  ctx.fillRect(0, 0, 256, 256);
+  ctx.fillStyle = 'rgba(255,255,255,.35)';
+  ctx.fillRect(0, 0, 256, 24);
+  ctx.fillRect(0, 0, 24, 256);
+  ctx.strokeStyle = 'rgba(120,70,0,.55)';
+  ctx.lineWidth = 10;
+  ctx.strokeRect(5, 5, 246, 246);
+  ctx.fillStyle = 'rgba(110,60,0,.9)';
+  ctx.font = '800 150px "Trebuchet MS", "Arial Black", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('?', 128, 140);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+function makeBrickTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#b5653a';
+  ctx.fillRect(0, 0, 256, 256);
+  ctx.strokeStyle = 'rgba(60,25,15,.55)';
+  ctx.lineWidth = 6;
+  for (let row = 0; row < 4; row++) {
+    const y = row * 64;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y); ctx.stroke();
+    const offset = row % 2 === 0 ? 0 : 64;
+    for (let x = offset; x < 256; x += 128) {
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 64); ctx.stroke();
+    }
+  }
+  ctx.fillStyle = 'rgba(255,255,255,.12)';
+  for (let i = 0; i < 40; i++) ctx.fillRect(Math.random() * 256, Math.random() * 256, 12, 4);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+const QUESTION_TEXTURE = makeQuestionBlockTexture();
+const BRICK_TEXTURE = makeBrickTexture();
 
 export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
   // ------------------------------------------------------------- scene -------
@@ -139,9 +231,13 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
 
   function addSolid(x, y, w, h, color = COLORS.groundTop) {
     const mesh = box(w, h, 2.4, color);
+    mesh.material.map = SPECKLE_TEXTURE;
+    mesh.material.needsUpdate = true;
     mesh.position.set(x + w / 2, y + h / 2, 0);
     scene.add(mesh);
     const top = box(w, 0.25, 2.5, color === COLORS.brick ? COLORS.brick : 0xa6f27a, 0xa6f27a, 0.15);
+    top.material.map = SPECKLE_TEXTURE;
+    top.material.needsUpdate = true;
     top.position.set(x + w / 2, y + h - 0.02, 0);
     scene.add(top);
     const solid = { x, y, w, h, minX: x, maxX: x + w, minY: y, maxY: y + h, mesh, top, kind: 'ground' };
@@ -150,12 +246,12 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function addBumpBlock(x, y, kind = 'coin') {
-    const mesh = box(1.8, 1.8, 1.8, kind === 'coin' ? COLORS.question : COLORS.brick, kind === 'coin' ? COLORS.question : 0x0, kind === 'coin' ? 0.35 : 0);
+    const mesh = box(1.8, 1.8, 1.8, 0xffffff, kind === 'coin' ? COLORS.question : 0x0, kind === 'coin' ? 0.3 : 0);
+    mesh.material.map = kind === 'coin' ? QUESTION_TEXTURE : BRICK_TEXTURE;
+    mesh.material.needsUpdate = true;
     mesh.position.set(x, y, 0);
     scene.add(mesh);
-    const label = kind === 'coin' ? makeLabel('?', { accent: '#ffc93c', scale: 1.2, height: 1.0 }) : null;
-    if (label) { label.position.set(x, y, 1.2); scene.add(label); }
-    const block = { x, y, w: 1.8, h: 1.8, minX: x - 0.9, maxX: x + 0.9, minY: y - 0.9, maxY: y + 0.9, kind, mesh, label, used: false, bump: 0 };
+    const block = { x, y, w: 1.8, h: 1.8, minX: x - 0.9, maxX: x + 0.9, minY: y - 0.9, maxY: y + 0.9, kind, mesh, label: null, used: false, bump: 0 };
     bumpBlocks.push(block);
     solids.push(block);
     return block;
@@ -324,7 +420,8 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
 
   function hurt() {
     if (player.invulnerable > 0 || finished) return;
-    const reachedCheckpoint = player.x >= 76;
+    const levelCheckpoint = LEVELS[levelIndex].checkpoint;
+    const reachedCheckpoint = player.x >= levelCheckpoint;
     player.lives -= 1;
     player.invulnerable = 1.4;
     if (player.lives <= 0) {
@@ -333,7 +430,7 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
       finishOverlay();
       return;
     }
-    player.x = reachedCheckpoint ? 77 : START_X;
+    player.x = reachedCheckpoint ? levelCheckpoint : START_X;
     player.y = reachedCheckpoint ? 2.8 : START_Y;
     player.vx = 0;
     player.vy = 0;
@@ -361,7 +458,7 @@ export function createBros({ canvas, renderer, getBest, onFinish, onExit }) {
     player.y = block.minY - 1.76;
     player.vy = 0;
     block.mesh.material.emissiveIntensity = 0;
-    block.mesh.material.color.set(0x9b7b5a);
+    block.mesh.material.color.set(0x8a6a4a);
     if (block.label) block.label.visible = false;
     showToast('Coin block!');
     updateHud();
