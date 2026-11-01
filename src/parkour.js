@@ -566,7 +566,7 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
       const cpPlatform = addPlatform({ x, z, top, w: cpSize, d: cpSize, color: theme.checkpoint });
       addCheckpoint(checkpoints.length + 1, cpPlatform);
       // Lava pools under later stretches (the first section stays friendly).
-      if (section > 0) addHazard({ x: clamp(x, -10, 10), z: z + 10, y: 0.9, w: 30, h: 1.8, d: 24 });
+      if (section > 0) addHazard({ x: clamp(x, -10, 10), z: z + 10, y: 0.3, w: 30, h: 0.6, d: 24 });
       previousHalf = cpSize / 2;
     }
 
@@ -1195,6 +1195,7 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
         w: platform.w, d: platform.d, move: platform.move ? platform.move.axis : null,
       })),
       checkpoints: checkpoints.map((checkpoint) => ({ x: checkpoint.x, z: checkpoint.z, top: checkpoint.top })),
+      hazards: hazards.map((hazard) => ({ minX: hazard.minX, maxX: hazard.maxX, minY: hazard.minY, maxY: hazard.maxY, minZ: hazard.minZ, maxZ: hazard.maxZ })),
       finish: finish ? { x: finish.x, z: finish.z, top: finish.top } : null,
     });
     api.debugScene = () => ({ sceneChildren: scene.children.length, levelChildren: levelGroup.children.length });
