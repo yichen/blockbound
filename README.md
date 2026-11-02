@@ -27,8 +27,9 @@ menu:
   hit the checkpoint and raise the flag with 3 lives. The jump arc now clears block tops
   and every pit; best flag time saved per level.
 - **Neon Dash** — an original Geometry Dash–style one-button auto-runner with **three
-  neon courses** filled with spikes, spinning saw blades, blocks and floating hazards:
-  tap/space to jump, crash restarts instantly, attempts and best progress saved per level.
+  neon courses** packed with spikes, spinning and bobbing saw blades, hanging ceiling
+  spikes, blocks, floating hazards and death pits: tap/space to jump, crash restarts
+  instantly, attempts and best progress saved per level.
 - **Blockbound Studio** — a 3D modeling sandbox, not a game: add boxes, spheres,
   cylinders, cones, tori and wedges; move/rotate/scale each part on X/Y/Z axles; change
   colours and finishes; start from console, controller, car, house or room templates;

@@ -9,75 +9,48 @@ const JUMP_SPEED = 13.5;
 const PLAYER_SIZE = 1;
 const START_X = 0;
 
+const CLUSTERS = {
+  spike: [{ type: 'spike' }],
+  twin: [{ type: 'spike' }, { type: 'spike', dx: 1.25 }],
+  triple: [{ type: 'spike' }, { type: 'spike', dx: 1.2 }, { type: 'spike', dx: 2.4 }],
+  saw: [{ type: 'saw', y: 0.62, r: 0.6 }],
+  sawSpike: [{ type: 'saw', y: 0.62, r: 0.6 }, { type: 'spike', dx: 2.1 }],
+  bob: [{ type: 'saw', y: 0.9, r: 0.55, bob: { amp: 0.55, speed: 2.2, phase: 0 } }],
+  block: [{ type: 'block', w: 2, h: 1 }],
+  pit: [{ type: 'pit', w: 2.3 }],
+  ceil: [{ type: 'ceil', y: 3.0 }],
+  float: [{ type: 'block', y: 2.2, w: 2.2, h: 1 }],
+};
+
+function course(startX, step, groups, repetitions) {
+  const list = [];
+  let x = startX;
+  const total = groups.length * repetitions;
+  for (let i = 0; i < total; i++) {
+    const group = CLUSTERS[groups[i % groups.length]];
+    for (const part of group) {
+      list.push({ ...part, x: x + (part.dx || 0) });
+    }
+    x += step;
+  }
+  return list;
+}
+
 const LEVELS = [
   {
-    name: 'Stereo Start', speed: 7.0, length: 88,
+    name: 'Stereo Start', speed: 7.0, length: 154,
     sky: 0x0d0820, floor: 0x1a1038, accent: 0x63e6d5, spikeColor: 0xff5c8a, blockColor: 0x8b5cff,
-    obstacles: [
-      { type: 'spike', x: 16 },
-      { type: 'saw', x: 23, y: 0.62, r: 0.62 },
-      { type: 'spike', x: 30 },
-      { type: 'saw', x: 37, y: 0.62, r: 0.62 },
-      { type: 'spike', x: 44 },
-      { type: 'saw', x: 51, y: 0.62, r: 0.62 },
-      { type: 'spike', x: 58 },
-      { type: 'saw', x: 65, y: 0.62, r: 0.62 },
-      { type: 'spike', x: 72 },
-      { type: 'saw', x: 79, y: 0.62, r: 0.62 },
-    ],
+    obstacles: course(14, 8, ['spike', 'saw', 'twin', 'block', 'pit', 'ceil', 'sawSpike', 'float'], 2),
   },
   {
-    name: 'Bass Drop', speed: 8.0, length: 124,
+    name: 'Bass Drop', speed: 8.0, length: 222,
     sky: 0x1a0a20, floor: 0x2a1030, accent: 0xff9ff3, spikeColor: 0xffc93c, blockColor: 0xff5c8a,
-    obstacles: [
-      { type: 'spike', x: 12 },
-      { type: 'saw', x: 19, y: 0.62, r: 0.6 },
-      { type: 'block', x: 26, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 33 },
-      { type: 'saw', x: 40, y: 0.62, r: 0.6 },
-      { type: 'block', x: 47, y: 2.2, w: 2.4, h: 1.0 },
-      { type: 'spike', x: 54 },
-      { type: 'saw', x: 61, y: 0.62, r: 0.6 },
-      { type: 'block', x: 68, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 75 },
-      { type: 'saw', x: 82, y: 0.62, r: 0.6 },
-      { type: 'block', x: 89, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 96 },
-      { type: 'saw', x: 103, y: 0.62, r: 0.6 },
-      { type: 'block', x: 110, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 117 },
-    ],
+    obstacles: course(14, 8, ['sawSpike', 'twin', 'block', 'pit', 'ceil', 'bob', 'spike', 'float'], 3),
   },
   {
-    name: 'Neon Overdrive', speed: 8.8, length: 150,
+    name: 'Neon Overdrive', speed: 8.8, length: 268,
     sky: 0x061426, floor: 0x0c2a3a, accent: 0x7be3cb, spikeColor: 0xff4d6d, blockColor: 0x74a7ff,
-    obstacles: [
-      { type: 'spike', x: 10 },
-      { type: 'saw', x: 16, y: 0.62, r: 0.6 },
-      { type: 'block', x: 22, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 28 },
-      { type: 'saw', x: 34, y: 0.62, r: 0.6 },
-      { type: 'block', x: 40, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 46 },
-      { type: 'spike', x: 47.4 },
-      { type: 'saw', x: 54, y: 0.62, r: 0.6 },
-      { type: 'block', x: 60, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 66 },
-      { type: 'saw', x: 72, y: 0.62, r: 0.6 },
-      { type: 'block', x: 78, w: 2.2, h: 1.2 },
-      { type: 'saw', x: 85, y: 2.3, r: 0.55 },
-      { type: 'spike', x: 92 },
-      { type: 'spike', x: 93.4 },
-      { type: 'saw', x: 99, y: 0.62, r: 0.6 },
-      { type: 'block', x: 105, w: 2.0, h: 1.0 },
-      { type: 'spike', x: 111 },
-      { type: 'saw', x: 117, y: 0.62, r: 0.6 },
-      { type: 'block', x: 123, w: 2.2, h: 1.2 },
-      { type: 'spike', x: 129 },
-      { type: 'spike', x: 130.4 },
-      { type: 'saw', x: 136, y: 0.62, r: 0.6 },
-      { type: 'spike', x: 143 },
-    ],
+    obstacles: course(14, 8, ['triple', 'bob', 'block', 'pit', 'ceil', 'sawSpike', 'twin', 'float', 'sawSpike', 'triple'], 3),
   },
 ];
 
@@ -301,6 +274,28 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
         levelGroup.add(spike);
         obstacle.minX = obstacle.x - 0.3; obstacle.maxX = obstacle.x + 0.3;
         obstacle.minY = 0; obstacle.maxY = 1.1;
+      } else if (obstacle.type === 'ceil') {
+        const spike = new THREE.Mesh(
+          new THREE.ConeGeometry(0.62, 1.1, 4),
+          new THREE.MeshStandardMaterial({ color: level.spikeColor, emissive: level.spikeColor, emissiveIntensity: 0.8, roughness: 0.3, metalness: 0.3 }),
+        );
+        spike.rotation.z = Math.PI;
+        spike.position.set(obstacle.x, obstacle.y || 3, 0);
+        levelGroup.add(spike);
+        obstacle.minX = obstacle.x - 0.3; obstacle.maxX = obstacle.x + 0.3;
+        obstacle.minY = (obstacle.y || 3) - 0.55; obstacle.maxY = (obstacle.y || 3) + 0.55;
+      } else if (obstacle.type === 'pit') {
+        const width = obstacle.w || 2.3;
+        const pit = box(width, 0.08, 2.3, 0x010509);
+        pit.position.set(obstacle.x, 0.02, 0);
+        levelGroup.add(pit);
+        for (const side of [-1, 1]) {
+          const edge = box(0.08, 0.12, 2.3, level.spikeColor, level.spikeColor, 1.1);
+          edge.position.set(obstacle.x + side * width / 2, 0.03, 0);
+          levelGroup.add(edge);
+        }
+        obstacle.minX = obstacle.x - width / 2; obstacle.maxX = obstacle.x + width / 2;
+        obstacle.minY = 0; obstacle.maxY = 0.1;
       } else if (obstacle.type === 'saw') {
         const radius = obstacle.r || 0.6;
         const group = new THREE.Group();
@@ -329,6 +324,7 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
         levelGroup.add(group);
         obstacle.mesh = group;
         obstacle.spin = 0;
+        obstacle.baseY = obstacle.y || radius;
         const hit = radius * 0.85;
         obstacle.minX = obstacle.x - hit; obstacle.maxX = obstacle.x + hit;
         obstacle.minY = (obstacle.y || radius) - hit; obstacle.maxY = (obstacle.y || radius) + hit;
@@ -560,6 +556,10 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
 
     const box = { minX: player.x - 0.5, maxX: player.x + 0.5, minY: player.y, maxY: player.y + PLAYER_SIZE };
     for (const obstacle of level.obstacles) {
+      if (obstacle.type === 'pit') {
+        if (player.y < 0.25 && box.maxX > obstacle.minX && box.minX < obstacle.maxX) { die(); return; }
+        continue;
+      }
       if (box.maxX <= obstacle.minX || box.minX >= obstacle.maxX || box.maxY <= obstacle.minY || box.minY >= obstacle.maxY) continue;
       if (obstacle.type === 'block' && player.vy <= 0 && previousY >= obstacle.maxY - 0.5) {
         player.y = obstacle.maxY;
@@ -575,9 +575,15 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
       return;
     }
     for (const obstacle of level.obstacles) {
-      if (obstacle.type === 'saw' && obstacle.mesh) {
-        obstacle.spin = (obstacle.spin || 0) + dt * 7;
-        obstacle.mesh.rotation.z = obstacle.spin;
+      if (obstacle.type !== 'saw' || !obstacle.mesh) continue;
+      obstacle.spin = (obstacle.spin || 0) + dt * 7;
+      obstacle.mesh.rotation.z = obstacle.spin;
+      if (obstacle.bob) {
+        const wave = Math.sin(performance.now() * 0.001 * obstacle.bob.speed + obstacle.bob.phase) * obstacle.bob.amp;
+        const y = obstacle.baseY + wave;
+        obstacle.mesh.position.y = y;
+        const hit = (obstacle.r || 0.6) * 0.85;
+        obstacle.minY = y - hit; obstacle.maxY = y + hit;
       }
     }
     progress = clamp((player.x / level.length) * 100, 0, 100);
