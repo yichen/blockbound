@@ -20,6 +20,9 @@ const CLUSTERS = {
   pit: [{ type: 'pit', w: 2.3 }],
   ceil: [{ type: 'ceil', y: 3.0 }],
   float: [{ type: 'block', y: 2.2, w: 2.2, h: 1 }],
+  platform: [{ type: 'platform', y: 1.3, w: 2.8, h: 0.3 }],
+  lift: [{ type: 'lift', y: 1.35, w: 2.6, h: 0.3, bob: { amp: 0.7, speed: 1.7, phase: 0 } }],
+  portal: [{ type: 'portal', y: 2.2 }],
 };
 
 function course(startX, step, groups, repetitions) {
@@ -38,19 +41,19 @@ function course(startX, step, groups, repetitions) {
 
 const LEVELS = [
   {
-    name: 'Stereo Start', speed: 7.0, length: 154,
+    name: 'Stereo Start', speed: 7.0, length: 186,
     sky: 0x0d0820, floor: 0x1a1038, accent: 0x63e6d5, spikeColor: 0xff5c8a, blockColor: 0x8b5cff,
-    obstacles: course(14, 8, ['spike', 'saw', 'twin', 'block', 'pit', 'ceil', 'sawSpike', 'float'], 2),
+    obstacles: course(14, 8, ['spike', 'saw', 'twin', 'platform', 'pit', 'ceil', 'sawSpike', 'lift', 'portal', 'float'], 2),
   },
   {
-    name: 'Bass Drop', speed: 8.0, length: 222,
+    name: 'Bass Drop', speed: 8.0, length: 266,
     sky: 0x1a0a20, floor: 0x2a1030, accent: 0xff9ff3, spikeColor: 0xffc93c, blockColor: 0xff5c8a,
-    obstacles: course(14, 8, ['sawSpike', 'twin', 'block', 'pit', 'ceil', 'bob', 'spike', 'float'], 3),
+    obstacles: course(14, 8, ['sawSpike', 'twin', 'lift', 'pit', 'ceil', 'bob', 'platform', 'float', 'portal', 'spike'], 3),
   },
   {
-    name: 'Neon Overdrive', speed: 8.8, length: 268,
+    name: 'Neon Overdrive', speed: 8.8, length: 314,
     sky: 0x061426, floor: 0x0c2a3a, accent: 0x7be3cb, spikeColor: 0xff4d6d, blockColor: 0x74a7ff,
-    obstacles: course(14, 8, ['triple', 'bob', 'block', 'pit', 'ceil', 'sawSpike', 'twin', 'float', 'sawSpike', 'triple'], 3),
+    obstacles: course(14, 8, ['triple', 'bob', 'lift', 'pit', 'ceil', 'sawSpike', 'platform', 'float', 'portal', 'sawSpike', 'triple', 'lift'], 3),
   },
 ];
 
@@ -162,7 +165,7 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
   scene.add(playerGroup);
 
   const trail = [];
-  const player = { x: START_X, y: 0, vy: 0, onGround: true, rotation: 0 };
+  const player = { x: START_X, y: 0, vy: 0, onGround: true, rotation: 0, support: null };
   const keys = new Set();
   let active = false;
   let paused = false;
@@ -212,7 +215,7 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
     if (element.attempts) element.attempts.textContent = `Attempt ${attempts}`;
     if (element.progress) element.progress.textContent = `${Math.floor(progress)}%`;
     if (element.best) element.best.textContent = `Best ${Math.floor(bestProgress)}%`;
-    if (element.objective) element.objective.textContent = finished ? 'Level complete!' : !begun ? 'Press SPACE / tap to start' : 'Jump the spikes — hold to auto-jump';
+    if (element.objective) element.objective.textContent = finished ? 'Level complete!' : !begun ? 'Press SPACE / tap to start' : 'Jump · ride lifts · hit portals — hold to auto-jump';
     if (element.pauseLine) element.pauseLine.textContent = `${level.name} · ${Math.floor(progress)}% · attempt ${attempts}`;
   }
 
@@ -284,6 +287,43 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
         levelGroup.add(spike);
         obstacle.minX = obstacle.x - 0.3; obstacle.maxX = obstacle.x + 0.3;
         obstacle.minY = (obstacle.y || 3) - 0.55; obstacle.maxY = (obstacle.y || 3) + 0.55;
+      } else if (obstacle.type === 'platform' || obstacle.type === 'lift') {
+        const width = obstacle.w || 2.8;
+        const height = obstacle.h || 0.3;
+        const baseY = obstacle.y || 1.3;
+        const group = new THREE.Group();
+        const slab = box(width, height, 1.6, level.blockColor, level.blockColor, 0.5);
+        slab.position.y = height / 2;
+        const topGlow = box(width * 0.96, 0.05, 1.65, level.accent, level.accent, 1.1);
+        topGlow.position.y = height + 0.03;
+        group.add(slab, topGlow);
+        group.position.set(obstacle.x + width / 2, baseY, 0);
+        levelGroup.add(group);
+        obstacle.mesh = group;
+        obstacle.baseY = baseY;
+        obstacle.currentBase = baseY;
+        obstacle.minX = obstacle.x; obstacle.maxX = obstacle.x + width;
+        obstacle.minY = baseY; obstacle.maxY = baseY + height;
+      } else if (obstacle.type === 'portal') {
+        const y = obstacle.y || 2.2;
+        const group = new THREE.Group();
+        const outer = new THREE.Mesh(
+          new THREE.TorusGeometry(0.85, 0.12, 10, 32),
+          new THREE.MeshStandardMaterial({ color: level.accent, emissive: level.accent, emissiveIntensity: 1.2, roughness: 0.25, metalness: 0.4 }),
+        );
+        const inner = new THREE.Mesh(
+          new THREE.TorusGeometry(0.52, 0.06, 8, 28),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: level.spikeColor, emissiveIntensity: 1.4, roughness: 0.2 }),
+        );
+        inner.rotation.z = Math.PI / 4;
+        group.add(outer, inner);
+        group.position.set(obstacle.x, y, 0);
+        levelGroup.add(group);
+        obstacle.mesh = group;
+        obstacle.inner = inner;
+        obstacle.baseY = y;
+        obstacle.minX = obstacle.x - 0.55; obstacle.maxX = obstacle.x + 0.55;
+        obstacle.minY = y - 0.95; obstacle.maxY = y + 0.95;
       } else if (obstacle.type === 'pit') {
         const width = obstacle.w || 2.3;
         const pit = box(width, 0.08, 2.3, 0x010509);
@@ -367,8 +407,10 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
     player.y = 0;
     player.vy = 0;
     player.onGround = true;
+    player.support = null;
     player.rotation = 0;
     playerGroup.rotation.z = 0;
+    for (const obstacle of level.obstacles) { obstacle.used = false; if (obstacle.mesh) obstacle.mesh.visible = true; }
     playerCube.rotation.z = 0;
     playerGroup.position.set(player.x, player.y, 0);
     progress = 0;
@@ -457,6 +499,7 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
   function doJump() {
     player.vy = JUMP_SPEED;
     player.onGround = false;
+    player.support = null;
     jumpBuffer = 0;
     coyote = 0;
   }
@@ -524,6 +567,22 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
     if (attemptFlash > 0) attemptFlash = Math.max(0, attemptFlash - dt);
     if (!begun) { updateHud(); return; }
 
+    const now = performance.now();
+    for (const obstacle of level.obstacles) {
+      if (obstacle.type === 'lift' && obstacle.mesh) {
+        const wave = Math.sin(now * 0.001 * obstacle.bob.speed + obstacle.bob.phase) * obstacle.bob.amp;
+        const base = obstacle.baseY + wave;
+        const delta = base - obstacle.currentBase;
+        obstacle.currentBase = base;
+        obstacle.mesh.position.y = base;
+        obstacle.minY = base; obstacle.maxY = base + (obstacle.h || 0.3);
+        if (player.support === obstacle && player.onGround) player.y += delta;
+      } else if (obstacle.type === 'portal' && obstacle.mesh) {
+        obstacle.mesh.rotation.z += dt * 1.6;
+        if (obstacle.inner) obstacle.inner.rotation.z -= dt * 2.4;
+      }
+    }
+
     const previousY = player.y;
     const wasGrounded = player.onGround;
     jumpBuffer = Math.max(0, jumpBuffer - dt);
@@ -536,6 +595,7 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
     if (player.y <= 0) {
       player.y = 0;
       player.vy = 0;
+      player.support = null;
       if (!player.onGround) {
         const step = Math.PI / 2;
         player.rotation = Math.round(player.rotation / step) * step;
@@ -556,6 +616,28 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
 
     const box = { minX: player.x - 0.5, maxX: player.x + 0.5, minY: player.y, maxY: player.y + PLAYER_SIZE };
     for (const obstacle of level.obstacles) {
+      if (obstacle.type === 'portal') {
+        if (!obstacle.used && box.maxX > obstacle.minX && box.minX < obstacle.maxX && box.maxY > obstacle.minY && box.minY < obstacle.maxY) {
+          obstacle.used = true;
+          obstacle.mesh.visible = false;
+          player.vy = Math.max(22, player.vy);
+          player.onGround = false;
+          player.support = null;
+        }
+        continue;
+      }
+      if (obstacle.type === 'platform' || obstacle.type === 'lift') {
+        if (box.maxX <= obstacle.minX || box.minX >= obstacle.maxX || box.maxY <= obstacle.minY || box.minY >= obstacle.maxY) continue;
+        if (player.vy <= 0 && previousY >= obstacle.maxY - 0.5) {
+          player.y = obstacle.maxY;
+          player.vy = 0;
+          player.onGround = true;
+          player.support = obstacle.type === 'lift' ? obstacle : null;
+          const step = Math.PI / 2;
+          player.rotation = Math.round(player.rotation / step) * step;
+        }
+        continue;
+      }
       if (obstacle.type === 'pit') {
         if (player.y < 0.25 && box.maxX > obstacle.minX && box.minX < obstacle.maxX) { die(); return; }
         continue;
