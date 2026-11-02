@@ -17,8 +17,8 @@
     <meta name="twitter:description" content="Seven browser games plus a 3D modeler: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
     <meta name="twitter:image" content="/blockbound/og.jpg" />
     <title>Blockbound — Game Launcher</title>
-    <script type="module" crossorigin src="/blockbound/assets/index-DcSCjJ1S.js"></script>
-    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-Bg1Zty4K.css">
+    <script type="module" crossorigin src="/blockbound/assets/index-CHTyOEUi.js"></script>
+    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-CLReLZPh.css">
   </head>
   <body>
     <canvas id="world" aria-label="A blocky landscape"></canvas>
@@ -263,7 +263,7 @@
                   <h2 id="studio-card-title">Blockbound Studio</h2>
                   <span class="game-status studio-badge">Creative · New</span>
                 </div>
-                <p class="game-description">A 3D modeling sandbox: stack boxes, spheres, cylinders and wedges, then twist, lift and stretch them with XYZ axle controls. Start from console, controller, car, house or room templates — or build something entirely new, save it, and export it.</p>
+                <p class="game-description">A 3D modeling sandbox: stack boxes, spheres, cylinders and wedges, then grab and drag parts directly — or twist, lift and stretch them with XYZ axle controls. Start from console, controller, car, house or room templates — or build something entirely new, save it, and export it.</p>
                 <ul class="game-meta">
                   <li>3D modeler · templates</li>
                   <li id="studio-design-count">No saved designs yet</li>
@@ -291,7 +291,7 @@
         </div>
 
         <footer class="launcher-footer">
-          <span>Blockbound Launcher 0.8.1 <span class="muted">· Web Edition</span></span>
+          <span>Blockbound Launcher 0.8.2 <span class="muted">· Web Edition</span></span>
           <span class="muted">Not an official Minecraft or Roblox product. Fan-built voxel demo.</span>
         </footer>
       </section>
@@ -803,7 +803,7 @@
         <header class="studio-topbar">
           <div class="studio-brand">
             <span id="studio-title" class="studio-logo">Blockbound Studio</span>
-            <span class="studio-subtitle">3D modeler · drag to orbit · click to select</span>
+            <span class="studio-subtitle">3D modeler · drag a part to move it · drag empty space to orbit</span>
           </div>
           <div class="studio-topactions">
             <button data-studio-action="undo" type="button" title="Undo (Ctrl+Z)">Undo</button>
@@ -879,16 +879,17 @@
             <summary>How to use the studio</summary>
             <ul>
               <li>Click a shape to add it at the origin.</li>
-              <li>Click any object in the viewport or list to select it.</li>
-              <li>Use Move / Rotate / Scale, then drag the X, Y or Z axle slider — or tap − / +.</li>
-              <li>Left-drag orbits, right-drag pans, wheel zooms; double-click focuses.</li>
+              <li><strong>Drag any part directly</strong> to move it; hold Shift while dragging to lift/lower it.</li>
+              <li>In Rotate / Scale mode, drag the part itself to spin or resize it.</li>
+              <li>Left-drag empty space orbits, right-drag pans, wheel zooms; double-click focuses.</li>
+              <li>Use the X / Y / Z axle sliders or −/+ buttons for precise values.</li>
               <li>Ctrl+Z undo · Ctrl+Shift+Z redo · Delete removes · Ctrl+D duplicates.</li>
             </ul>
           </details>
         </aside>
 
         <p id="studio-empty" class="studio-empty">Add a shape or load a template to start modeling</p>
-        <p class="studio-hint">Drag orbit · wheel zoom · right-drag pan · click select · the three colored arrows show the active axles</p>
+        <p class="studio-hint">Drag a part to move it · Shift-drag to lift/lower · drag empty space to orbit · wheel zoom</p>
         <p id="studio-status" class="studio-status">0 objects · not saved yet</p>
         <div id="studio-toast" class="parkour-toast" role="status" aria-live="polite"></div>
         <input id="studio-import" type="file" accept="application/json,.json" hidden />

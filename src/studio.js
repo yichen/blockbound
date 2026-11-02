@@ -391,6 +391,16 @@ export function createStudio({ canvas, renderer, onExit }) {
     });
   }
 
+  function updateHint() {
+    if (!element.hint) return;
+    const messages = {
+      move: 'Drag a part to move it · Shift-drag to lift/lower · drag empty space to orbit',
+      rotate: 'Drag a part to rotate it · drag empty space to orbit · axle sliders for precision',
+      scale: 'Drag a part up/down to scale it · drag empty space to orbit · axle sliders for precision',
+    };
+    element.hint.textContent = messages[mode] || messages.move;
+  }
+
   function select(id) {
     selectedId = objectById(id) ? id : null;
     const object = selectedObject();
@@ -802,11 +812,109 @@ export function createStudio({ canvas, renderer, onExit }) {
     renderer.render(scene, camera);
   }
 
-  // Pointer orbit / pan / select.
+  // Pointer orbit / pan / select / direct manipulation.
   let pointer = null;
+
+  function viewportPoint(event) {
+    const rect = viewport.getBoundingClientRect();
+    return {
+      ndcX: ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      ndcY: -((event.clientY - rect.top) / rect.height) * 2 + 1,
+    };
+  }
+
+  function intersectPlaneAt(clientX, clientY, y) {
+    const rect = viewport.getBoundingClientRect();
+    const ndc = new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
+    raycaster.setFromCamera(ndc, camera);
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -y);
+    const point = new THREE.Vector3();
+    return raycaster.ray.intersectPlane(plane, point) ? point : null;
+  }
+
+  function worldUnitsPerPixel(object) {
+    const objectY = object.position[1] + 0.8;
+    const height = Math.max(1, viewport?.clientHeight || innerHeight);
+    const distanceToObject = camera.position.distanceTo(new THREE.Vector3(object.position[0], objectY, object.position[2]));
+    return (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) * distanceToObject) / height;
+  }
+
+  function beginDragObject(event, mesh) {
+    const id = mesh.userData.studioId;
+    select(id);
+    const object = selectedObject();
+    if (!object) return false;
+    const grab = intersectPlaneAt(event.clientX, event.clientY, object.position[1]);
+    pointer = {
+      x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY,
+      moved: 0, button: event.button, mode: 'drag',
+      drag: {
+        id,
+        startPosition: [...object.position],
+        startRotation: [...object.rotation],
+        startScale: [...object.scale],
+        grab,
+        recorded: false,
+        unitsPerPixel: worldUnitsPerPixel(object),
+      },
+    };
+    viewport?.setPointerCapture?.(event.pointerId);
+    viewport?.classList.add('studio-dragging');
+    updateHint();
+    return true;
+  }
+
+  function updateDrag(event) {
+    if (!pointer?.drag) return;
+    const object = objectById(pointer.drag.id);
+    if (!object) return;
+    const totalDx = event.clientX - pointer.startX;
+    const totalDy = event.clientY - pointer.startY;
+    const drag = pointer.drag;
+    if (!drag.recorded) { record(); drag.recorded = true; }
+    if (mode === 'move') {
+      if (event.shiftKey) {
+        object.position[1] = drag.startPosition[1] - totalDy * drag.unitsPerPixel;
+        if (snap) object.position[1] = round(object.position[1], 0.05);
+      } else if (drag.grab) {
+        const point = intersectPlaneAt(event.clientX, event.clientY, drag.startPosition[1]);
+        if (point) {
+          object.position[0] = drag.startPosition[0] + point.x - drag.grab.x;
+          object.position[2] = drag.startPosition[2] + point.z - drag.grab.z;
+          if (snap) {
+            object.position[0] = round(object.position[0], 0.05);
+            object.position[2] = round(object.position[2], 0.05);
+          }
+        }
+      }
+    } else if (mode === 'rotate') {
+      object.rotation[1] = drag.startRotation[1] + totalDx * 0.008;
+      object.rotation[0] = clamp(drag.startRotation[0] + totalDy * 0.008, -Math.PI / 2, Math.PI / 2);
+      if (snap) {
+        object.rotation[1] = round(object.rotation[1], THREE.MathUtils.degToRad(5));
+        object.rotation[0] = round(object.rotation[0], THREE.MathUtils.degToRad(5));
+      }
+    } else {
+      const factor = clamp(1 - totalDy * 0.006, 0.1, 8);
+      object.scale = drag.startScale.map((value) => value * factor);
+    }
+    updateMesh(object);
+    updateSelectionHelpers();
+    syncAxes();
+    scheduleSave();
+  }
+
   viewport?.addEventListener('pointerdown', (event) => {
     if (!active) return;
-    pointer = { x: event.clientX, y: event.clientY, moved: 0, button: event.button };
+    if (event.button === 0) {
+      const mesh = pickObjectAt(event.clientX, event.clientY);
+      if (mesh && beginDragObject(event, mesh)) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+    }
+    pointer = { x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY, moved: 0, button: event.button, mode: 'orbit' };
     viewport?.setPointerCapture?.(event.pointerId);
     event.preventDefault();
     event.stopPropagation();
@@ -818,6 +926,12 @@ export function createStudio({ canvas, renderer, onExit }) {
     pointer.moved += Math.abs(dx) + Math.abs(dy);
     pointer.x = event.clientX;
     pointer.y = event.clientY;
+    if (pointer.mode === 'drag') {
+      updateDrag(event);
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     if (pointer.button === 0) {
       yaw -= dx * 0.006;
       pitch = clamp(pitch + dy * 0.005, -0.15, 1.35);
@@ -832,13 +946,24 @@ export function createStudio({ canvas, renderer, onExit }) {
   }, { capture: true });
   viewport?.addEventListener('pointerup', (event) => {
     if (!active || !pointer) return;
+    const wasDrag = pointer.mode === 'drag';
     const wasClick = pointer.moved < 5 && pointer.button === 0;
+    if (wasDrag) {
+      const object = selectedObject();
+      if (object) {
+        syncAxes();
+        scheduleSave();
+        if (pointer.moved >= 4) showToast(`${mode === 'move' ? 'Moved' : mode === 'rotate' ? 'Rotated' : 'Scaled'} ${object.name}`);
+      }
+      viewport?.classList.remove('studio-dragging');
+    } else if (wasClick) {
+      pickAt(event.clientX, event.clientY);
+    }
     pointer = null;
-    if (wasClick) pickAt(event.clientX, event.clientY);
     event.preventDefault();
     event.stopPropagation();
   }, { capture: true });
-  viewport?.addEventListener('pointercancel', () => { pointer = null; }, { capture: true });
+  viewport?.addEventListener('pointercancel', () => { pointer = null; viewport?.classList.remove('studio-dragging'); }, { capture: true });
   viewport?.addEventListener('wheel', (event) => {
     if (!active) return;
     distance = clamp(distance * (1 + Math.sign(event.deltaY) * 0.09), 4, 70);
@@ -923,6 +1048,7 @@ export function createStudio({ canvas, renderer, onExit }) {
       mode = modeButton.dataset.studioMode;
       element.screen?.querySelectorAll('[data-studio-mode]').forEach((button) => button.classList.toggle('active', button.dataset.studioMode === mode));
       renderAxes();
+      updateHint();
       return;
     }
     const swatch = event.target.closest('[data-color]');
@@ -1004,6 +1130,7 @@ export function createStudio({ canvas, renderer, onExit }) {
     mode = 'move';
     element.screen?.querySelectorAll('[data-studio-mode]').forEach((button) => button.classList.toggle('active', button.dataset.studioMode === 'move'));
     renderAxes();
+    updateHint();
     updateCamera();
   }
 
@@ -1031,6 +1158,15 @@ export function createStudio({ canvas, renderer, onExit }) {
     window.__studio = {
       start, stop, state: () => ({ active, objects: objects.length, selected: selectedId, mode, designs: Object.keys(readStore().designs), name: element.designName?.value }),
       add: addObject, template: loadTemplate, select, snapshot, save: () => saveDesign({ quiet: true }),
+      screenOfSelected: () => {
+        const object = selectedObject();
+        const mesh = object ? meshes.get(object.id) : null;
+        if (!mesh) return null;
+        const v = new THREE.Vector3();
+        mesh.getWorldPosition(v);
+        v.project(camera);
+        return [(v.x * 0.5 + 0.5) * innerWidth, (-v.y * 0.5 + 0.5) * innerHeight];
+      },
       scene, renderer, camera,
     };
   }

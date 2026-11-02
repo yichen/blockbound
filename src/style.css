@@ -2859,3 +2859,5 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
   .studio-status { left: 10px; bottom: calc(42vh + 14px); }
   .studio-empty { top: 34%; }
 }
+.studio-viewport.studio-dragging { cursor: grabbing; }
+.studio-viewport.studio-dragging * { cursor: grabbing; }

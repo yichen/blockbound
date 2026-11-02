@@ -31,7 +31,8 @@ menu:
   spikes, blocks, floating hazards and death pits: tap/space to jump, crash restarts
   instantly, attempts and best progress saved per level.
 - **Blockbound Studio** — a 3D modeling sandbox, not a game: add boxes, spheres,
-  cylinders, cones, tori and wedges; move/rotate/scale each part on X/Y/Z axles; change
+  cylinders, cones, tori and wedges; **drag parts directly in the viewport** (Shift-drag
+  to lift), or move/rotate/scale on X/Y/Z axles; change
   colours and finishes; start from console, controller, car, house or room templates;
   save designs, export JSON and snapshots. Build anything from a games console to a
   whole house interior.
