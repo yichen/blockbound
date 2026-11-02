@@ -29,6 +29,11 @@ menu:
 - **Neon Dash** — an original Geometry Dash–style one-button auto-runner with **three
   neon courses** filled with spikes, spinning saw blades, blocks and floating hazards:
   tap/space to jump, crash restarts instantly, attempts and best progress saved per level.
+- **Blockbound Studio** — a 3D modeling sandbox, not a game: add boxes, spheres,
+  cylinders, cones, tori and wedges; move/rotate/scale each part on X/Y/Z axles; change
+  colours and finishes; start from console, controller, car, house or room templates;
+  save designs, export JSON and snapshots. Build anything from a games console to a
+  whole house interior.
 
 These are original tributes: no Nintendo characters, sprites, music or other assets
 are used.

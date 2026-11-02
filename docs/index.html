@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#141f26" />
-    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash — seven games playable free in your browser." />
+    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash — seven games and a 3D modeler, all free in your browser." />
     <link rel="icon" type="image/png" href="/blockbound/icon-512.png" />
     <link rel="apple-touch-icon" href="/blockbound/icon-180.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Blockbound" />
     <meta property="og:title" content="Blockbound — Game Launcher" />
-    <meta property="og:description" content="Seven browser games: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
+    <meta property="og:description" content="Seven browser games plus a 3D modeler: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
     <meta property="og:image" content="/blockbound/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Blockbound — Game Launcher" />
-    <meta name="twitter:description" content="Seven browser games: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
+    <meta name="twitter:description" content="Seven browser games plus a 3D modeler: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
     <meta name="twitter:image" content="/blockbound/og.jpg" />
     <title>Blockbound — Game Launcher</title>
-    <script type="module" crossorigin src="/blockbound/assets/index-CbUR74LB.js"></script>
-    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-BuA4bAV6.css">
+    <script type="module" crossorigin src="/blockbound/assets/index-DNWmtZsn.js"></script>
+    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-Bg1Zty4K.css">
   </head>
   <body>
     <canvas id="world" aria-label="A blocky landscape"></canvas>
@@ -250,6 +250,36 @@
                 </div>
               </div>
             </article>
+            <article class="game-card game-card-studio" data-game-card="studio" aria-labelledby="studio-card-title">
+              <div class="game-art studio-art" aria-hidden="true">
+                <div class="studio-art-grid"></div>
+                <div class="studio-art-cube one"></div>
+                <div class="studio-art-cube two"></div>
+                <div class="studio-art-cube three"></div>
+                <span class="studio-art-label">3D</span>
+              </div>
+              <div class="game-details">
+                <div class="game-heading">
+                  <h2 id="studio-card-title">Blockbound Studio</h2>
+                  <span class="game-status studio-badge">Creative · New</span>
+                </div>
+                <p class="game-description">A 3D modeling sandbox: stack boxes, spheres, cylinders and wedges, then twist, lift and stretch them with XYZ axle controls. Start from console, controller, car, house or room templates — or build something entirely new, save it, and export it.</p>
+                <ul class="game-meta">
+                  <li>3D modeler · templates</li>
+                  <li id="studio-design-count">No saved designs yet</li>
+                  <li>Save · load · export</li>
+                </ul>
+                <div class="game-actions">
+                  <button class="mc-button launch-button" data-action="launch" data-game="studio" type="button">Open Studio</button>
+                  <p id="studio-hint" class="launch-hint">Build anything · axes · materials</p>
+                  <p class="game-link-row">
+                    <span class="game-link-label">Launch link</span>
+                    <a id="studio-launch-link" class="game-link" href="?play=studio" title="Direct launch link for Blockbound Studio">/?play=studio</a>
+                    <button class="game-link-copy" type="button" data-action="copy-launch-link" data-game="studio">Copy</button>
+                  </p>
+                </div>
+              </div>
+            </article>
           </div>
 
           <nav class="launcher-actions" aria-label="Launcher">
@@ -261,7 +291,7 @@
         </div>
 
         <footer class="launcher-footer">
-          <span>Blockbound Launcher 0.7.3 <span class="muted">· Web Edition</span></span>
+          <span>Blockbound Launcher 0.8.0 <span class="muted">· Web Edition</span></span>
           <span class="muted">Not an official Minecraft or Roblox product. Fan-built voxel demo.</span>
         </footer>
       </section>
@@ -766,6 +796,102 @@
             </div>
           </div>
         </div>
+      </section>
+
+      <section id="studio-screen" class="screen studio-screen" aria-labelledby="studio-title">
+        <div id="studio-viewport" class="studio-viewport" aria-label="3D viewport; drag to orbit, scroll to zoom, click to select"></div>
+        <header class="studio-topbar">
+          <div class="studio-brand">
+            <span id="studio-title" class="studio-logo">Blockbound Studio</span>
+            <span class="studio-subtitle">3D modeler · drag to orbit · click to select</span>
+          </div>
+          <div class="studio-topactions">
+            <button data-studio-action="undo" type="button" title="Undo (Ctrl+Z)">Undo</button>
+            <button data-studio-action="redo" type="button" title="Redo (Ctrl+Shift+Z)">Redo</button>
+            <button data-studio-action="fit" type="button">Fit view</button>
+            <input id="studio-design-name" class="studio-name" type="text" value="Untitled build" maxlength="48" aria-label="Design name" />
+            <button data-studio-action="save" type="button">Save</button>
+            <button data-studio-action="new" type="button">New</button>
+            <button data-studio-action="export" type="button">Export JSON</button>
+            <button data-studio-action="snapshot" type="button">Snapshot</button>
+            <button data-studio-action="import" type="button">Import</button>
+            <button data-studio-action="menu" class="studio-exit" type="button">← Launcher</button>
+          </div>
+        </header>
+
+        <aside class="studio-panel studio-library" aria-label="Shapes, templates and saved designs">
+          <h2>Add a shape</h2>
+          <div class="studio-shapes">
+            <button data-studio-add="box" type="button"><span>◼</span>Box</button>
+            <button data-studio-add="sphere" type="button"><span>●</span>Sphere</button>
+            <button data-studio-add="cylinder" type="button"><span>⬤</span>Cylinder</button>
+            <button data-studio-add="cone" type="button"><span>▲</span>Cone</button>
+            <button data-studio-add="torus" type="button"><span>◎</span>Torus</button>
+            <button data-studio-add="wedge" type="button"><span>◣</span>Wedge</button>
+          </div>
+          <h2>Start from a template</h2>
+          <div class="studio-templates">
+            <button data-studio-template="console" type="button">Game console</button>
+            <button data-studio-template="controller" type="button">Controller</button>
+            <button data-studio-template="car" type="button">Car</button>
+            <button data-studio-template="house" type="button">House</button>
+            <button data-studio-template="room" type="button">House room</button>
+          </div>
+          <p class="studio-note">Templates load into the editor as regular objects — every part stays editable.</p>
+          <h2>Saved designs</h2>
+          <ul id="studio-design-list" class="studio-design-list"></ul>
+          <p class="studio-note">Drafts autosave. Export JSON to move a design; Snapshot saves a PNG.</p>
+        </aside>
+
+        <aside class="studio-panel studio-inspector" aria-label="Selected object and transform axles">
+          <h2>Selected part</h2>
+          <p id="studio-selection" class="studio-selection">Nothing selected</p>
+          <input id="studio-selection-name" class="studio-name studio-object-name" type="text" placeholder="Part name" maxlength="48" disabled aria-label="Selected part name" />
+          <select id="studio-object-list" class="studio-object-list" aria-label="All objects"></select>
+
+          <h2>Appearance</h2>
+          <div id="studio-palette" class="studio-palette" aria-label="Colour palette"></div>
+          <div class="studio-appearance-row">
+            <label class="studio-color-label">Colour <input id="studio-color" type="color" value="#63e6d5" disabled /></label>
+            <label class="studio-material-label">Finish
+              <select id="studio-material" disabled>
+                <option value="matte">Matte</option>
+                <option value="gloss">Glossy</option>
+                <option value="metal">Metal</option>
+              </select>
+            </label>
+          </div>
+
+          <h2>Axles</h2>
+          <div class="studio-modes" role="group" aria-label="Transform mode">
+            <button data-studio-mode="move" type="button" class="active">Move</button>
+            <button data-studio-mode="rotate" type="button">Rotate</button>
+            <button data-studio-mode="scale" type="button">Scale</button>
+          </div>
+          <div id="studio-axes" class="studio-axes" aria-label="Axis controls"></div>
+
+          <div class="studio-selection-actions">
+            <button data-studio-selection-action="duplicate" type="button">Duplicate</button>
+            <button data-studio-selection-action="delete" type="button">Delete</button>
+          </div>
+
+          <details class="studio-help">
+            <summary>How to use the studio</summary>
+            <ul>
+              <li>Click a shape to add it at the origin.</li>
+              <li>Click any object in the viewport or list to select it.</li>
+              <li>Use Move / Rotate / Scale, then drag the X, Y or Z axle slider — or tap − / +.</li>
+              <li>Left-drag orbits, right-drag pans, wheel zooms; double-click focuses.</li>
+              <li>Ctrl+Z undo · Ctrl+Shift+Z redo · Delete removes · Ctrl+D duplicates.</li>
+            </ul>
+          </details>
+        </aside>
+
+        <p id="studio-empty" class="studio-empty">Add a shape or load a template to start modeling</p>
+        <p class="studio-hint">Drag orbit · wheel zoom · right-drag pan · click select · the three colored arrows show the active axles</p>
+        <p id="studio-status" class="studio-status">0 objects · not saved yet</p>
+        <div id="studio-toast" class="parkour-toast" role="status" aria-live="polite"></div>
+        <input id="studio-import" type="file" accept="application/json,.json" hidden />
       </section>
 
       <div id="confirm-dialog" class="dialog-backdrop" aria-hidden="true">

@@ -11,6 +11,7 @@ import { createJelly } from './jelly.js';
 import { createKart } from './kart.js';
 import { createBros } from './bros.js';
 import { createDash } from './dash.js';
+import { createStudio } from './studio.js';
 
 // Public asset URLs must respect the deployment base (e.g. /blockbound/ on GitHub
 // Pages) as well as the root deployment used locally and on Vercel.
@@ -1721,6 +1722,7 @@ const STORAGE = {
   kart: 'java-menu-kart-v1',
   bros: 'java-menu-bros-v1',
   dash: 'java-menu-dash-v1',
+  studio: 'java-menu-studio-v1',
 };
 const defaultSettings = { fov: 72, distance: 4, volume: 70, bobbing: true, highContrast: false, blur: true, autoJump: false, narrator: false, language: 'en' };
 
@@ -1821,6 +1823,18 @@ const GAMES = {
       { keys: ['SPACE', 'W', 'CLICK'], label: 'Jump' },
       { keys: ['R'], label: 'Restart level' },
       { keys: ['ESC'], label: 'Pause menu' },
+    ],
+  },
+  studio: {
+    name: 'Blockbound Studio',
+    version: 'Creative · 3D Modeler',
+    linkLabel: '/?play=studio',
+    movement: false,
+    controls: [
+      { keys: ['DRAG'], label: 'Orbit' },
+      { keys: ['WHEEL'], label: 'Zoom' },
+      { keys: ['DEL'], label: 'Delete part' },
+      { keys: ['CTRL', 'Z'], label: 'Undo' },
     ],
   },
 };
@@ -2286,6 +2300,27 @@ function renderLauncher() {
     dashHint.innerHTML = dash.runs ? `3 levels · ${dash.runs} clear${dash.runs === 1 ? '' : 's'} · one-button jumps` : '3 levels · jump · retry · 100%';
   }
 
+  // --- Blockbound Studio card ---------------------------------------------
+  const studio = studioRecord();
+  const studioLink = document.querySelector('#studio-launch-link');
+  if (studioLink) {
+    const href = `?${LAUNCH_PARAM}=studio`;
+    studioLink.setAttribute('href', href);
+    studioLink.textContent = `/${href}`;
+    studioLink.title = `Direct launch link for ${GAMES.studio.name}`;
+  }
+  const studioCount = Object.keys(studio.designs || {}).length;
+  const studioCountNode = document.querySelector('#studio-design-count');
+  if (studioCountNode) {
+    studioCountNode.textContent = studioCount ? `${studioCount} saved design${studioCount === 1 ? '' : 's'}` : 'No saved designs yet';
+  }
+  const studioHint = document.querySelector('#studio-hint');
+  if (studioHint) {
+    studioHint.innerHTML = studio.lastDesign
+      ? `Continue <strong>${escapeHtml(studio.lastDesign)}</strong> · ${studioCount} design${studioCount === 1 ? '' : 's'}`
+      : 'Build anything · axes · materials';
+  }
+
   renderGameControlsRows();
 }
 
@@ -2293,6 +2328,12 @@ function renderLauncher() {
 // is generated from GAMES metadata, so newly added movement games get it automatically.
 function keyChips(keys) {
   return keys.map((key) => `<kbd>${key}</kbd>`).join('');
+}
+
+function studioRecord() {
+  const record = readStore(STORAGE.studio, {}) || {};
+  if (!record.designs || typeof record.designs !== 'object') record.designs = {};
+  return record;
 }
 
 function renderGameControlsRows() {
@@ -2468,6 +2509,23 @@ function launchBros() {
   bros.start(brosLast == null ? 1 : Math.min(brosLast + 1, 5));
 }
 
+let studio = null;
+function launchStudio() {
+  studio ??= createStudio({
+    canvas,
+    renderer,
+    onExit: () => {
+      showScreen('launcher');
+      syncLaunchUrl(null);
+    },
+  });
+  inWorld = false;
+  closeLan();
+  showScreen('studio', { focus: false });
+  syncLaunchUrl('studio');
+  studio.start();
+}
+
 let dash = null;
 function launchDash() {
   dash ??= createDash({
@@ -2496,6 +2554,7 @@ function launchGame(game = 'minecraft') {
   else if (game === 'kart') launchKart();
   else if (game === 'bros') launchBros();
   else if (game === 'dash') launchDash();
+  else if (game === 'studio') launchStudio();
   else launchMinecraft();
 }
 
@@ -3022,6 +3081,12 @@ let worldTime = 65;
 let nextAnimalSpawn = 0;
 function animate() {
   const delta = Math.min(clock.getDelta(), .05);
+  if (studio?.active) {
+    studio.update(delta);
+    studio.render();
+    requestAnimationFrame(animate);
+    return;
+  }
   if (dash?.active) {
     dash.update(delta);
     dash.render();
