@@ -28,8 +28,8 @@ menu:
   and every pit; best flag time saved per level.
 - **Neon Dash** — an original Geometry Dash–style one-button auto-runner with **three
   neon courses** packed with spikes, spinning and bobbing saw blades, hanging ceiling
-  spikes, death pits, floating platforms you can land on, rideable moving lifts and
-  air portals: tap/space to jump, crash restarts instantly, attempts and best progress
+  spikes, death pits, three-block gaps, floating platforms you can land on, rideable
+  moving lifts and air portals: tap/space to jump, crash restarts instantly, attempts and best progress
   saved per level.
 - **Blockbound Studio** — a 3D modeling sandbox, not a game: add boxes, spheres,
   cylinders, cones, tori and wedges; **drag parts directly in the viewport** (Shift-drag

@@ -4,8 +4,8 @@ import * as THREE from 'three';
 // One-button jump timing through neon spike-and-block courses. Three levels, attempts
 // and progress saved. No Geometry Dash assets or music are used.
 
-const GRAVITY = 42;
-const JUMP_SPEED = 13.5;
+const GRAVITY = 41;
+const JUMP_SPEED = 15.5;
 const PLAYER_SIZE = 1;
 const START_X = 0;
 
@@ -17,10 +17,11 @@ const CLUSTERS = {
   sawSpike: [{ type: 'saw', y: 0.62, r: 0.6 }, { type: 'spike', dx: 2.1 }],
   bob: [{ type: 'saw', y: 0.9, r: 0.55, bob: { amp: 0.55, speed: 2.2, phase: 0 } }],
   block: [{ type: 'block', w: 2, h: 1 }],
-  pit: [{ type: 'pit', w: 2.3 }],
+  pit: [{ type: 'pit', w: 3.0 }],
   ceil: [{ type: 'ceil', y: 3.0 }],
   float: [{ type: 'block', y: 2.2, w: 2.2, h: 1 }],
   platform: [{ type: 'platform', y: 1.3, w: 2.8, h: 0.3 }],
+  gap: [{ type: 'platform', y: 1.3, w: 2.8, h: 0.3 }, { type: 'platform', dx: 5.8, y: 1.5, w: 2.8, h: 0.3 }],
   lift: [{ type: 'lift', y: 1.35, w: 2.6, h: 0.3, bob: { amp: 0.7, speed: 1.7, phase: 0 } }],
   portal: [{ type: 'portal', y: 2.2 }],
 };
@@ -43,17 +44,17 @@ const LEVELS = [
   {
     name: 'Stereo Start', speed: 7.0, length: 186,
     sky: 0x0d0820, floor: 0x1a1038, accent: 0x63e6d5, spikeColor: 0xff5c8a, blockColor: 0x8b5cff,
-    obstacles: course(14, 8, ['spike', 'saw', 'twin', 'platform', 'pit', 'ceil', 'sawSpike', 'lift', 'portal', 'float'], 2),
+    obstacles: course(14, 8, ['spike', 'saw', 'twin', 'gap', 'pit', 'ceil', 'sawSpike', 'lift', 'portal', 'float'], 2),
   },
   {
     name: 'Bass Drop', speed: 8.0, length: 266,
     sky: 0x1a0a20, floor: 0x2a1030, accent: 0xff9ff3, spikeColor: 0xffc93c, blockColor: 0xff5c8a,
-    obstacles: course(14, 8, ['sawSpike', 'twin', 'lift', 'pit', 'ceil', 'bob', 'platform', 'float', 'portal', 'spike'], 3),
+    obstacles: course(14, 8, ['sawSpike', 'twin', 'lift', 'pit', 'ceil', 'bob', 'gap', 'float', 'portal', 'spike'], 3),
   },
   {
     name: 'Neon Overdrive', speed: 8.8, length: 314,
     sky: 0x061426, floor: 0x0c2a3a, accent: 0x7be3cb, spikeColor: 0xff4d6d, blockColor: 0x74a7ff,
-    obstacles: course(14, 8, ['triple', 'bob', 'lift', 'pit', 'ceil', 'sawSpike', 'platform', 'float', 'portal', 'sawSpike', 'triple', 'lift'], 3),
+    obstacles: course(14, 8, ['triple', 'bob', 'lift', 'pit', 'ceil', 'sawSpike', 'gap', 'float', 'portal', 'sawSpike', 'triple', 'lift'], 3),
   },
 ];
 
@@ -325,7 +326,7 @@ export function createDash({ canvas, renderer, getBest, onProgress, onFinish, on
         obstacle.minX = obstacle.x - 0.55; obstacle.maxX = obstacle.x + 0.55;
         obstacle.minY = y - 0.95; obstacle.maxY = y + 0.95;
       } else if (obstacle.type === 'pit') {
-        const width = obstacle.w || 2.3;
+        const width = obstacle.w || 3.0;
         const pit = box(width, 0.08, 2.3, 0x010509);
         pit.position.set(obstacle.x, 0.02, 0);
         levelGroup.add(pit);
