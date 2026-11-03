@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#141f26" />
-    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash — seven games and a 3D modeler, all free in your browser." />
+    <meta name="description" content="Blockbound: a browser game launcher with a Minecraft-style voxel world, an endless Roblox-style parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash — eight games and a 3D modeler, all free in your browser." />
     <link rel="icon" type="image/png" href="/blockbound/icon-512.png" />
     <link rel="apple-touch-icon" href="/blockbound/icon-180.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Blockbound" />
     <meta property="og:title" content="Blockbound — Game Launcher" />
-    <meta property="og:description" content="Seven browser games plus a 3D modeler: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
+    <meta property="og:description" content="Eight browser games plus a 3D modeler: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
     <meta property="og:image" content="/blockbound/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Blockbound — Game Launcher" />
-    <meta name="twitter:description" content="Seven browser games plus a 3D modeler: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
+    <meta name="twitter:description" content="Eight browser games plus a 3D modeler: Minecraft-style voxel worlds, an endless parkour obby, 12 Dozen, Jelly Run 2048, Kart Rush, Super Block Bros. and Neon Dash." />
     <meta name="twitter:image" content="/blockbound/og.jpg" />
     <title>Blockbound — Game Launcher</title>
-    <script type="module" crossorigin src="/blockbound/assets/index-CXbquw6o.js"></script>
-    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-CLReLZPh.css">
+    <script type="module" crossorigin src="/blockbound/assets/index-BfTUA10b.js"></script>
+    <link rel="stylesheet" crossorigin href="/blockbound/assets/index-B_Toit8b.css">
   </head>
   <body>
     <canvas id="world" aria-label="A blocky landscape"></canvas>
@@ -250,6 +250,38 @@
                 </div>
               </div>
             </article>
+            <article class="game-card game-card-hopper" data-game-card="hopper" aria-labelledby="hopper-card-title">
+              <div class="game-art hopper-art" aria-hidden="true">
+                <div class="hopper-sky"></div>
+                <div class="hopper-road"></div>
+                <div class="hopper-dash one"></div>
+                <div class="hopper-dash two"></div>
+                <div class="hopper-car"></div>
+                <div class="hopper-player"></div>
+              </div>
+              <div class="game-details">
+                <div class="game-heading">
+                  <h2 id="hopper-card-title">Road Hopper</h2>
+                  <span class="game-status hopper-badge">Endless · Traffic</span>
+                </div>
+                <p class="game-description">A Crossy Road–style desktop time-killer: hop a blocky character forward across endless grass and traffic, dodge the cars, and push your lane count as high as possible. One wrong hop and it’s a splat.</p>
+                <ul class="game-meta">
+                  <li>Endless lanes · cars</li>
+                  <li id="hopper-best-card">No best run yet</li>
+                  <li>WASD · arrows · space</li>
+                </ul>
+                <div class="game-actions">
+                  <button class="mc-button launch-button" data-action="launch" data-game="hopper" type="button">Play</button>
+                  <p id="hopper-hint" class="launch-hint">Hop · dodge · endless</p>
+                  <p class="game-link-row">
+                    <span class="game-link-label">Launch link</span>
+                    <a id="hopper-launch-link" class="game-link" href="?play=hopper" title="Direct launch link for Road Hopper">/?play=hopper</a>
+                    <button class="game-link-copy" type="button" data-action="copy-launch-link" data-game="hopper">Copy</button>
+                  </p>
+                </div>
+              </div>
+            </article>
+
             <article class="game-card game-card-studio" data-game-card="studio" aria-labelledby="studio-card-title">
               <div class="game-art studio-art" aria-hidden="true">
                 <div class="studio-art-grid"></div>
@@ -291,7 +323,7 @@
         </div>
 
         <footer class="launcher-footer">
-          <span>Blockbound Launcher 0.8.4 <span class="muted">· Web Edition</span></span>
+          <span>Blockbound Launcher 0.9.0 <span class="muted">· Web Edition</span></span>
           <span class="muted">Not an official Minecraft or Roblox product. Fan-built voxel demo.</span>
         </footer>
       </section>
@@ -893,6 +925,57 @@
         <p id="studio-status" class="studio-status">0 objects · not saved yet</p>
         <div id="studio-toast" class="parkour-toast" role="status" aria-live="polite"></div>
         <input id="studio-import" type="file" accept="application/json,.json" hidden />
+      </section>
+
+      <section id="hopper-screen" class="screen parkour-screen hopper-screen" aria-labelledby="hopper-title">
+        <div class="parkour-hud">
+          <header class="parkour-topbar">
+            <div class="parkour-brand">
+              <span id="hopper-title" class="parkour-logo">Road Hopper</span>
+              <span class="parkour-server">Endless traffic · desktop</span>
+            </div>
+            <div class="parkour-timer" id="hopper-score" aria-label="Lanes crossed">0 lanes</div>
+            <div class="parkour-stats">
+              <span id="hopper-best">Best 0</span>
+            </div>
+          </header>
+          <p class="parkour-objective" id="hopper-objective">WASD / arrows / Space to hop</p>
+          <p class="parkour-controls">WASD or arrows hop · SPACE forward · R restart · ESC pause</p>
+          <div class="parkour-toast" id="hopper-toast" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="parkour-touch hopper-touch" aria-label="Touch hop controls">
+          <button data-hopper-move="forward" type="button" aria-label="Hop forward">▲</button>
+          <div class="hopper-touch-row">
+            <button data-hopper-move="left" type="button" aria-label="Hop left">◀</button>
+            <button data-hopper-move="back" type="button" aria-label="Hop back">▼</button>
+            <button data-hopper-move="right" type="button" aria-label="Hop right">▶</button>
+          </div>
+        </div>
+
+        <div id="hopper-pause" class="parkour-overlay" hidden>
+          <div class="parkour-panel">
+            <h2>Paused</h2>
+            <p class="hopper-pause-line" id="hopper-pause-line">0 lanes · best 0</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-hopper-panel="resume" type="button">Resume</button>
+              <button class="mc-button wide" data-hopper-panel="restart" type="button">Restart run</button>
+              <button class="mc-button wide" data-hopper-panel="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="hopper-finish" class="parkour-overlay" hidden>
+          <div class="parkour-panel parkour-finish-panel">
+            <h2 id="hopper-finish-title">Squashed!</h2>
+            <p class="parkour-finish-time" id="hopper-finish-score">0 lanes crossed</p>
+            <p class="parkour-finish-best" id="hopper-finish-best">New best run!</p>
+            <div class="parkour-panel-actions">
+              <button class="mc-button wide" data-hopper-panel="restart" type="button">Hop again</button>
+              <button class="mc-button wide" data-hopper-panel="menu" type="button">Back to launcher</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <div id="confirm-dialog" class="dialog-backdrop" aria-hidden="true">

@@ -31,6 +31,9 @@ menu:
   spikes, death pits, three-block gaps, floating platforms you can land on, rideable
   moving lifts and air portals: tap/space to jump, crash restarts instantly, attempts and best progress
   saved per level.
+- **Road Hopper** — a Crossy Road–style endless desktop time-killer: hop a blocky
+  character across grass and traffic, dodge cars, and push your lane count as high as
+  possible. WASD / arrows / Space; best run saved.
 - **Blockbound Studio** — a 3D modeling sandbox, not a game: add boxes, spheres,
   cylinders, cones, tori and wedges; **drag parts directly in the viewport** (Shift-drag
   to lift), or move/rotate/scale on X/Y/Z axles; change

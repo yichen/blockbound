@@ -2861,3 +2861,108 @@ body:has(#app[data-screen="game"]):not(:has(.creative-inventory.open)) #hud * { 
 }
 .studio-viewport.studio-dragging { cursor: grabbing; }
 .studio-viewport.studio-dragging * { cursor: grabbing; }
+
+/* ===== Road Hopper (endless traffic) ===== */
+.game-card-hopper {
+  border-color: rgba(125, 220, 98, .32);
+  background: linear-gradient(150deg, rgba(14, 34, 22, .97), rgba(9, 18, 26, .97));
+}
+.game-card-hopper .game-heading h2 { color: #dcffd2; }
+.hopper-badge {
+  border-color: rgba(125, 220, 98, .55) !important;
+  background: rgba(125, 220, 98, .15) !important;
+  color: #e3ffd8 !important;
+}
+.hopper-art {
+  border-color: rgba(125, 220, 98, .26);
+  background: linear-gradient(#7ed8f5 0%, #b9ecff 48%, #355a44 49%, #1d3a2c 100%);
+  overflow: hidden;
+}
+.hopper-sky {
+  position: absolute;
+  inset: 0 0 46%;
+  background: radial-gradient(circle at 70% 26%, rgba(255, 255, 255, .7), transparent 18%), linear-gradient(#6fd0f4, #d8f5ff);
+}
+.hopper-road {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: 10%;
+  height: 24%;
+  background: #363b48;
+  transform: perspective(140px) rotateX(38deg);
+  border-top: 3px solid #f7fbff;
+  border-bottom: 3px solid #f7fbff;
+}
+.hopper-dash {
+  position: absolute;
+  bottom: 22%;
+  z-index: 1;
+  width: 26%;
+  height: 5px;
+  border-radius: 3px;
+  background: #ffd166;
+  transform: perspective(90px) rotateX(34deg);
+}
+.hopper-dash.one { left: 8%; }
+.hopper-dash.two { right: 10%; }
+.hopper-car {
+  position: absolute;
+  right: 12%;
+  bottom: 25%;
+  z-index: 2;
+  width: 46px;
+  height: 24px;
+  border-radius: 7px 7px 4px 4px;
+  background: linear-gradient(#ff7d99, #d94868);
+  box-shadow: inset 0 -5px rgba(0, 0, 0, .25), 0 5px 0 rgba(0, 0, 0, .18);
+}
+.hopper-car::before,
+.hopper-car::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #12141c;
+}
+.hopper-car::before { left: 6px; }
+.hopper-car::after { right: 6px; }
+.hopper-player {
+  position: absolute;
+  left: 36%;
+  bottom: 31%;
+  z-index: 3;
+  width: 28px;
+  height: 28px;
+  border: 3px solid #63e6d5;
+  border-radius: 6px;
+  background: linear-gradient(150deg, #b9fff5, #28b9a9);
+  box-shadow: 0 0 16px rgba(99, 230, 213, .6);
+  transform: rotate(-8deg);
+}
+.hopper-screen { --pk-coral: #7ddc62; --pk-yellow: #ffd166; }
+.hopper-pause-line { color: #d8ffd0; font-size: 14px; }
+.hopper-touch { display: none; flex-direction: column; align-items: center; gap: 8px; }
+.hopper-touch-row { display: flex; gap: 8px; }
+.hopper-touch button {
+  width: 62px;
+  height: 56px;
+  border: 1px solid rgba(125, 220, 98, .65);
+  border-radius: 14px;
+  background: rgba(125, 220, 98, .2);
+  color: #fff;
+  font: 800 20px/1 "Trebuchet MS", sans-serif;
+  pointer-events: auto;
+  touch-action: none;
+}
+@media (pointer: coarse) {
+  .hopper-touch { display: flex; }
+}
+
+#app[data-screen="hopper"]::before {
+  opacity: 0;
+  backdrop-filter: none;
+  pointer-events: none;
+}

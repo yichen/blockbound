@@ -12,6 +12,7 @@ import { createKart } from './kart.js';
 import { createBros } from './bros.js';
 import { createDash } from './dash.js';
 import { createStudio } from './studio.js';
+import { createHopper } from './hopper.js';
 
 // Public asset URLs must respect the deployment base (e.g. /blockbound/ on GitHub
 // Pages) as well as the root deployment used locally and on Vercel.
@@ -1723,6 +1724,7 @@ const STORAGE = {
   bros: 'java-menu-bros-v1',
   dash: 'java-menu-dash-v1',
   studio: 'java-menu-studio-v1',
+  hopper: 'java-menu-hopper-v1',
 };
 const defaultSettings = { fov: 72, distance: 4, volume: 70, bobbing: true, highContrast: false, blur: true, autoJump: false, narrator: false, language: 'en' };
 
@@ -1835,6 +1837,18 @@ const GAMES = {
       { keys: ['WHEEL'], label: 'Zoom' },
       { keys: ['DEL'], label: 'Delete part' },
       { keys: ['CTRL', 'Z'], label: 'Undo' },
+    ],
+  },
+  hopper: {
+    name: 'Road Hopper',
+    version: 'Endless · Traffic Hop',
+    linkLabel: '/?play=hopper',
+    movement: true,
+    controls: [
+      { keys: ['W', 'A', 'S', 'D', '↑'], label: 'Hop' },
+      { keys: ['SPACE'], label: 'Hop forward' },
+      { keys: ['R'], label: 'Restart run' },
+      { keys: ['ESC'], label: 'Pause menu' },
     ],
   },
 };
@@ -2300,6 +2314,26 @@ function renderLauncher() {
     dashHint.innerHTML = dash.runs ? `3 levels · ${dash.runs} clear${dash.runs === 1 ? '' : 's'} · one-button jumps` : '3 levels · jump · retry · 100%';
   }
 
+  // --- Road Hopper card ---------------------------------------------------
+  const hopper = hopperRecord();
+  const hopperLink = document.querySelector('#hopper-launch-link');
+  if (hopperLink) {
+    const href = `?${LAUNCH_PARAM}=hopper`;
+    hopperLink.setAttribute('href', href);
+    hopperLink.textContent = `/${href}`;
+    hopperLink.title = `Direct launch link for ${GAMES.hopper.name}`;
+  }
+  const hopperBestCard = document.querySelector('#hopper-best-card');
+  if (hopperBestCard) {
+    hopperBestCard.textContent = hopper.best > 0 ? `Best ${hopper.best} lanes` : 'No best run yet';
+  }
+  const hopperHint = document.querySelector('#hopper-hint');
+  if (hopperHint) {
+    hopperHint.innerHTML = hopper.runs
+      ? `${hopper.runs} run${hopper.runs === 1 ? '' : 's'} · best ${hopper.best} lanes`
+      : 'Hop · dodge · endless';
+  }
+
   // --- Blockbound Studio card ---------------------------------------------
   const studio = studioRecord();
   const studioLink = document.querySelector('#studio-launch-link');
@@ -2334,6 +2368,20 @@ function studioRecord() {
   const record = readStore(STORAGE.studio, {}) || {};
   if (!record.designs || typeof record.designs !== 'object') record.designs = {};
   return record;
+}
+
+function hopperRecord() {
+  const record = readStore(STORAGE.hopper, {}) || {};
+  return { best: Number(record.best) || 0, runs: Number(record.runs) || 0 };
+}
+
+function saveHopperRun(score) {
+  const record = hopperRecord();
+  const isBest = score > record.best;
+  const best = Math.max(record.best, score);
+  writeStore(STORAGE.hopper, { best, runs: record.runs + 1 });
+  renderLauncher();
+  return { isBest, best };
 }
 
 function renderGameControlsRows() {
@@ -2509,6 +2557,25 @@ function launchBros() {
   bros.start(brosLast == null ? 1 : Math.min(brosLast + 1, 5));
 }
 
+let hopper = null;
+function launchHopper() {
+  hopper ??= createHopper({
+    canvas,
+    renderer,
+    getBest: () => hopperRecord().best,
+    onFinish: (score) => saveHopperRun(score),
+    onExit: () => {
+      showScreen('launcher');
+      syncLaunchUrl(null);
+    },
+  });
+  inWorld = false;
+  closeLan();
+  showScreen('hopper', { focus: false });
+  syncLaunchUrl('hopper');
+  hopper.start();
+}
+
 let studio = null;
 function launchStudio() {
   studio ??= createStudio({
@@ -2555,6 +2622,7 @@ function launchGame(game = 'minecraft') {
   else if (game === 'bros') launchBros();
   else if (game === 'dash') launchDash();
   else if (game === 'studio') launchStudio();
+  else if (game === 'hopper') launchHopper();
   else launchMinecraft();
 }
 
@@ -3081,6 +3149,12 @@ let worldTime = 65;
 let nextAnimalSpawn = 0;
 function animate() {
   const delta = Math.min(clock.getDelta(), .05);
+  if (hopper?.active) {
+    hopper.update(delta);
+    hopper.render();
+    requestAnimationFrame(animate);
+    return;
+  }
   if (studio?.active) {
     studio.update(delta);
     studio.render();
