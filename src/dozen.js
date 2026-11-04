@@ -888,30 +888,16 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function updateMapCamera(aspect) {
-    const bounds = courseBounds();
-    const margin = 12;
-    const width = bounds.maxX - bounds.minX + margin * 2;
-    const length = bounds.maxZ - bounds.minZ + margin * 2;
-    const centerX = (bounds.minX + bounds.maxX) / 2;
-    const centerZ = (bounds.minZ + bounds.maxZ) / 2;
-    mapCamera.position.set(centerX, 160, centerZ);
-    if (aspect >= 1) {
-      const halfHeight = Math.max(length / 2 / aspect, width / 2);
-      mapCamera.left = -halfHeight * aspect;
-      mapCamera.right = halfHeight * aspect;
-      mapCamera.top = halfHeight;
-      mapCamera.bottom = -halfHeight;
-      mapCamera.up.set(-1, 0, 0);
-    } else {
-      const halfHeight = length / 2;
-      const halfWidth = Math.max(halfHeight * aspect, width / 2);
-      mapCamera.left = -halfWidth;
-      mapCamera.right = halfWidth;
-      mapCamera.top = halfHeight;
-      mapCamera.bottom = -halfHeight;
-      mapCamera.up.set(0, 0, -1);
-    }
-    mapCamera.lookAt(centerX, 0, centerZ);
+    const viewHeight = 28;
+    const viewWidth = viewHeight * aspect;
+    const focusZ = player.position.z - 6;
+    mapCamera.left = -viewWidth / 2;
+    mapCamera.right = viewWidth / 2;
+    mapCamera.top = viewHeight / 2;
+    mapCamera.bottom = -viewHeight / 2;
+    mapCamera.position.set(player.position.x, 120, focusZ);
+    mapCamera.up.set(0, 0, -1);
+    mapCamera.lookAt(player.position.x, 0, focusZ);
     mapCamera.updateProjectionMatrix();
   }
 
@@ -956,7 +942,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     else if (code === 'KeyA' || code === 'ArrowLeft') keys.add('left');
     else if (code === 'KeyD' || code === 'ArrowRight') keys.add('right');
     else if (code === 'Space') { keys.add('jump'); player.jumpBuffer = 0.16; }
-    else if (code === 'KeyR') { if (!paused && !finished && !mapView) respawn('Reset to checkpoint'); }
+    else if (code === 'KeyR') { if (!paused && !finished) respawn('Reset to checkpoint'); }
     else if (code === 'KeyM') { toggleMap(); }
     else if (code === 'Escape') {
       if (mapView) setMapView(false);
@@ -1029,14 +1015,14 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   document.addEventListener('keyup', up);
   for (const button of document.querySelectorAll('[data-dozen-move]')) {
     const key = button.dataset.dozenMove;
-    button.addEventListener('pointerdown', (event) => { event.preventDefault(); if (!active || paused || finished || mapView) return; keys.add(key); startTimer(); button.setPointerCapture?.(event.pointerId); });
+    button.addEventListener('pointerdown', (event) => { event.preventDefault(); if (!active || paused || finished) return; keys.add(key); startTimer(); button.setPointerCapture?.(event.pointerId); });
     const release = (event) => { keys.delete(key); if (button.hasPointerCapture?.(event.pointerId)) button.releasePointerCapture(event.pointerId); };
     for (const type of ['pointerup', 'pointercancel', 'pointerleave']) button.addEventListener(type, release);
   }
   for (const button of document.querySelectorAll('[data-dozen-jump]')) {
     button.addEventListener('pointerdown', (event) => {
       event.preventDefault();
-      if (!active || paused || finished || mapView) return;
+      if (!active || paused || finished) return;
       keys.add('jump');
       player.jumpBuffer = 0.16;
       startTimer();
@@ -1164,7 +1150,6 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function checkPads() {
-    if (mapView) return;
     for (const pad of pads) {
       if (pad.used) continue;
       if (Math.abs(player.position.x - pad.x) > 1.2 + PLAYER_WIDTH / 2) continue;
@@ -1423,7 +1408,6 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
 
   function update(dt) {
     if (!active) return;
-    if (mapView) return;
     if (respawnTimer > 0) respawnTimer = Math.max(0, respawnTimer - dt);
     if (!paused && !finished) {
       if (running) elapsed += dt;
