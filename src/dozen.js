@@ -49,23 +49,112 @@ const POWER_DEFS = [
   { id: 'flip', label: 'Upside down', rule: 'negative numbers', short: '< 0', test: (value) => value < 0 },
 ];
 
+const PAD_SETS = [
+  { a1: ['+', 12], a2: ['×', 2], a3: ['+', 6], b1: ['+', 1], b2: ['×', 3], b3: ['−', 3], c1: null, c3: ['×', 2] },
+  { a1: ['+', 12], a2: ['+', 24], a3: ['+', 6], b1: ['+', 2], b2: ['×', 3], b3: ['−', 3], c1: ['−', 6], c3: ['×', 2] },
+  { a1: ['+', 12], a2: ['+', 12], a3: ['×', 2], b1: ['+', 4], b2: ['+', 50], b3: ['−', 3], c1: null, c3: ['+', 54] },
+];
+
+const ODD_DOZEN = { text: '12 odd dozen = ?', answer: 156, choices: [144, 156, 168] };
+
 const LEVELS = [
   {
-    name: 'Sunny Stones', sky: 0x9fdcff,
-    gates: [24, 72, 144],
-    pads: { a1: ['+', 12], a2: ['×', 2], a3: ['+', 6], b1: ['+', 1], b2: ['×', 3], b3: ['−', 3], c1: null, c3: ['×', 2] },
+    name: 'Sunny Stones', sky: 0x9fdcff, padSet: 0,
+    questions: [
+      { text: '12 × 2 = ?', answer: 24, choices: [22, 24, 26] },
+      { text: '6 × 12 = ?', answer: 72, choices: [60, 72, 84] },
+      ODD_DOZEN,
+    ],
   },
   {
-    name: 'Canyon Numbers', sky: 0xffc48a,
-    gates: [48, 150, 144],
-    pads: { a1: ['+', 12], a2: ['+', 24], a3: ['+', 6], b1: ['+', 2], b2: ['×', 3], b3: ['−', 3], c1: ['−', 6], c3: ['×', 2] },
+    name: 'Canyon Numbers', sky: 0xffc48a, padSet: 1,
+    questions: [
+      { text: '12 × 4 = ?', answer: 48, choices: [44, 48, 52] },
+      { text: '150 ÷ 2 = ?', answer: 75, choices: [70, 75, 80] },
+      ODD_DOZEN,
+    ],
   },
   {
-    name: 'Sky Sums', sky: 0xa8e6ff,
-    gates: [36, 90, 144],
-    pads: { a1: ['+', 12], a2: ['+', 12], a3: ['×', 2], b1: ['+', 4], b2: ['+', 50], b3: ['−', 3], c1: null, c3: ['+', 54] },
+    name: 'Sky Sums', sky: 0xa8e6ff, padSet: 2,
+    questions: [
+      { text: '12 + 24 = ?', answer: 36, choices: [34, 36, 38] },
+      { text: '9 × 10 = ?', answer: 90, choices: [80, 90, 100] },
+      ODD_DOZEN,
+    ],
   },
-];
+  {
+    name: 'Odd Dozen', sky: 0xffb3d9, padSet: 0,
+    questions: [
+      { text: '13 × 1 = ?', answer: 13, choices: [12, 13, 14] },
+      { text: '13 × 2 = ?', answer: 26, choices: [24, 26, 28] },
+      ODD_DOZEN,
+    ],
+  },
+  {
+    name: 'Prime Path', sky: 0xb9e6c9, padSet: 1,
+    questions: [
+      { text: 'Which is prime?', answer: 23, choices: [21, 23, 25] },
+      { text: '12 × 5 = ?', answer: 60, choices: [55, 60, 65] },
+      ODD_DOZEN,
+    ],
+  },
+  {
+    name: 'Factor Falls', sky: 0xc9b3ff, padSet: 2,
+    questions: [
+      { text: '12 has ? factors', answer: 6, choices: [4, 6, 8] },
+      { text: '144 ÷ 12 = ?', answer: 12, choices: [10, 12, 14] },
+      ODD_DOZEN,
+    ],
+  },
+  {
+    name: 'Square Steps', sky: 0xffe28a, padSet: 0,
+    questions: [
+      { text: '12² = ?', answer: 144, choices: [124, 144, 164] },
+      { text: '√81 = ?', answer: 9, choices: [8, 9, 10] },
+      ODD_DOZEN,
+    ],
+  },
+  {
+    name: 'Halfway House', sky: 0x9fe0d0, padSet: 1,
+    questions: [
+      { text: 'Half of 36 = ?', answer: 18, choices: [16, 18, 20] },
+      { text: '12 × 3 = ?', answer: 36, choices: [34, 36, 38] },
+      ODD_DOZEN,
+    ],
+  },
+  {
+    name: 'Thirteen Times', sky: 0xffc6a8, padSet: 2,
+    questions: [
+      { text: '13 × 3 = ?', answer: 39, choices: [36, 39, 42] },
+      { text: '13 × 4 = ?', answer: 52, choices: [50, 52, 54] },
+      ODD_DOZEN,
+    ],
+  },
+  {
+    name: 'Number Ninths', sky: 0xa8d8ff, padSet: 0,
+    questions: [
+      { text: '9 × 9 = ?', answer: 81, choices: [72, 81, 90] },
+      { text: '81 ÷ 9 = ?', answer: 9, choices: [7, 9, 11] },
+      ODD_DOZEN,
+    ],
+  },
+  {
+    name: 'Equation Estate', sky: 0xd8c6ff, padSet: 1,
+    questions: [
+      { text: '12 + 12 = ?', answer: 24, choices: [22, 24, 26] },
+      { text: '24 × 3 = ?', answer: 72, choices: [62, 72, 82] },
+      ODD_DOZEN,
+    ],
+  },
+  {
+    name: 'Twelve Dozens', sky: 0xffd2e8, padSet: 2,
+    questions: [
+      { text: '5 × 12 = ?', answer: 60, choices: [50, 60, 70] },
+      { text: '12 × 12 = ?', answer: 144, choices: [134, 144, 154] },
+      ODD_DOZEN,
+    ],
+  },
+].map((level) => ({ ...level, pads: PAD_SETS[level.padSet] }));
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -200,24 +289,24 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     return sign;
   }
 
-  function addPad({ x, z, top, op, amount, underside = false }) {
-    const color = op === '+' ? COLORS.add : op === '−' ? COLORS.sub : (op === '×' && amount >= 0) ? COLORS.mul : COLORS.div;
+  function addPad({ x, z, top, op, amount, underside = false, answer = false }) {
+    const color = answer ? COLORS.purple : op === '+' ? COLORS.add : op === '−' ? COLORS.sub : (op === '×' && amount >= 0) ? COLORS.mul : COLORS.div;
     const tile = boxMesh(2.4, 0.16, 2.4, color, color, 0.55);
     tile.position.set(x, underside ? top - 0.1 : top + 0.07, z);
-    const label = makeLabelSprite(`${op}${amount}`, {
+    const label = makeLabelSprite(answer ? `= ${amount}` : `${op}${amount}`, {
       accent: `#${color.toString(16).padStart(6, '0')}`,
-      scale: 2.6,
+      scale: answer ? 2.3 : 2.6,
       height: 0.65,
     });
     label.position.set(x, underside ? top - 1.7 : top + 1.9, z);
     label.userData.baseScale = label.scale.clone();
     label.userData.mapScale = label.scale.clone().multiplyScalar(2.6);
     levelGroup.add(tile, label);
-    pads.push({ x, z, top, op, amount, color, tile, label, underside, used: false });
+    pads.push({ x, z, top, op, amount, color, tile, label, underside, answer, used: false });
   }
 
-  function addGate({ x, z, top, required, finish = false }) {
-    const gate = { x, z, top, required, open: false, finish };
+  function addGate({ x, z, top, required, question, finish = false }) {
+    const gate = { x, z, top, required, question, open: false, finish };
     const frameColor = COLORS.pink;
     for (const side of [-1, 1]) {
       const pillar = boxMesh(0.7, 4.2, 0.7, frameColor, frameColor, 0.28);
@@ -231,7 +320,12 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
       new THREE.MeshStandardMaterial({ color: COLORS.pink, emissive: COLORS.pink, emissiveIntensity: 0.55, transparent: true, opacity: 0.38, side: THREE.DoubleSide }),
     );
     barrier.position.set(x, top + 2.0, z);
-    const sign = makeLabelSprite(`NEEDS ${required}`, { accent: '#ff9ff3', scale: 4.4, height: 1.1 });
+    const questionText = question ? question.text : `NEEDS ${required}`;
+    const sign = makeLabelSprite(questionText, {
+      accent: '#ff9ff3',
+      scale: questionText.length > 16 ? 3.8 : 4.4,
+      height: 1.1,
+    });
     sign.position.set(x, top + 5.3, z);
     sign.userData.baseScale = sign.scale.clone();
     sign.userData.mapScale = sign.scale.clone().multiplyScalar(2.2);
@@ -244,6 +338,13 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     gate.minY = top; gate.maxY = top + 3.9;
     gates.push(gate);
     return gate;
+  }
+
+  function addQuizPads({ x, z, top, question }) {
+    const xs = [-3.8, 0, 3.8];
+    question.choices.forEach((choice, index) => {
+      addPad({ x: x + xs[index], z, top, op: '=', amount: choice, answer: true });
+    });
   }
 
   function addClimbWall({ x, z, top, w = 7, d = 1.4 }) {
@@ -348,8 +449,9 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     addConfigPad('a3', { x: 2.4, z: -24.2, top: 4.3 });
     const gate1Top = 4.3;
     addPlatform({ x: 0, z: -28.4, top: gate1Top, w: 12, d: 5.2, color: COLORS.blue });
-    const gate1 = addGate({ x: 0, z: -31.0, top: gate1Top, required: cfg.gates[0] });
-    gateCheckpoints.push({ gate: gate1, position: new THREE.Vector3(0, 4.5 + 0.06, -33.6), value: cfg.gates[0] });
+    addQuizPads({ x: 0, z: -29.5, top: gate1Top, question: cfg.questions[0] });
+    const gate1 = addGate({ x: 0, z: -31.0, top: gate1Top, required: cfg.questions[0].answer, question: cfg.questions[0] });
+    gateCheckpoints.push({ gate: gate1, position: new THREE.Vector3(0, 4.5 + 0.06, -33.6), value: cfg.questions[0].answer });
     addPlatform({ x: 0, z: -33.6, top: 4.5, w: 7.4, d: 4.8, color: COLORS.teal });
 
     // Section B: swim.
@@ -363,8 +465,9 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     addConfigPad('b3', { x: 0, z: -56.4, top: 2.1 });
     const gate2Top = 2.3;
     addPlatform({ x: 0, z: -60.6, top: gate2Top, w: 12, d: 5.2, color: COLORS.blue });
-    const gate2 = addGate({ x: 0, z: -63.2, top: gate2Top, required: cfg.gates[1] });
-    gateCheckpoints.push({ gate: gate2, position: new THREE.Vector3(0, 2.5 + 0.06, -65.6), value: cfg.gates[1] });
+    addQuizPads({ x: 0, z: -61.7, top: gate2Top, question: cfg.questions[1] });
+    const gate2 = addGate({ x: 0, z: -63.2, top: gate2Top, required: cfg.questions[1].answer, question: cfg.questions[1] });
+    gateCheckpoints.push({ gate: gate2, position: new THREE.Vector3(0, 2.5 + 0.06, -65.6), value: cfg.questions[1].answer });
     addPlatform({ x: 0, z: -65.6, top: 2.5, w: 7.4, d: 4.8, color: COLORS.teal });
 
     // Section C: tall jump / upside down.
@@ -380,10 +483,11 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     addConfigPad('c3', { x: 0, z: -84.2, top: 1.2 });
     const finishTop = 1.6;
     addPlatform({ x: 0, z: -89.6, top: finishTop, w: 16, d: 10, color: COLORS.gold });
-    const finishGate = addGate({ x: 0, z: -94.6, top: finishTop, required: cfg.gates[2], finish: true });
+    addQuizPads({ x: 0, z: -92.2, top: finishTop, question: cfg.questions[2] });
+    const finishGate = addGate({ x: 0, z: -94.6, top: finishTop, required: cfg.questions[2].answer, question: cfg.questions[2], finish: true });
     finishGate.finish = true;
     finishPoint = { x: 0, y: finishTop + 0.1, z: -94.6 };
-    addSign('144 = 12 DOZEN', { x: 0, y: finishTop + 6.4, z: -101, accent: '#ffc93c', scale: 7.0, height: 1.7 });
+    addSign('156 = 12 ODD DOZEN', { x: 0, y: finishTop + 6.4, z: -101, accent: '#ffc93c', scale: 7.0, height: 1.7 });
     const pad = boxMesh(5.4, 0.14, 5.4, COLORS.gold, COLORS.gold, 0.7);
     pad.position.set(0, finishTop + 0.08, -96.5);
     levelGroup.add(pad);
@@ -513,7 +617,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
       element.objective.textContent = finished
         ? 'Twelve dozen!'
         : gate
-          ? `Level ${levelIndex + 1}: make ${gate.required} — you have ${value}`
+          ? `Q: ${gate.question ? gate.question.text : gate.required} — pick the answer pad`
           : 'Reach the finish';
     }
     if (element.pauseValue) element.pauseValue.textContent = `Your number: ${value} · ${equation}`;
@@ -623,7 +727,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
         gateIndex = Math.min(gateIndex + 1, gates.length);
       }
     }
-    showToast(gate.finish ? 'You made twelve dozen!' : `Gate open · ${gate.required} is correct!`);
+    showToast(gate.finish ? 'Correct! 12 odd dozen = 156!' : `Correct! ${gate.question ? gate.question.text : gate.required} → ${gate.required}`);
     updateHud();
   }
 
@@ -637,7 +741,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     if (element.finishTitle) element.finishTitle.textContent = `Level ${levelIndex + 1} Complete!`;
     if (element.finishTime) element.finishTime.textContent = formatTime(elapsed);
     if (element.finishBest) element.finishBest.textContent = result.isBest ? 'New best time!' : `Best ${formatTime(result.best)}`;
-    if (element.finishValue) element.finishValue.textContent = '144 = 12 × 12';
+    if (element.finishValue) element.finishValue.textContent = '156 = 12 odd dozen (13 × 12)';
     setOverlay(element.finish, true);
     updateHud();
   }
@@ -906,9 +1010,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
       if (isGate) {
         if (elapsed - lastGateToast > 2.5) {
           lastGateToast = elapsed;
-          showToast(blocker.finish
-            ? `The finish needs exactly 144 · you have ${value}`
-            : `Needs ${blocker.required} · you have ${value} — change your number`);
+          showToast(`Q: ${blocker.question ? blocker.question.text : blocker.required} — pick the correct answer pad (you have ${value})`);
         }
       }
       if (!isGate && !isCrate && (player.onGround || player.inWater)) {
@@ -987,15 +1089,16 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
       pad.label.visible = false;
       const before = value;
       const beforePowers = activePowers.slice();
-      if (pad.op === '+') value += pad.amount;
+      if (pad.op === '=') value = pad.amount;
+      else if (pad.op === '+') value += pad.amount;
       else if (pad.op === '−') value -= pad.amount;
       else if (pad.op === '×') value *= pad.amount;
       else if (pad.op === '÷') value = Math.round((value / pad.amount) * 100) / 100;
       const rounded = Math.round(value * 100) / 100;
-      setValue(rounded, `${before} ${pad.op} ${formatAmount(pad.amount)} = ${rounded}`);
+      setValue(rounded, pad.op === '=' ? `Answer ${pad.amount}` : `${before} ${pad.op} ${formatAmount(pad.amount)} = ${rounded}`);
       const gained = activePowers.filter((id) => !beforePowers.includes(id))
         .map((id) => POWER_DEFS.find((definition) => definition.id === id).label);
-      showToast(`${before} ${pad.op} ${formatAmount(pad.amount)} = ${rounded}${gained.length ? ` · ${gained.join(' + ')} unlocked!` : ''}`);
+      showToast(pad.op === '=' ? `Picked ${pad.amount}` : `${before} ${pad.op} ${formatAmount(pad.amount)} = ${rounded}${gained.length ? ` · ${gained.join(' + ')} unlocked!` : ''}`);
       break;
     }
   }

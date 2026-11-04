@@ -9,10 +9,11 @@ menu:
 - **Parkour Obby** — an endless Roblox-style obstacle course: three to five checkpoints
   per level, moving platforms, lava, timer, per-level best times, rotating visual
   themes and simulated online players who actually run, fall and respawn.
-- **12 Dozen** — a 3D math platformer with **three levels**, each with different gate
-  targets and pad values (24/72/144, then 48/150/144, then 36/90/144). Step on
-  `+ − × ÷` pads and use **math powers**: multiples of 3 climb, 4 push, 5 swim,
-  9 jump tall, negatives flip gravity upside down. Best time saved per level.
+- **12 Dozen** — a 3D math platformer with **twelve levels** and a math question at
+  every gate: step on `+ − × ÷` pads for **math powers** (multiples of 3 climb, 4 push,
+  5 swim, 9 jump tall, negatives flip gravity), then choose the right answer from the
+  answer pads. Targets include 24, 72 and the final **156 = 12 odd dozen (12 × 13)**.
+  Best time saved per level.
 - **Jelly Run 2048** — a 3D merge-runner in the spirit of Jelly Run 2048 with **seven
   themed stages** that double the target every time (32 → 64 → 128 → 256 → 512 → 1024 →
   2048): auto-run the jelly lane, switch tracks, merge matching number cubes to double,

@@ -1768,7 +1768,7 @@ const GAMES = {
   },
   dozen: {
     name: '12 Dozen',
-    version: 'Math Platformer · 3 Levels',
+    version: 'Math Platformer · 12 Levels',
     linkLabel: '/?play=dozen',
     movement: true,
     controls: [
@@ -2211,7 +2211,7 @@ function renderLauncher() {
 
   // --- 12 Dozen math platformer card --------------------------------------
   const dozenRecordData = dozenRecord();
-  const dozenLevel = Math.min((dozenRecordData.lastLevel ?? 0) + 1, 3);
+  const dozenLevel = Math.min((dozenRecordData.lastLevel ?? 0) + 1, 12);
   const dozenTime = dozenRecordData.levels?.[dozenLevel] ?? null;
   const dozenLink = document.querySelector('#dozen-launch-link');
   if (dozenLink) {
@@ -2221,11 +2221,11 @@ function renderLauncher() {
     dozenLink.title = `Direct launch link for ${GAMES.dozen.name}`;
   }
   const dozenBestNode = document.querySelector('#dozen-best');
-  if (dozenBestNode) dozenBestNode.textContent = dozenTime != null ? `Level ${dozenLevel}/3 · best ${formatParkourTime(dozenTime)}` : `Level ${dozenLevel}/3 · no best yet`;
+  if (dozenBestNode) dozenBestNode.textContent = dozenTime != null ? `Level ${dozenLevel}/12 · best ${formatParkourTime(dozenTime)}` : `Level ${dozenLevel}/12 · no best yet`;
   const dozenHint = document.querySelector('#dozen-hint');
   if (dozenHint) {
     const runs = dozenRecordData.runs || 0;
-    dozenHint.innerHTML = `3 math levels · next up <strong>Level ${dozenLevel}</strong>${runs ? ` · ${runs} run${runs === 1 ? '' : 's'}` : ''}`;
+    dozenHint.innerHTML = `12 math levels · next up <strong>Level ${dozenLevel}</strong>${runs ? ` · ${runs} run${runs === 1 ? '' : 's'}` : ''}`;
   }
 
   // --- Jelly Run 2048 card ------------------------------------------------
@@ -2493,7 +2493,7 @@ function launchDozen() {
   showScreen('dozen', { focus: false });
   syncLaunchUrl('dozen');
   const dozenLast = dozenRecord().lastLevel;
-  dozen.start(dozenLast == null ? 1 : Math.min(dozenLast + 1, 3));
+  dozen.start(dozenLast == null ? 1 : Math.min(dozenLast + 1, 12));
 }
 
 let jelly = null;
