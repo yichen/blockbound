@@ -1768,7 +1768,7 @@ const GAMES = {
   },
   dozen: {
     name: '12 Dozen',
-    version: 'Math Platformer · 12 Levels',
+    version: 'Math Platformer · Gear Works',
     linkLabel: '/?play=dozen',
     movement: true,
     controls: [

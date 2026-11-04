@@ -247,6 +247,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   const platforms = [];
   const pads = [];
   const gates = [];
+  const movers = [];
   const decorations = [];
   const climbables = [];
   const waters = [];
@@ -274,12 +275,64 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     mesh.position.set(x, top - h / 2, z);
     const rim = boxMesh(w + 0.12, 0.1, d + 0.12, color, color, 0.5);
     rim.position.set(x, top + 0.03, z);
+    platform.mesh = mesh;
+    platform.rim = rim;
     levelGroup.add(mesh, rim);
     platform.minX = x - w / 2; platform.maxX = x + w / 2;
     platform.minY = top - h; platform.maxY = top;
     platform.minZ = z - d / 2; platform.maxZ = z + d / 2;
     platforms.push(platform);
     return platform;
+  }
+
+  function makeGearMesh({ radius = 0.85, teeth = 10, thickness = 0.16, color = 0x8fa6b4 } = {}) {
+    const group = new THREE.Group();
+    const material = new THREE.MeshStandardMaterial({ color, roughness: 0.35, metalness: 0.72, emissive: 0x1d3340, emissiveIntensity: 0.25 });
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.8, radius * 0.8, thickness, 24), material);
+    disc.rotation.x = Math.PI / 2;
+    group.add(disc);
+    for (let i = 0; i < teeth; i++) {
+      const angle = (i / teeth) * Math.PI * 2;
+      const tooth = new THREE.Mesh(new THREE.BoxGeometry(radius * 0.32, radius * 0.24, thickness), material);
+      tooth.position.set(Math.cos(angle) * radius * 0.88, Math.sin(angle) * radius * 0.88, 0);
+      tooth.rotation.z = angle;
+      group.add(tooth);
+    }
+    const hub = new THREE.Mesh(
+      new THREE.CylinderGeometry(radius * 0.24, radius * 0.24, thickness * 1.3, 12),
+      new THREE.MeshStandardMaterial({ color: 0xffd166, roughness: 0.3, metalness: 0.8, emissive: 0xffc93c, emissiveIntensity: 0.35 }),
+    );
+    hub.rotation.x = Math.PI / 2;
+    group.add(hub);
+    return group;
+  }
+
+  function addLift({ x, z, w = 3.6, d = 2.8, low = 1.0, high = 4.3, phase = 0, speed = 1.1, data = 24 }) {
+    const platform = addPlatform({ x, z, top: low, w, d, h: 0.5, color: 0x5f7684 });
+    const gear = makeGearMesh({ radius: 0.62, teeth: 8 + Math.round(data) % 9, thickness: 0.14, color: 0x9fb3c0 });
+    gear.position.set(x, low - 0.55, z + d / 2 + 0.08);
+    levelGroup.add(gear);
+    const plaque = makeLabelSprite(`GEAR LIFT · ${data}T`, { accent: '#ffd166', scale: 3.0, height: 0.7 });
+    plaque.position.set(x, low + 2.0, z + d / 2 + 0.08);
+    levelGroup.add(plaque);
+    platform.mover = { low, high, phase, speed, gear, plaque };
+    movers.push(platform);
+    return platform;
+  }
+
+  function addMachinePlaque(cfg) {
+    const answers = cfg.questions.map((q) => q.answer);
+    const label = makeLabelSprite(`GEARBOX · ${answers.join(' / ')}`, { accent: '#ffd166', scale: 4.6, height: 1.0 });
+    label.position.set(-7.4, 3.1, -3.2);
+    levelGroup.add(label);
+    for (const side of [-1, 1]) {
+      const gear = makeGearMesh({ radius: 1.15, teeth: 10, thickness: 0.2, color: 0x7f98a8 });
+      gear.position.set(side * 7.2, 1.2, -1.6);
+      levelGroup.add(gear);
+      const pipe = boxMesh(0.4, 2.2, 0.4, 0x526975, 0x0, 0);
+      pipe.position.set(side * 7.2, 0.2, -1.6);
+      levelGroup.add(pipe);
+    }
   }
 
   function addSign(text, { x, y, z, accent = '#7be3cb', scale = 4.2, height = 1.05 } = {}) {
@@ -291,8 +344,15 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
 
   function addPad({ x, z, top, op, amount, underside = false, answer = false }) {
     const color = answer ? COLORS.purple : op === '+' ? COLORS.add : op === '−' ? COLORS.sub : (op === '×' && amount >= 0) ? COLORS.mul : COLORS.div;
-    const tile = boxMesh(2.4, 0.16, 2.4, color, color, 0.55);
-    tile.position.set(x, underside ? top - 0.1 : top + 0.07, z);
+    let tile;
+    if (answer) {
+      tile = makeGearMesh({ radius: 1.05, teeth: 8 + Math.abs(Math.round(amount)) % 9, thickness: 0.16, color: 0xb38bff });
+      tile.rotation.x = -Math.PI / 2;
+      tile.position.set(x, top + 0.08, z);
+    } else {
+      tile = boxMesh(2.4, 0.16, 2.4, color, color, 0.55);
+      tile.position.set(x, underside ? top - 0.1 : top + 0.07, z);
+    }
     const label = makeLabelSprite(answer ? `= ${amount}` : `${op}${amount}`, {
       accent: `#${color.toString(16).padStart(6, '0')}`,
       scale: answer ? 2.3 : 2.6,
@@ -306,23 +366,48 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
   }
 
   function addGate({ x, z, top, required, question, finish = false }) {
-    const gate = { x, z, top, required, question, open: false, finish };
-    const frameColor = COLORS.pink;
+    const gate = { x, z, top, required, question, open: false, finish, openProgress: 0 };
+    const answer = question ? question.answer : required;
+    const teeth = 9 + Math.abs(Math.round(answer)) % 11;
+    const frameColor = 0x6d8492;
+    const accent = finish ? COLORS.gold : COLORS.pink;
     for (const side of [-1, 1]) {
-      const pillar = boxMesh(0.7, 4.2, 0.7, frameColor, frameColor, 0.28);
-      pillar.position.set(x + side * 5.4, top + 2.1, z);
+      const pillar = boxMesh(0.8, 4.4, 0.8, frameColor, frameColor, 0.18);
+      pillar.position.set(x + side * 5.4, top + 2.2, z);
       levelGroup.add(pillar);
+      const gear = makeGearMesh({ radius: 0.92, teeth, thickness: 0.18, color: 0x9fb3c0 });
+      gear.position.set(x + side * 5.4, top + 2.4, z + 0.58);
+      levelGroup.add(gear);
+      gate[side < 0 ? 'gearLeft' : 'gearRight'] = gear;
+      const pistonBase = boxMesh(0.36, 0.36, 1.6, 0x8a9baa);
+      pistonBase.position.set(x + side * 2.8, top + 3.9, z - 0.2);
+      levelGroup.add(pistonBase);
     }
-    const bar = boxMesh(11.5, 0.6, 0.7, frameColor, frameColor, 0.4);
+    const bar = boxMesh(11.5, 0.6, 0.7, frameColor, frameColor, 0.25);
     bar.position.set(x, top + 4.1, z);
     const barrier = new THREE.Mesh(
       new THREE.PlaneGeometry(10.2, 3.8),
-      new THREE.MeshStandardMaterial({ color: COLORS.pink, emissive: COLORS.pink, emissiveIntensity: 0.55, transparent: true, opacity: 0.38, side: THREE.DoubleSide }),
+      new THREE.MeshStandardMaterial({ color: accent, emissive: accent, emissiveIntensity: 0.28, transparent: true, opacity: 0.22, side: THREE.DoubleSide }),
     );
-    barrier.position.set(x, top + 2.0, z);
+    barrier.position.set(x, top + 2.0, z + 0.06);
+    const doors = [];
+    for (const side of [-1, 1]) {
+      const door = new THREE.Mesh(
+        new THREE.BoxGeometry(5.1, 3.8, 0.22),
+        new THREE.MeshStandardMaterial({ color: 0x405866, roughness: 0.38, metalness: 0.62, emissive: 0x15252e, emissiveIntensity: 0.25 }),
+      );
+      door.position.set(x + side * 2.56, top + 2.0, z);
+      door.userData.closedX = door.position.x;
+      door.userData.side = side;
+      levelGroup.add(door);
+      doors.push(door);
+      const stripe = boxMesh(0.16, 3.4, 0.3, accent, accent, 0.8);
+      stripe.position.set(x + side * 5.02, top + 2.0, z + 0.05);
+      levelGroup.add(stripe);
+    }
     const questionText = question ? question.text : `NEEDS ${required}`;
     const sign = makeLabelSprite(questionText, {
-      accent: '#ff9ff3',
+      accent: finish ? '#ffd166' : '#ff9ff3',
       scale: questionText.length > 16 ? 3.8 : 4.4,
       height: 1.1,
     });
@@ -333,6 +418,8 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     gate.barrier = barrier;
     gate.bar = bar;
     gate.sign = sign;
+    gate.doors = doors;
+    gate.gearSpeed = 0.45 + (Math.abs(Math.round(answer)) % 7) * 0.12;
     gate.minX = x - 5.4; gate.maxX = x + 5.4;
     gate.minZ = z - 0.5; gate.maxZ = z + 0.5;
     gate.minY = top; gate.maxY = top + 3.9;
@@ -422,6 +509,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     platforms.length = 0;
     pads.length = 0;
     gates.length = 0;
+    movers.length = 0;
     decorations.length = 0;
     climbables.length = 0;
     waters.length = 0;
@@ -436,6 +524,10 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
 
     addPlatform({ x: 0, z: 0, top: 0, w: 14, d: 14, h: 1.4, color: COLORS.white });
     addDozenDecor();
+    addMachinePlaque(cfg);
+    addLift({ x: -4.7, z: -24.0, low: 0.9 + (cfg.questions[0].answer % 4) * 0.12, high: 4.3, phase: levelIndex * 0.9, speed: 0.8 + (cfg.questions[0].answer % 5) * 0.07, data: cfg.questions[0].answer });
+    addLift({ x: 4.7, z: -56.0, low: 2.0, high: 5.6, phase: 1.8 + levelIndex * 0.7, speed: 0.9 + (cfg.questions[1].answer % 5) * 0.08, data: cfg.questions[1].answer });
+    addLift({ x: -6.8, z: -82.0, low: 1.2, high: 4.4, phase: 3.1 + levelIndex * 0.5, speed: 0.7 + (cfg.questions[2].answer % 5) * 0.06, data: cfg.questions[2].answer });
 
     // Section A: climb / push.
     addPlatform({ x: 0, z: -9, top: 0.4, w: 5.8, d: 4.8, color: COLORS.teal });
@@ -1270,6 +1362,34 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     camera.lookAt(cameraTarget);
   }
 
+  function updateMachines(dt) {
+    const time = performance.now() * 0.001;
+    for (const mover of movers) {
+      const wave = 0.5 + 0.5 * Math.sin(time * mover.mover.speed + mover.mover.phase);
+      const top = mover.mover.low + (mover.mover.high - mover.mover.low) * wave;
+      const delta = top - mover.top;
+      mover.top = top;
+      mover.minY = top - mover.h;
+      mover.maxY = top;
+      mover.mesh.position.y = top - mover.h / 2;
+      mover.rim.position.y = top + 0.03;
+      if (player.ground === mover && player.onGround) player.position.y += delta;
+      mover.mover.gear.rotation.z += dt * (1.2 + mover.mover.speed);
+      mover.mover.plaque.position.y = top + 2.0;
+    }
+    for (const gate of gates) {
+      if (gate.gearLeft) gate.gearLeft.rotation.z += dt * gate.gearSpeed;
+      if (gate.gearRight) gate.gearRight.rotation.z -= dt * gate.gearSpeed;
+      if (gate.open) {
+        gate.openProgress = Math.min(1, (gate.openProgress || 0) + dt * 1.8);
+        const eased = 1 - Math.pow(1 - gate.openProgress, 3);
+        for (const door of gate.doors) {
+          door.position.x = door.userData.closedX + door.userData.side * eased * 5.3;
+        }
+      }
+    }
+  }
+
   function updateVisuals(dt, time) {
     playerGroup.position.copy(player.position);
     valueSprite.position.y = (value < 0 ? -1.0 : PLAYER_HEIGHT + 0.9) + Math.sin(time * 2.2) * 0.06;
@@ -1307,6 +1427,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
     if (respawnTimer > 0) respawnTimer = Math.max(0, respawnTimer - dt);
     if (!paused && !finished) {
       if (running) elapsed += dt;
+      updateMachines(dt);
       physics(dt);
       updateCamera(dt);
       updateHud();
@@ -1355,6 +1476,7 @@ export function createDozen({ canvas, renderer, getBest, onFinish, onExit }) {
       waters: waters.map((water) => ({ x: water.x, z: water.z, surface: water.surface, minX: water.minX, maxX: water.maxX, minZ: water.minZ, maxZ: water.maxZ })),
       crates: crates.map((crate) => ({ x: crate.x, z: crate.z, y: crate.y, falling: crate.falling, removed: crate.removed })),
       pads: pads.map((pad) => ({ x: pad.x, z: pad.z, top: pad.top, op: pad.op, amount: pad.amount, underside: pad.underside, used: pad.used })),
+      movers: movers.map((mover) => ({ x: mover.x, z: mover.z, top: mover.top, low: mover.mover.low, high: mover.mover.high })),
     });
     api.debugGate = (index) => gates[index] ? { x: gates[index].x, z: gates[index].z, top: gates[index].top, required: gates[index].required, open: gates[index].open } : null;
     api.debugFinishPoint = () => finishPoint;
