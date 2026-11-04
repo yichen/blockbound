@@ -246,6 +246,9 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
   // always builds the same course (fair best times) while difficulty ramps forever.
   const platforms = [];
   const hazards = [];
+  const saws = [];
+  const lasers = [];
+  const spikeTraps = [];
   const checkpoints = [];
   const otherPlayers = [];
   const COURSE_COLORS = [COLORS.teal, COLORS.lime, COLORS.yellow, COLORS.purple, COLORS.blue, COLORS.coral];
@@ -309,6 +312,114 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     mesh.position.set(x, y, z);
     levelGroup.add(mesh);
     hazards.push({ minX: x - w / 2, maxX: x + w / 2, minY: y - h / 2, maxY: y + h / 2, minZ: z - d / 2, maxZ: z + d / 2 });
+  }
+
+  function addSawBlade(platform, rng) {
+    const radius = 0.55;
+    const offsetX = (rng() < 0.5 ? -1 : 1) * platform.w * (0.24 + rng() * 0.1);
+    const offsetZ = (rng() < 0.5 ? -1 : 1) * platform.d * (0.24 + rng() * 0.1);
+    const x = platform.x + offsetX;
+    const z = platform.z + offsetZ;
+    const group = new THREE.Group();
+    const metal = new THREE.MeshStandardMaterial({ color: 0xdfe9ff, roughness: 0.24, metalness: 0.9, emissive: 0x9fe8ff, emissiveIntensity: 0.2 });
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.14, 20), metal);
+    disc.rotation.x = Math.PI / 2;
+    group.add(disc);
+    const hub = new THREE.Mesh(
+      new THREE.CylinderGeometry(radius * 0.28, radius * 0.28, 0.2, 10),
+      new THREE.MeshStandardMaterial({ color: 0xff5c8a, emissive: 0xff5c8a, emissiveIntensity: 0.8, roughness: 0.3 }),
+    );
+    hub.rotation.x = Math.PI / 2;
+    group.add(hub);
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const tooth = new THREE.Mesh(
+        new THREE.ConeGeometry(radius * 0.2, radius * 0.46, 4),
+        metal,
+      );
+      tooth.position.set(Math.cos(angle) * radius * 0.92, Math.sin(angle) * radius * 0.92, 0);
+      tooth.rotation.z = angle - Math.PI / 2;
+      group.add(tooth);
+    }
+    group.position.set(x, platform.top + 0.65, z);
+    levelGroup.add(group);
+    saws.push({
+      group, x, z, top: platform.top, speed: 2.4 + rng() * 2.2,
+      hazard: {
+        minX: x - 0.44, maxX: x + 0.44,
+        minY: platform.top + 0.12, maxY: platform.top + 1.1,
+        minZ: z - 0.44, maxZ: z + 0.44,
+      },
+    });
+  }
+
+  function addLaserGate(a, b, rng) {
+    const x = (a.x + b.x) / 2;
+    const z = (a.z + b.z) / 2;
+    const base = Math.min(a.top, b.top) + 0.15;
+    const height = 3.1;
+    const beam = boxMesh(0.22, height, 0.22, 0xff4d6d, 0xff4d6d, 1.0);
+    beam.position.set(x, base + height / 2, z);
+    beam.material.transparent = true;
+    beam.material.opacity = 0.9;
+    levelGroup.add(beam);
+    for (const side of [-1, 1]) {
+      const cap = boxMesh(0.5, 0.16, 0.5, 0x8a9baa, 0x0, 0);
+      cap.position.set(x, base + (side > 0 ? height : 0), z);
+      levelGroup.add(cap);
+    }
+    lasers.push({
+      group: beam, x, z, base, height, phase: rng() * Math.PI * 2, active: false,
+      hazard: {
+        minX: x - 0.24, maxX: x + 0.24,
+        minY: base + 0.1, maxY: base + height,
+        minZ: z - 0.24, maxZ: z + 0.24,
+      },
+    });
+  }
+
+  function addSpikeTrap(platform, x, z) {
+    const spikes = new THREE.Group();
+    for (const [dx, dz] of [[-0.36, -0.36], [0.36, -0.36], [-0.36, 0.36], [0.36, 0.36]]) {
+      const spike = new THREE.Mesh(
+        new THREE.ConeGeometry(0.26, 0.65, 4),
+        new THREE.MeshStandardMaterial({ color: 0xff7676, emissive: 0xff4d6d, emissiveIntensity: 0.65, roughness: 0.35 }),
+      );
+      spike.position.set(dx, 0.33, dz);
+      spikes.add(spike);
+    }
+    spikes.position.set(x, platform.top + 0.02, z);
+    levelGroup.add(spikes);
+    spikeTraps.push({
+      group: spikes,
+      hazard: {
+        minX: x - 0.62, maxX: x + 0.62,
+        minY: platform.top, maxY: platform.top + 0.7,
+        minZ: z - 0.62, maxZ: z + 0.62,
+      },
+    });
+  }
+
+  function addCourseObstacles(rng, difficulty) {
+    // Saw blades on some hop platforms.
+    for (const platform of platforms) {
+      if (platform.role || platform === spawnPlatform) continue;
+      if (rng() < 0.16 + difficulty * 0.3) addSawBlade(platform, rng);
+    }
+    // Guarantee at least one saw on early levels too.
+    const sawCandidates = platforms.filter((platform) => !platform.role && platform !== spawnPlatform);
+    if (saws.length === 0 && sawCandidates.length) addSawBlade(sawCandidates[Math.min(sawCandidates.length - 1, 2)], rng);
+    // Timed laser gates over a few gaps.
+    for (let i = 1; i < platforms.length - 1; i++) {
+      if (rng() < 0.12 + difficulty * 0.22) addLaserGate(platforms[i], platforms[i + 1], rng);
+    }
+    // Spike traps in the corners of checkpoint pads.
+    for (const checkpoint of checkpoints) {
+      const platform = checkpoint.platform;
+      for (const side of [-1, 1]) {
+        addSpikeTrap(platform, platform.x + side * (platform.w * 0.32), platform.z + platform.d * 0.32);
+      }
+    }
   }
 
   function addCheckpoint(index, platform) {
@@ -630,6 +741,9 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     disposeGroup(levelGroup);
     platforms.length = 0;
     hazards.length = 0;
+    saws.length = 0;
+    lasers.length = 0;
+    spikeTraps.length = 0;
     checkpoints.length = 0;
     otherPlayers.length = 0;
     finish = null;
@@ -661,6 +775,7 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     });
 
     spawnPlatform = addPlatform({ x: 0, z: 0, top: 0, w: 16, d: 16, h: 1.6, color: theme.spawn, emissive: theme.trim, emissiveIntensity: 0.12 });
+    spawnPlatform.role = 'spawn';
     spawn = new THREE.Vector3(0, spawnPlatform.top + 0.06, 4.5);
     addSpawnDressing(spawnPlatform, theme);
 
@@ -706,6 +821,7 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
       top += 0.35;
       x = clamp(x + (rng() * 2 - 1) * 1.5, -13, 13);
       const cpPlatform = addPlatform({ x, z, top, w: cpSize, d: cpSize, color: theme.checkpoint });
+      cpPlatform.role = 'checkpoint';
       addCheckpoint(checkpoints.length + 1, cpPlatform);
       // Lava pools under later stretches (the first section stays friendly).
       if (section > 0) addHazard({ x: clamp(x, -10, 10), z: z + 10, y: 0.3, w: 30, h: 0.6, d: 24 });
@@ -720,7 +836,9 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     top += 0.5;
     x = clamp(x + (rng() * 2 - 1) * 1.2, -10, 10);
     const finishPlatform = addPlatform({ x, z, top, w: finishHalf * 2, d: finishHalf * 2, h: 1.4, color: COLORS.gold, emissive: COLORS.gold, emissiveIntensity: 0.28 });
+    finishPlatform.role = 'finish';
     addFinish(finishPlatform);
+    addCourseObstacles(rng, difficulty);
 
     buildRunners();
 
@@ -1068,6 +1186,15 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
     for (const hazard of hazards) {
       if (overlapsHazard(box, hazard)) { respawn('You touched the lava!'); return; }
     }
+    for (const saw of saws) {
+      if (overlapsHazard(box, saw.hazard)) { respawn('Sliced by a saw blade!'); return; }
+    }
+    for (const trap of spikeTraps) {
+      if (overlapsHazard(box, trap.hazard)) { respawn('Ouch — spike trap!'); return; }
+    }
+    for (const laser of lasers) {
+      if (laser.active && overlapsHazard(box, laser.hazard)) { respawn('Zapped by a laser gate!'); return; }
+    }
     if (player.position.y < VOID_Y) { respawn('You fell!'); return; }
 
     for (const checkpoint of checkpoints) {
@@ -1297,6 +1424,14 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
       if (item.drift) item.mesh.position.x = item.baseX + Math.sin(courseTime * 0.08 * item.drift) * 9;
       else item.mesh.position.y = item.baseY + Math.sin(courseTime * 0.5 + item.mesh.position.x) * 0.35;
     }
+    for (const saw of saws) saw.group.rotation.z += saw.speed * dt;
+    for (const laser of lasers) {
+      laser.active = Math.sin(courseTime * 2.4 + laser.phase) > 0.1;
+      laser.group.material.opacity = laser.active ? 0.95 : 0.12;
+      laser.group.scale.x = laser.active ? 1 : 0.55;
+      laser.group.scale.z = laser.active ? 1 : 0.55;
+    }
+    for (const trap of spikeTraps) trap.group.rotation.y = Math.sin(courseTime * 1.6) * 0.18;
     if (!paused && !finished) for (const runner of otherPlayers) updateRunner(runner, dt);
     if (finishPad) finishPad.rotation.y += dt * 0.9;
     for (const checkpoint of checkpoints) {
@@ -1338,6 +1473,8 @@ export function createParkour({ canvas, renderer, getBest, onFinish, onExit, onl
       })),
       checkpoints: checkpoints.map((checkpoint) => ({ x: checkpoint.x, z: checkpoint.z, top: checkpoint.top })),
       hazards: hazards.map((hazard) => ({ minX: hazard.minX, maxX: hazard.maxX, minY: hazard.minY, maxY: hazard.maxY, minZ: hazard.minZ, maxZ: hazard.maxZ })),
+      saws: saws.length, lasers: lasers.length, spikeTraps: spikeTraps.length,
+      obstacles: [...saws.map((saw) => ({ type: 'saw', x: saw.x, z: saw.z, top: saw.top })), ...lasers.map((laser) => ({ type: 'laser', x: laser.x, z: laser.z, top: laser.base })), ...spikeTraps.map((trap) => ({ type: 'spikes', x: trap.hazard.minX + 0.62, z: trap.hazard.minZ + 0.62 }))],
       finish: finish ? { x: finish.x, z: finish.z, top: finish.top } : null,
     });
     api.debugScene = () => ({ sceneChildren: scene.children.length, levelChildren: levelGroup.children.length });
